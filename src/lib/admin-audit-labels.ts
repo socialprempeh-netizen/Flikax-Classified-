@@ -11,6 +11,7 @@ export const ADMIN_AUDIT_ACTION_LABELS: Record<string, string> = {
   "user.unban": "Unbanned user",
   "user.delete": "Deleted user",
   "user.warn": "Warned user",
+  "user.verify_toggle": "Toggled seller verification",
   "admin.role_change": "Changed admin role",
   "admin.grant_access": "Granted admin access",
   "report.status_change": "Changed report status",

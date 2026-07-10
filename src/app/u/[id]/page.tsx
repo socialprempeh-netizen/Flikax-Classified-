@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Smile, Meh, Frown } from "lucide-react";
+import { Smile, Meh, Frown, BadgeCheck } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { getInitials } from "@/lib/avatar";
 import { SiteHeader } from "@/components/site-header";
@@ -14,7 +14,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const [{ data: userData }, { data: profile }, { data: feedback }] = await Promise.all([
     getUser(),
-    supabase.from("profiles").select("id, full_name").eq("id", id).maybeSingle(),
+    supabase.from("profiles").select("id, full_name, verified").eq("id", id).maybeSingle(),
     supabase
       .from("profile_feedback")
       .select(
@@ -45,7 +45,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             {getInitials(profile.full_name) || "F"}
           </span>
           <div>
-            <p className="text-lg font-bold text-neutral-800">{profile.full_name || "Flikax user"}</p>
+            <p className="flex items-center gap-1.5 text-lg font-bold text-neutral-800">
+              {profile.full_name || "Flikax user"}
+              {profile.verified && (
+                <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
+                  <BadgeCheck className="size-3.5" />
+                  Verified
+                </span>
+              )}
+            </p>
             <p className="text-sm text-neutral-500">Seller on Flikax</p>
           </div>
         </div>

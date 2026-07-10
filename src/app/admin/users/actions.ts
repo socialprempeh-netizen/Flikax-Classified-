@@ -84,6 +84,17 @@ export async function deleteUserAction(userId: string) {
   revalidatePath("/admin/users");
 }
 
+export async function toggleVerifiedAction(userId: string, verified: boolean) {
+  const { adminClient, actorId } = await requireAdminActor();
+
+  const { error } = await adminClient.from("profiles").update({ verified }).eq("id", userId);
+  if (error) throw new Error(error.message);
+
+  await logAdminAction({ actorId, action: "user.verify_toggle", targetType: "user", targetId: userId, detail: { verified } });
+  revalidateUser(userId);
+  revalidatePath(`/u/${userId}`);
+}
+
 export async function logWarningAction(userId: string, message: string) {
   const { adminClient, actorId } = await requireAdminActor();
   if (!message.trim()) throw new Error("Enter a message.");

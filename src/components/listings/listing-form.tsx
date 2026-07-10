@@ -40,7 +40,7 @@ export type ExistingListing = {
   location: string;
   negotiable: string | null;
   category_id: string;
-  attributes: Record<string, string>;
+  attributes: Record<string, string | string[]>;
   video_url: string | null;
   contact_phone: string | null;
   images: { id: string; storage_path: string; url: string }[];
@@ -76,7 +76,7 @@ export function ListingForm({
   const [step, setStep] = useState<1 | 2>(1);
   const [parentId, setParentId] = useState(initialCategory?.parent_id ?? "");
   const [categoryId, setCategoryId] = useState(existingListing?.category_id ?? "");
-  const [attributes, setAttributes] = useState<Record<string, string>>(
+  const [attributes, setAttributes] = useState<Record<string, string | string[]>>(
     existingListing?.attributes ?? {}
   );
   const [description, setDescription] = useState(existingListing?.description ?? "");
@@ -118,6 +118,14 @@ export function ListingForm({
 
   function setAttribute(key: string, value: string) {
     setAttributes((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function toggleTagAttribute(key: string, tag: string) {
+    setAttributes((prev) => {
+      const current = Array.isArray(prev[key]) ? (prev[key] as string[]) : [];
+      const next = current.includes(tag) ? current.filter((t) => t !== tag) : [...current, tag];
+      return { ...prev, [key]: next };
+    });
   }
 
   async function uploadOne(file: File, accessToken: string | undefined) {
@@ -218,7 +226,10 @@ export function ListingForm({
       return;
     }
     for (const field of dynamicFields) {
-      if (field.required && !attributes[field.key]?.trim()) {
+      if (!field.required) continue;
+      const value = attributes[field.key];
+      const isEmpty = Array.isArray(value) ? value.length === 0 : !value?.trim();
+      if (isEmpty) {
         setError(`${field.label} is required.`);
         return;
       }
@@ -442,65 +453,98 @@ export function ListingForm({
 
           {genericFields.length > 0 && categoryId && (
             <div className="grid grid-cols-2 gap-4">
-              {genericFields.map((field) => (
-                <label
-                  key={field.key}
-                  className={field.type === "boolean" ? "flex items-center gap-2 pt-6" : "block"}
-                >
-                  {field.type !== "boolean" && (
-                    <span className="mb-1 block text-sm font-medium text-neutral-700">
-                      {field.label}
-                      {field.required && "*"}
-                    </span>
-                  )}
-                  {field.type === "text" && (
-                    <input
-                      type="text"
-                      required={field.required}
-                      value={attributes[field.key] ?? ""}
-                      onChange={(e) => setAttribute(field.key, e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
-                    />
-                  )}
-                  {field.type === "number" && (
-                    <input
-                      type="number"
-                      required={field.required}
-                      value={attributes[field.key] ?? ""}
-                      onChange={(e) => setAttribute(field.key, e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
-                    />
-                  )}
-                  {field.type === "select" && (
-                    <select
-                      required={field.required}
-                      value={attributes[field.key] ?? ""}
-                      onChange={(e) => setAttribute(field.key, e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
-                    >
-                      <option value="" disabled>
-                        Select {field.label.toLowerCase()}
-                      </option>
-                      {field.options?.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  {field.type === "boolean" && (
-                    <>
+              {genericFields.map((field) => {
+                const scalarValue = (attributes[field.key] as string | undefined) ?? "";
+                const tagValues = Array.isArray(attributes[field.key]) ? (attributes[field.key] as string[]) : [];
+
+                return (
+                  <label
+                    key={field.key}
+                    className={
+                      field.type === "boolean" || field.type === "tags"
+                        ? field.type === "boolean"
+                          ? "flex items-center gap-2 pt-6"
+                          : "col-span-2 block"
+                        : "block"
+                    }
+                  >
+                    {field.type !== "boolean" && (
+                      <span className="mb-1 block text-sm font-medium text-neutral-700">
+                        {field.label}
+                        {field.required && "*"}
+                      </span>
+                    )}
+                    {field.type === "text" && (
                       <input
-                        type="checkbox"
-                        checked={attributes[field.key] === "yes"}
-                        onChange={(e) => setAttribute(field.key, e.target.checked ? "yes" : "no")}
-                        className="size-4 accent-brand"
+                        type="text"
+                        required={field.required}
+                        value={scalarValue}
+                        onChange={(e) => setAttribute(field.key, e.target.value)}
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
                       />
-                      <span className="text-sm font-medium text-neutral-700">{field.label}</span>
-                    </>
-                  )}
-                </label>
-              ))}
+                    )}
+                    {field.type === "number" && (
+                      <input
+                        type="number"
+                        required={field.required}
+                        value={scalarValue}
+                        onChange={(e) => setAttribute(field.key, e.target.value)}
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                      />
+                    )}
+                    {field.type === "select" && (
+                      <select
+                        required={field.required}
+                        value={scalarValue}
+                        onChange={(e) => setAttribute(field.key, e.target.value)}
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                      >
+                        <option value="" disabled>
+                          Select {field.label.toLowerCase()}
+                        </option>
+                        {field.options?.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {field.type === "boolean" && (
+                      <>
+                        <input
+                          type="checkbox"
+                          checked={scalarValue === "yes"}
+                          onChange={(e) => setAttribute(field.key, e.target.checked ? "yes" : "no")}
+                          className="size-4 accent-brand"
+                        />
+                        <span className="text-sm font-medium text-neutral-700">{field.label}</span>
+                      </>
+                    )}
+                    {field.type === "tags" && (
+                      <div className="flex flex-wrap gap-2">
+                        {field.options?.map((opt) => {
+                          const isSelected = tagValues.includes(opt);
+                          return (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => toggleTagAttribute(field.key, opt)}
+                              aria-pressed={isSelected}
+                              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                isSelected
+                                  ? "border-brand bg-brand-light text-brand"
+                                  : "border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </label>
+                );
+              })}
             </div>
           )}
 

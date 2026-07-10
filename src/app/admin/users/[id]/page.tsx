@@ -77,6 +77,11 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                   {profile.role === "super_admin" ? "Super Admin" : "Admin"}
                 </span>
               )}
+              {profile.verified && (
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
+                  Verified
+                </span>
+              )}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-3 text-sm text-neutral-600 sm:grid-cols-3">
               <div>
@@ -177,6 +182,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             userId={profile.id}
             suspended={status === "suspended"}
             banned={status === "banned"}
+            verified={profile.verified}
           />
         </div>
       </div>

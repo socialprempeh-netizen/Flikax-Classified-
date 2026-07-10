@@ -48,10 +48,22 @@ export default async function AdminListingDetailPage({ params }: { params: Promi
   }
 
   const fields = getFieldsForCategory(topLevelSlug ?? undefined);
-  const attributes = (listing.attributes ?? {}) as Record<string, string>;
+  const attributes = (listing.attributes ?? {}) as Record<string, string | string[]>;
+
   const specs = fields
-    .map((field) => ({ key: field.key, label: field.label, value: attributes[field.key] }))
+    .filter((field) => field.type !== "tags")
+    .map((field) => ({ key: field.key, label: field.label, value: attributes[field.key] as string | undefined }))
     .filter((spec) => spec.value);
+
+  const tagSpecs = fields
+    .filter((field) => field.type === "tags")
+    .map((field) => ({
+      key: field.key,
+      label: field.label,
+      values: (attributes[field.key] as string[] | undefined) ?? [],
+    }))
+    .filter((spec) => spec.values.length > 0);
+
   const headlineKeys = topLevelSlug ? (HEADLINE_FIELD_KEYS[topLevelSlug] ?? []) : [];
   const headlineSpecs = specs.filter((spec) => headlineKeys.includes(spec.key));
 
@@ -145,6 +157,22 @@ export default async function AdminListingDetailPage({ params }: { params: Promi
                 ))}
               </div>
             )}
+
+            {tagSpecs.map((spec) => (
+              <div key={spec.key} className="mt-4 border-t border-neutral-100 pt-4">
+                <h2 className="mb-2 text-sm font-bold text-neutral-800">{spec.label}</h2>
+                <div className="flex flex-wrap gap-2">
+                  {spec.values.map((value) => (
+                    <span
+                      key={value}
+                      className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700"
+                    >
+                      {value}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
 
             {listing.description && (
               <div className="mt-4 border-t border-neutral-100 pt-4">

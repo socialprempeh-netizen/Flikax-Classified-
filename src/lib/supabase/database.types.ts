@@ -595,6 +595,7 @@ export type Database = {
           sex: string | null
           suspended_until: string | null
           updated_at: string
+          verified: boolean
         }
         Insert: {
           created_at?: string
@@ -609,6 +610,7 @@ export type Database = {
           sex?: string | null
           suspended_until?: string | null
           updated_at?: string
+          verified?: boolean
         }
         Update: {
           created_at?: string
@@ -623,6 +625,7 @@ export type Database = {
           sex?: string | null
           suspended_until?: string | null
           updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }

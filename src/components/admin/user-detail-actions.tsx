@@ -9,6 +9,7 @@ import {
   unbanUserAction,
   deleteUserAction,
   logWarningAction,
+  toggleVerifiedAction,
 } from "@/app/admin/users/actions";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { withAuthRetry } from "@/lib/auth-retry";
@@ -19,10 +20,12 @@ export function UserDetailActions({
   userId,
   suspended,
   banned,
+  verified,
 }: {
   userId: string;
   suspended: boolean;
   banned: boolean;
+  verified: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -51,6 +54,32 @@ export function UserDetailActions({
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       <div className="mt-3 border-t border-neutral-100 pt-4">
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          Verification
+        </span>
+        {verified ? (
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => run(() => toggleVerifiedAction(userId, false))}
+            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+          >
+            Remove verification
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => run(() => toggleVerifiedAction(userId, true))}
+            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark disabled:opacity-60"
+          >
+            Mark as verified
+          </button>
+        )}
+        <p className="mt-1 text-xs text-neutral-400">Shows a verified badge on their public profile.</p>
+      </div>
+
+      <div className="mt-4 border-t border-neutral-100 pt-4">
         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
           Suspend posting
         </span>

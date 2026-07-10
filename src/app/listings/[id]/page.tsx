@@ -15,6 +15,7 @@ import {
   HardDrive,
   Tag,
   Layers,
+  BadgeCheck,
   type LucideIcon,
 } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
@@ -78,7 +79,7 @@ export default async function ListingDetailPage({
     supabase
       .from("listings")
       .select(
-        "*, categories(id, name, slug, parent_id), listing_images(storage_path, position), profiles(full_name, phone)"
+        "*, categories(id, name, slug, parent_id), listing_images(storage_path, position), profiles(full_name, phone, verified)"
       )
       .eq("id", id)
       .maybeSingle(),
@@ -130,10 +131,21 @@ export default async function ListingDetailPage({
   const initialSaved = Boolean(savedResult.data);
 
   const fields = getFieldsForCategory(topLevelSlug ?? undefined);
-  const attributes = (listing.attributes ?? {}) as Record<string, string>;
+  const attributes = (listing.attributes ?? {}) as Record<string, string | string[]>;
+
   const specs = fields
-    .map((field) => ({ key: field.key, label: field.label, value: attributes[field.key] }))
+    .filter((field) => field.type !== "tags")
+    .map((field) => ({ key: field.key, label: field.label, value: attributes[field.key] as string | undefined }))
     .filter((spec) => spec.value);
+
+  const tagSpecs = fields
+    .filter((field) => field.type === "tags")
+    .map((field) => ({
+      key: field.key,
+      label: field.label,
+      values: (attributes[field.key] as string[] | undefined) ?? [],
+    }))
+    .filter((spec) => spec.values.length > 0);
 
   const headlineKeys = topLevelSlug ? (HEADLINE_FIELD_KEYS[topLevelSlug] ?? []) : [];
   const headlineSpecs = specs.filter((spec) => headlineKeys.includes(spec.key));
@@ -289,6 +301,22 @@ export default async function ListingDetailPage({
                 </div>
               )}
 
+              {tagSpecs.map((spec) => (
+                <div key={spec.key} className="mt-5 border-t border-neutral-100 pt-5">
+                  <h2 className="mb-2 text-base font-bold text-neutral-800">{spec.label}</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {spec.values.map((value) => (
+                      <span
+                        key={value}
+                        className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700"
+                      >
+                        {value}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
               {listing.description && (
                 <div className="mt-5 border-t border-neutral-100 pt-5">
                   <h2 className="mb-2 text-base font-bold text-neutral-800">Description</h2>
@@ -317,9 +345,12 @@ export default async function ListingDetailPage({
                 <div className="min-w-0">
                   <Link
                     href={`/u/${listing.user_id}`}
-                    className="block truncate text-base font-bold text-neutral-800 hover:text-brand hover:underline"
+                    className="flex items-center gap-1 truncate text-base font-bold text-neutral-800 hover:text-brand hover:underline"
                   >
-                    {sellerName}
+                    <span className="truncate">{sellerName}</span>
+                    {listing.profiles?.verified && (
+                      <BadgeCheck className="size-4 shrink-0 fill-brand text-white" aria-label="Verified seller" />
+                    )}
                   </Link>
                   <p className="text-sm text-neutral-500">Seller on Flikax</p>
                 </div>

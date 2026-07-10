@@ -20,11 +20,11 @@ export function VehicleSpecFields({
   attributes,
   setAttribute,
 }: {
-  attributes: Record<string, string>;
+  attributes: Record<string, string | string[]>;
   setAttribute: (key: string, value: string) => void;
 }) {
-  const currentMake = attributes.make ?? "";
-  const currentModel = attributes.model ?? "";
+  const currentMake = (attributes.make as string | undefined) ?? "";
+  const currentModel = (attributes.model as string | undefined) ?? "";
   const modelsForMake =
     currentMake && CAR_MAKES_MODELS[currentMake]
       ? [...CAR_MAKES_MODELS[currentMake]].sort((a, b) => a.localeCompare(b))
@@ -151,7 +151,7 @@ export function VehicleSpecFields({
         <span className="mb-1 block text-sm font-medium text-neutral-700">Year of Manufacture*</span>
         <select
           required
-          value={attributes.year ?? ""}
+          value={(attributes.year as string | undefined) ?? ""}
           onChange={(e) => setAttribute("year", e.target.value)}
           className={FIELD_CLASS}
         >
@@ -170,7 +170,7 @@ export function VehicleSpecFields({
         <span className="mb-1 block text-sm font-medium text-neutral-700">Trim (optional)</span>
         <input
           type="text"
-          value={attributes.trim ?? ""}
+          value={(attributes.trim as string | undefined) ?? ""}
           onChange={(e) => setAttribute("trim", e.target.value)}
           placeholder="e.g. SE, Limited, Sport"
           className={FIELD_CLASS}

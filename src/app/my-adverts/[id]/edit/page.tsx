@@ -50,7 +50,7 @@ export default async function EditListingPage({
     location: listing.location,
     negotiable: listing.negotiable,
     category_id: listing.category_id,
-    attributes: (listing.attributes ?? {}) as Record<string, string>,
+    attributes: (listing.attributes ?? {}) as Record<string, string | string[]>,
     video_url: listing.video_url,
     contact_phone: listing.contact_phone,
     images,
