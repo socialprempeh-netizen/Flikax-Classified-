@@ -9,7 +9,7 @@ export async function toggleSavedListingAction(listingId: string): Promise<{ sav
     data: { user },
   } = await getUser();
 
-  if (!user) return { saved: false };
+  if (!user) throw new Error("Not authenticated");
 
   const { data: existing } = await supabase
     .from("saved_listings")
@@ -37,7 +37,7 @@ export async function markListingUnavailableAction(listingId: string): Promise<v
     data: { user },
   } = await getUser();
 
-  if (!user) return;
+  if (!user) throw new Error("Not authenticated");
 
   await supabase
     .from("listings")
