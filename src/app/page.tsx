@@ -34,7 +34,11 @@ export default async function Home({ searchParams }: PageProps) {
   const [{ data: userData }, { data: categories }, { data: countRows }, { data: results }, { data: locationRows }] =
     await Promise.all([
       getUser(),
-      supabase.from("categories").select("id, name, slug, parent_id").order("name"),
+      supabase
+        .from("categories")
+        .select("id, name, slug, parent_id, icon")
+        .order("display_order")
+        .order("name"),
       supabase.rpc("category_counts"),
       supabase.rpc("search_listings", {
         search_query: filters.q,

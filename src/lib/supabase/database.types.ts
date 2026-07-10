@@ -56,6 +56,8 @@ export type Database = {
       categories: {
         Row: {
           created_at: string
+          display_order: number
+          icon: string | null
           id: string
           name: string
           parent_id: string | null
@@ -63,6 +65,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_order?: number
+          icon?: string | null
           id?: string
           name: string
           parent_id?: string | null
@@ -70,6 +74,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_order?: number
+          icon?: string | null
           id?: string
           name?: string
           parent_id?: string | null
@@ -112,7 +118,7 @@ export type Database = {
           created_at: string
           id: string
           listing_id: string
-          phash: unknown | null
+          phash: unknown
           position: number
           storage_path: string
         }
@@ -121,7 +127,7 @@ export type Database = {
           created_at?: string
           id?: string
           listing_id: string
-          phash?: unknown | null
+          phash?: unknown
           position?: number
           storage_path: string
         }
@@ -130,7 +136,7 @@ export type Database = {
           created_at?: string
           id?: string
           listing_id?: string
-          phash?: unknown | null
+          phash?: unknown
           position?: number
           storage_path?: string
         }
@@ -275,6 +281,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      locations: {
+        Row: {
+          created_at: string
+          district_name: string
+          district_order: number
+          district_slug: string
+          enabled: boolean
+          id: string
+          region_name: string
+          region_order: number
+          region_slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          district_name: string
+          district_order?: number
+          district_slug: string
+          enabled?: boolean
+          id?: string
+          region_name: string
+          region_order?: number
+          region_slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          district_name?: string
+          district_order?: number
+          district_slug?: string
+          enabled?: boolean
+          id?: string
+          region_name?: string
+          region_order?: number
+          region_slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -666,18 +711,9 @@ export type Database = {
         Args: { listing_id: string }
         Returns: undefined
       }
-      is_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      is_super_admin: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      is_suspended: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { user_id: string }; Returns: boolean }
+      is_suspended: { Args: { user_id: string }; Returns: boolean }
       search_listings: {
         Args: {
           category_slug?: string

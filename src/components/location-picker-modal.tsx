@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { GHANA_REGIONS, type District, type Region } from "@/lib/locations";
+import type { District, Region } from "@/lib/locations";
+import { useRegions } from "@/lib/use-regions";
 
 function groupByLetter<T extends { name: string }>(items: T[]) {
   const groups: { letter: string; items: T[] }[] = [];
@@ -45,10 +46,11 @@ export function LocationPickerModal({
   locationCounts: Record<string, number>;
   totalListingsCount: number;
 }) {
+  const regions = useRegions();
   const [activeRegionSlug, setActiveRegionSlug] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
-  const activeRegion = GHANA_REGIONS.find((r) => r.slug === activeRegionSlug) ?? null;
+  const activeRegion = regions.find((r) => r.slug === activeRegionSlug) ?? null;
 
   function districtCount(name: string) {
     return locationCounts[name] ?? 0;
@@ -78,7 +80,7 @@ export function LocationPickerModal({
     const q = query.trim().toLowerCase();
     if (!q) return null;
     const results: SearchResult[] = [];
-    for (const region of GHANA_REGIONS) {
+    for (const region of regions) {
       if (region.name.toLowerCase().includes(q)) {
         results.push({ kind: "region", region });
       }
@@ -89,12 +91,12 @@ export function LocationPickerModal({
       }
     }
     return results;
-  }, [query]);
+  }, [query, regions]);
 
   const regionColumns = useMemo(() => {
-    const sorted = [...GHANA_REGIONS].sort((a, b) => a.name.localeCompare(b.name));
+    const sorted = [...regions].sort((a, b) => a.name.localeCompare(b.name));
     return splitIntoColumns(sorted, 2).map(groupByLetter);
-  }, []);
+  }, [regions]);
 
   const districtColumns = useMemo(() => {
     if (!activeRegion) return [];

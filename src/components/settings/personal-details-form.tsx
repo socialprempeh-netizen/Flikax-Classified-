@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { GHANA_REGIONS } from "@/lib/locations";
+import { useRegions } from "@/lib/use-regions";
 
 type Profile = {
   full_name: string | null;
@@ -13,6 +13,7 @@ type Profile = {
 
 export function PersonalDetailsForm({ profile }: { profile: Profile }) {
   const [supabase] = useState(() => createClient());
+  const regions = useRegions();
   const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
   const [dateOfBirth, setDateOfBirth] = useState(profile.date_of_birth ?? "");
@@ -85,7 +86,7 @@ export function PersonalDetailsForm({ profile }: { profile: Profile }) {
           className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">Select location</option>
-          {GHANA_REGIONS.map((region) => (
+          {regions.map((region) => (
             <optgroup key={region.slug} label={region.name}>
               {region.districts.map((district) => (
                 <option key={district.slug} value={district.name}>

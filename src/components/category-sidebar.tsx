@@ -19,6 +19,7 @@ export type Category = {
   name: string;
   slug: string;
   parent_id: string | null;
+  icon?: string | null;
 };
 
 export function CategorySidebar({

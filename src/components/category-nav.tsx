@@ -2,43 +2,35 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Car,
-  Home,
-  Smartphone,
-  Laptop,
-  Sofa,
-  Shirt,
-  Sparkles,
-  Wrench,
-  Hammer,
-  Briefcase,
-  Dumbbell,
-  Baby,
-  ShoppingBasket,
-  PawPrint,
-  ChevronRight,
-  type LucideIcon,
-} from "lucide-react";
+import { Car, ChevronRight } from "lucide-react";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import type { Category } from "@/components/category-sidebar";
+import { CATEGORY_ICON_MAP } from "@/lib/category-icons";
 
-const ICONS: Record<string, LucideIcon> = {
-  vehicles: Car,
-  property: Home,
-  "phones-tablets": Smartphone,
-  electronics: Laptop,
-  "home-furniture-appliances": Sofa,
-  fashion: Shirt,
-  "beauty-personal-care": Sparkles,
-  services: Wrench,
-  "repair-construction": Hammer,
-  "commercial-equipment-tools": Briefcase,
-  "leisure-activities": Dumbbell,
-  "babies-kids": Baby,
-  "food-agriculture-farming": ShoppingBasket,
-  "animals-pets": PawPrint,
+// Legacy fallback for any top-level category with no `icon` set in the DB
+// (pre-Phase-4C categories, or a slug this map doesn't recognize) — kept so
+// nothing regresses for categories that haven't been given an icon yet.
+const LEGACY_ICONS: Record<string, string> = {
+  vehicles: "Car",
+  property: "Home",
+  "phones-tablets": "Smartphone",
+  electronics: "Laptop",
+  "home-furniture-appliances": "Sofa",
+  fashion: "Shirt",
+  "beauty-personal-care": "Sparkles",
+  services: "Wrench",
+  "repair-construction": "Hammer",
+  "commercial-equipment-tools": "Briefcase",
+  "leisure-activities": "Dumbbell",
+  "babies-kids": "Baby",
+  "food-agriculture-farming": "ShoppingBasket",
+  "animals-pets": "PawPrint",
 };
+
+function resolveIcon(cat: Category) {
+  const iconName = cat.icon ?? LEGACY_ICONS[cat.slug];
+  return (iconName && CATEGORY_ICON_MAP[iconName]) || Car;
+}
 
 export function CategoryNav({
   parents,
@@ -64,7 +56,7 @@ export function CategoryNav({
   return (
     <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm sm:w-72">
       {parents.map((cat) => {
-        const Icon = ICONS[cat.slug] ?? Car;
+        const Icon = resolveIcon(cat);
         const children = categories.filter((c) => c.parent_id === cat.id);
         const isHovered = hoveredId === cat.id;
 
