@@ -14,6 +14,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ChevronRight,
+  Flag,
+  ScanSearch,
+  TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -31,6 +34,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Listings", href: "/admin/listings", icon: ClipboardList },
   { label: "Users", href: "/admin/users", icon: Users },
+  { label: "Reports", href: "/admin/reports", icon: Flag },
+  { label: "Moderation", href: "/admin/moderation", icon: ScanSearch },
+  { label: "Fraud Detection", href: "/admin/fraud", icon: TriangleAlert },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3, comingSoon: true },
   { label: "Admins", href: "/admin/admins", icon: ShieldCheck, superAdminOnly: true },
   { label: "Premium Plans", href: "/admin/premium-plans", icon: Gem, superAdminOnly: true },

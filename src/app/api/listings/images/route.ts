@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { watermarkImage } from "@/lib/watermark";
+import { computeAverageHash, computeBlurScore } from "@/lib/image-hash";
 
 export const runtime = "nodejs";
 
@@ -47,8 +48,14 @@ export async function POST(request: Request) {
   const inputBuffer = Buffer.from(await file.arrayBuffer());
 
   let watermarked: Buffer;
+  let phash: string;
+  let blurScore: number;
   try {
     watermarked = await watermarkImage(inputBuffer);
+    [phash, blurScore] = await Promise.all([
+      computeAverageHash(inputBuffer),
+      computeBlurScore(inputBuffer),
+    ]);
   } catch {
     return NextResponse.json({ error: "Could not process image" }, { status: 400 });
   }
@@ -66,5 +73,5 @@ export async function POST(request: Request) {
     data: { publicUrl },
   } = supabase.storage.from("listing-images").getPublicUrl(path);
 
-  return NextResponse.json({ path, url: publicUrl });
+  return NextResponse.json({ path, url: publicUrl, phash, blurScore });
 }

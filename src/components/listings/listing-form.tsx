@@ -26,6 +26,8 @@ type ImageSlot = {
   previewUrl: string;
   status: "uploading" | "done" | "error";
   path?: string;
+  phash?: string;
+  blurScore?: number;
   error?: string;
   isExisting?: boolean;
 };
@@ -176,7 +178,17 @@ export function ListingForm({
         }
 
         setImages((prev) =>
-          prev.map((img) => (img.id === id ? { ...img, status: "done", path: result.body.path } : img))
+          prev.map((img) =>
+            img.id === id
+              ? {
+                  ...img,
+                  status: "done",
+                  path: result.body.path,
+                  phash: result.body.phash,
+                  blurScore: result.body.blurScore,
+                }
+              : img
+          )
         );
       } catch {
         setImages((prev) =>
@@ -291,6 +303,8 @@ export function ListingForm({
             listing_id: listingId!,
             storage_path: img.path!,
             position: existingCount + index,
+            phash: img.phash ?? null,
+            blur_score: img.blurScore ?? null,
           }))
         );
         if (imagesError) {
@@ -318,6 +332,8 @@ export function ListingForm({
           listing_id: listingId!,
           storage_path: img.path!,
           position: index,
+          phash: img.phash ?? null,
+          blur_score: img.blurScore ?? null,
         }))
       );
 

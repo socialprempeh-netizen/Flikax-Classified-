@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Eye,
   MessageSquareWarning,
-  AlertTriangle,
   CheckCircle2,
   Sparkles,
   Settings2,
@@ -30,6 +29,7 @@ import { SaveListingButton } from "@/components/listings/save-listing-button";
 import { MarkUnavailableButton } from "@/components/listings/mark-unavailable-button";
 import { RevealPhoneButton } from "@/components/listings/reveal-phone-button";
 import { ShareButtons } from "@/components/listings/share-buttons";
+import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 
 const SIMILAR_LIMIT = 8;
@@ -186,9 +186,6 @@ export default async function ListingDetailPage({
   const whatsappHref = sellerPhoneDigits ? `https://wa.me/${sellerPhoneDigits}` : null;
   const feedbackHref = `mailto:feedback@flikax.com?subject=${encodeURIComponent(
     `Feedback on listing: ${listing.title}`
-  )}&body=${encodeURIComponent(`Listing ID: ${listing.id}`)}`;
-  const abuseHref = `mailto:abuse@flikax.com?subject=${encodeURIComponent(
-    `Report listing: ${listing.title}`
   )}&body=${encodeURIComponent(`Listing ID: ${listing.id}`)}`;
 
   return (
@@ -364,13 +361,7 @@ export default async function ListingDetailPage({
 
               {isOwner && listing.status === "active" && <MarkUnavailableButton listingId={listing.id} />}
 
-              <a
-                href={abuseHref}
-                className="flex items-center justify-center gap-2 rounded-lg border border-red-200 py-2 text-base font-bold text-red-600 hover:bg-red-50"
-              >
-                <AlertTriangle className="size-4" />
-                Report Abuse
-              </a>
+              {!isOwner && <ReportListingButton listingId={listing.id} />}
             </div>
 
             <div className="rounded-xl border border-dashed border-brand/30 bg-brand-light p-5 text-center">

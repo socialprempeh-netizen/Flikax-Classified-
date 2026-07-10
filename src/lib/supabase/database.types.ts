@@ -108,23 +108,29 @@ export type Database = {
       }
       listing_images: {
         Row: {
+          blur_score: number | null
           created_at: string
           id: string
           listing_id: string
+          phash: unknown | null
           position: number
           storage_path: string
         }
         Insert: {
+          blur_score?: number | null
           created_at?: string
           id?: string
           listing_id: string
+          phash?: unknown | null
           position?: number
           storage_path: string
         }
         Update: {
+          blur_score?: number | null
           created_at?: string
           id?: string
           listing_id?: string
+          phash?: unknown | null
           position?: number
           storage_path?: string
         }
@@ -134,6 +140,54 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_moderation_flags: {
+        Row: {
+          created_at: string
+          detail: string | null
+          flag_type: string
+          id: string
+          listing_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          flag_type: string
+          id?: string
+          listing_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          flag_type?: string
+          id?: string
+          listing_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_moderation_flags_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_moderation_flags_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -520,6 +574,7 @@ export type Database = {
           created_at: string
           id: string
           listing_id: string
+          priority: boolean
           reason: string | null
           reporter_id: string | null
           status: string
@@ -528,6 +583,7 @@ export type Database = {
           created_at?: string
           id?: string
           listing_id: string
+          priority?: boolean
           reason?: string | null
           reporter_id?: string | null
           status?: string
@@ -536,6 +592,7 @@ export type Database = {
           created_at?: string
           id?: string
           listing_id?: string
+          priority?: boolean
           reason?: string | null
           reporter_id?: string | null
           status?: string
@@ -614,6 +671,10 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      is_suspended: {
         Args: { user_id: string }
         Returns: boolean
       }
