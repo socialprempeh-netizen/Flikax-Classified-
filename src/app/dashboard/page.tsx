@@ -25,7 +25,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     redirect("/auth/login?redirect=/dashboard");
   }
 
-  const [{ data: listings }, { data: categories }, allPlans] = await Promise.all([
+  const [{ data: listings }, { data: categories }, allPlans, { data: profile }] = await Promise.all([
     supabase
       .from("listings")
       .select(
@@ -35,7 +35,10 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       .order("created_at", { ascending: false }),
     supabase.from("categories").select("id, name, slug, parent_id").order("name"),
     getEnabledPlans(),
+    supabase.from("profiles").select("suspended_until").eq("id", user.id).maybeSingle(),
   ]);
+
+  const isSuspended = Boolean(profile?.suspended_until && new Date(profile.suspended_until) > new Date());
 
   const listingScopedPlans = allPlans.filter((p) => LISTING_SCOPED_PLAN_TYPES.includes(p.plan_type));
 
@@ -130,9 +133,16 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         </button>
       </form>
 
+      {isSuspended && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+          Your account is suspended: you can&apos;t post new listings or buy boosts until{" "}
+          {new Date(profile!.suspended_until!).toLocaleDateString()}.
+        </div>
+      )}
+
       <DashboardListingsList
         listings={visibleListings}
-        paymentsEnabled={PAYMENTS_ENABLED}
+        paymentsEnabled={PAYMENTS_ENABLED && !isSuspended}
         plans={listingScopedPlans}
       />
     </section>

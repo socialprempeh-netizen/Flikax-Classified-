@@ -29,8 +29,8 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Listings", href: "/admin/listings", icon: ClipboardList, comingSoon: true },
-  { label: "Users", href: "/admin/users", icon: Users, comingSoon: true },
+  { label: "Listings", href: "/admin/listings", icon: ClipboardList },
+  { label: "Users", href: "/admin/users", icon: Users },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3, comingSoon: true },
   { label: "Admins", href: "/admin/admins", icon: ShieldCheck, superAdminOnly: true },
   { label: "Premium Plans", href: "/admin/premium-plans", icon: Gem, superAdminOnly: true },
@@ -88,7 +88,8 @@ export function AdminShell({
 
         <nav className="flex flex-1 flex-col gap-1 p-2">
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive =
+              item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href);
             if (item.comingSoon) {
               return (
                 <span

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_user_warnings: {
+        Row: {
+          admin_id: string | null
+          created_at: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_user_warnings_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_user_warnings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -108,6 +147,7 @@ export type Database = {
           created_at: string
           declined_reason: string | null
           description: string | null
+          expires_at: string | null
           featured_until: string | null
           id: string
           is_featured: boolean
@@ -129,6 +169,7 @@ export type Database = {
           created_at?: string
           declined_reason?: string | null
           description?: string | null
+          expires_at?: string | null
           featured_until?: string | null
           id?: string
           is_featured?: boolean
@@ -150,6 +191,7 @@ export type Database = {
           created_at?: string
           declined_reason?: string | null
           description?: string | null
+          expires_at?: string | null
           featured_until?: string | null
           id?: string
           is_featured?: boolean
@@ -372,6 +414,7 @@ export type Database = {
           phone: string | null
           role: string | null
           sex: string | null
+          suspended_until: string | null
           updated_at: string
         }
         Insert: {
@@ -385,6 +428,7 @@ export type Database = {
           phone?: string | null
           role?: string | null
           sex?: string | null
+          suspended_until?: string | null
           updated_at?: string
         }
         Update: {
@@ -398,6 +442,7 @@ export type Database = {
           phone?: string | null
           role?: string | null
           sex?: string | null
+          suspended_until?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -470,6 +515,48 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          reason: string | null
+          reporter_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          reason?: string | null
+          reporter_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          reason?: string | null
+          reporter_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_listings: {
         Row: {
           created_at: string
@@ -522,6 +609,10 @@ export type Database = {
         Args: { listing_id: string }
         Returns: undefined
       }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_super_admin: {
         Args: { user_id: string }
         Returns: boolean
@@ -535,7 +626,7 @@ export type Database = {
           search_query?: string
         }
         Returns: {
-          bumped_at: string | null
+          bumped_at: string
           category_id: string
           category_name: string
           category_slug: string
