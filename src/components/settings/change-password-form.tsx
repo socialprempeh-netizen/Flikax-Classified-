@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ redirectTo }: { redirectTo?: string } = {}) {
+  const router = useRouter();
   const [supabase] = useState(() => createClient());
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -36,6 +38,10 @@ export function ChangePasswordForm() {
     setPassword("");
     setConfirm("");
     setSaved(true);
+
+    if (redirectTo) {
+      router.push(redirectTo);
+    }
   }
 
   return (
