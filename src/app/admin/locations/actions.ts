@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 async function requireSuperAdminActor() {
   const {
@@ -13,7 +14,7 @@ async function requireSuperAdminActor() {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (profile?.role !== "super_admin") throw new Error("Not authorized");
 
-  return { supabase };
+  return { supabase, actorId: user.id };
 }
 
 function revalidateLocations() {
@@ -22,7 +23,7 @@ function revalidateLocations() {
 }
 
 export async function updateDistrictNameAction(id: string, name: string) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
   if (!name.trim()) throw new Error("Enter a name.");
 
   const { error } = await supabase
@@ -31,11 +32,12 @@ export async function updateDistrictNameAction(id: string, name: string) {
     .eq("id", id);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "location.district_rename", targetType: "location", targetId: id, detail: { name: name.trim() } });
   revalidateLocations();
 }
 
 export async function updateRegionNameAction(regionSlug: string, name: string) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
   if (!name.trim()) throw new Error("Enter a name.");
 
   const { error } = await supabase
@@ -44,11 +46,12 @@ export async function updateRegionNameAction(regionSlug: string, name: string) {
     .eq("region_slug", regionSlug);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "location.region_rename", targetType: "location_region", targetId: regionSlug, detail: { name: name.trim() } });
   revalidateLocations();
 }
 
 export async function toggleLocationEnabledAction(id: string, enabled: boolean) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { error } = await supabase
     .from("locations")
@@ -56,11 +59,12 @@ export async function toggleLocationEnabledAction(id: string, enabled: boolean) 
     .eq("id", id);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "location.toggle_enabled", targetType: "location", targetId: id, detail: { enabled } });
   revalidateLocations();
 }
 
 export async function reorderDistrictAction(id: string, direction: "up" | "down") {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data: current } = await supabase
     .from("locations")
@@ -91,11 +95,12 @@ export async function reorderDistrictAction(id: string, direction: "up" | "down"
     .eq("id", sibling.id);
   if (err1 || err2) throw new Error(err1?.message ?? err2?.message ?? "Could not reorder");
 
+  await logAdminAction({ actorId, action: "location.district_reorder", targetType: "location", targetId: id, detail: { direction } });
   revalidateLocations();
 }
 
 export async function reorderRegionAction(regionSlug: string, direction: "up" | "down") {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data: rows } = await supabase.from("locations").select("region_slug, region_order").order("region_order");
   const distinctRegions = Array.from(
@@ -120,11 +125,12 @@ export async function reorderRegionAction(regionSlug: string, direction: "up" | 
     .eq("region_slug", siblingSlug);
   if (err1 || err2) throw new Error(err1?.message ?? err2?.message ?? "Could not reorder");
 
+  await logAdminAction({ actorId, action: "location.region_reorder", targetType: "location_region", targetId: regionSlug, detail: { direction } });
   revalidateLocations();
 }
 
 export async function deleteLocationAction(id: string) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data: location } = await supabase.from("locations").select("district_name").eq("id", id).maybeSingle();
   if (!location) throw new Error("Location not found");
@@ -140,5 +146,6 @@ export async function deleteLocationAction(id: string) {
   const { error } = await supabase.from("locations").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "location.delete", targetType: "location", targetId: id });
   revalidateLocations();
 }

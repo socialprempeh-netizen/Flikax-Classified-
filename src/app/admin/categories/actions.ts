@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 async function requireSuperAdminActor() {
   const {
@@ -13,7 +14,7 @@ async function requireSuperAdminActor() {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (profile?.role !== "super_admin") throw new Error("Not authorized");
 
-  return { supabase };
+  return { supabase, actorId: user.id };
 }
 
 function revalidateCategories() {
@@ -35,7 +36,7 @@ export async function createCategoryAction(input: {
   parentId: string | null;
   icon: string | null;
 }) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
   await assertShallowParent(supabase, input.parentId);
 
   const siblingCountQuery = supabase.from("categories").select("id", { count: "exact", head: true });
@@ -43,18 +44,23 @@ export async function createCategoryAction(input: {
     ? siblingCountQuery.eq("parent_id", input.parentId)
     : siblingCountQuery.is("parent_id", null));
 
-  const { error } = await supabase.from("categories").insert({
-    name: input.name,
-    slug: input.slug,
-    parent_id: input.parentId,
-    icon: input.icon,
-    display_order: count ?? 0,
-  });
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({
+      name: input.name,
+      slug: input.slug,
+      parent_id: input.parentId,
+      icon: input.icon,
+      display_order: count ?? 0,
+    })
+    .select("id")
+    .single();
   if (error) {
     if (error.code === "23505") throw new Error("A category with this slug already exists.");
     throw new Error(error.message);
   }
 
+  await logAdminAction({ actorId, action: "category.create", targetType: "category", targetId: data.id, detail: { name: input.name } });
   revalidateCategories();
 }
 
@@ -62,7 +68,7 @@ export async function updateCategoryAction(
   id: string,
   input: { name: string; slug: string; icon: string | null; parentId: string | null }
 ) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
   if (input.parentId === id) throw new Error("A category can't be its own parent.");
   await assertShallowParent(supabase, input.parentId);
 
@@ -75,11 +81,12 @@ export async function updateCategoryAction(
     throw new Error(error.message);
   }
 
+  await logAdminAction({ actorId, action: "category.update", targetType: "category", targetId: id, detail: { name: input.name } });
   revalidateCategories();
 }
 
 export async function reorderCategoryAction(id: string, direction: "up" | "down") {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data: current } = await supabase
     .from("categories")
@@ -109,11 +116,12 @@ export async function reorderCategoryAction(id: string, direction: "up" | "down"
     .eq("id", sibling.id);
   if (err1 || err2) throw new Error(err1?.message ?? err2?.message ?? "Could not reorder");
 
+  await logAdminAction({ actorId, action: "category.reorder", targetType: "category", targetId: id, detail: { direction } });
   revalidateCategories();
 }
 
 export async function deleteCategoryAction(id: string) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const [{ count: listingCount }, { count: childCount }] = await Promise.all([
     supabase.from("listings").select("id", { count: "exact", head: true }).eq("category_id", id),
@@ -130,5 +138,6 @@ export async function deleteCategoryAction(id: string) {
   const { error } = await supabase.from("categories").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "category.delete", targetType: "category", targetId: id });
   revalidateCategories();
 }

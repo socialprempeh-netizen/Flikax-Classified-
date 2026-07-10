@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 async function requireAdminActor() {
   const {
@@ -35,15 +36,17 @@ export async function suspendUserAction(userId: string, days: number) {
   const { error } = await adminClient.from("profiles").update({ suspended_until: suspendedUntil }).eq("id", userId);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.suspend", targetType: "user", targetId: userId, detail: { days } });
   revalidateUser(userId);
 }
 
 export async function restoreUserAction(userId: string) {
-  const { adminClient } = await requireAdminActor();
+  const { adminClient, actorId } = await requireAdminActor();
 
   const { error } = await adminClient.from("profiles").update({ suspended_until: null }).eq("id", userId);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.restore", targetType: "user", targetId: userId });
   revalidateUser(userId);
 }
 
@@ -56,15 +59,17 @@ export async function banUserAction(userId: string) {
   const { error } = await adminClient.auth.admin.updateUserById(userId, { ban_duration: "876000h" });
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.ban", targetType: "user", targetId: userId });
   revalidateUser(userId);
 }
 
 export async function unbanUserAction(userId: string) {
-  const { adminClient } = await requireAdminActor();
+  const { adminClient, actorId } = await requireAdminActor();
 
   const { error } = await adminClient.auth.admin.updateUserById(userId, { ban_duration: "none" });
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.unban", targetType: "user", targetId: userId });
   revalidateUser(userId);
 }
 
@@ -75,6 +80,7 @@ export async function deleteUserAction(userId: string) {
   const { error } = await adminClient.auth.admin.deleteUser(userId);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.delete", targetType: "user", targetId: userId });
   revalidatePath("/admin/users");
 }
 
@@ -87,5 +93,6 @@ export async function logWarningAction(userId: string, message: string) {
     .insert({ user_id: userId, admin_id: actorId, message: message.trim() });
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "user.warn", targetType: "user", targetId: userId, detail: { message: message.trim() } });
   revalidateUser(userId);
 }

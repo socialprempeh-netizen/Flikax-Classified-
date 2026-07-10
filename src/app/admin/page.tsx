@@ -13,28 +13,9 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { BUMP_BADGE_DISPLAY_HOURS } from "@/lib/premium-plans";
 import { TrendChart, RankBarChart } from "@/components/admin/dashboard-charts";
+import { bucketByDay } from "@/lib/admin-analytics";
 
 const DAYS = 30;
-
-function bucketByDay(rows: { created_at: string }[], days: number): { date: string; count: number }[] {
-  const counts = new Map<string, number>();
-  for (const row of rows) {
-    const day = row.created_at.slice(0, 10); // YYYY-MM-DD, UTC — matches Ghana local (UTC+0, no DST)
-    counts.set(day, (counts.get(day) ?? 0) + 1);
-  }
-
-  const buckets: { date: string; count: number }[] = [];
-  const today = new Date();
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - i));
-    const key = d.toISOString().slice(0, 10);
-    buckets.push({
-      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }),
-      count: counts.get(key) ?? 0,
-    });
-  }
-  return buckets;
-}
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();

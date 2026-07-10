@@ -20,6 +20,9 @@ import {
   Banknote,
   FolderTree,
   MapPin,
+  Star,
+  LifeBuoy,
+  History,
   type LucideIcon,
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -40,13 +43,16 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Reports", href: "/admin/reports", icon: Flag },
   { label: "Moderation", href: "/admin/moderation", icon: ScanSearch },
   { label: "Fraud Detection", href: "/admin/fraud", icon: TriangleAlert },
+  { label: "Reviews", href: "/admin/reviews", icon: Star },
   { label: "Payments", href: "/admin/payments", icon: Banknote },
-  { label: "Analytics", href: "/admin/analytics", icon: BarChart3, comingSoon: true },
+  { label: "Support", href: "/admin/support", icon: LifeBuoy },
+  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { label: "Admins", href: "/admin/admins", icon: ShieldCheck, superAdminOnly: true },
   { label: "Premium Plans", href: "/admin/premium-plans", icon: Gem, superAdminOnly: true },
   { label: "Categories", href: "/admin/categories", icon: FolderTree, superAdminOnly: true },
   { label: "Locations", href: "/admin/locations", icon: MapPin, superAdminOnly: true },
-  { label: "Feature Flags", href: "/admin/settings", icon: ToggleLeft, superAdminOnly: true },
+  { label: "Audit Logs", href: "/admin/audit-logs", icon: History, superAdminOnly: true },
+  { label: "Settings", href: "/admin/settings", icon: ToggleLeft, superAdminOnly: true },
 ];
 
 function useBreadcrumbs() {

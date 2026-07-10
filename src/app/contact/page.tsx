@@ -11,9 +11,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getUser } from "@/lib/supabase/server";
+import { getSiteSetting } from "@/lib/site-settings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SupportCta, SUPPORT_EMAIL } from "@/components/cta/support-cta";
+import { SupportTicketForm } from "@/components/contact/support-ticket-form";
 
 const HELP_TOPICS: { icon: LucideIcon; label: string }[] = [
   { icon: UserCog, label: "Account issues" },
@@ -26,9 +28,8 @@ const HELP_TOPICS: { icon: LucideIcon; label: string }[] = [
 ];
 
 export default async function ContactPage() {
-  const {
-    data: { user },
-  } = await getUser();
+  const [{ data: { user } }, supportEmailSetting] = await Promise.all([getUser(), getSiteSetting("support_email")]);
+  const supportEmail = supportEmailSetting ?? SUPPORT_EMAIL;
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
@@ -44,6 +45,8 @@ export default async function ContactPage() {
           </p>
         </div>
 
+        <SupportTicketForm defaultEmail={user?.email} />
+
         {/* Customer Support */}
         <section className="rounded-2xl bg-white p-6 shadow-md sm:p-8">
           <div className="flex items-center gap-3">
@@ -53,8 +56,8 @@ export default async function ContactPage() {
             <h2 className="font-logo text-xl font-bold text-neutral-800">Customer Support</h2>
           </div>
           <p className="mt-4 text-sm text-neutral-500">Email us anytime at</p>
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-base font-semibold text-brand hover:underline">
-            {SUPPORT_EMAIL}
+          <a href={`mailto:${supportEmail}`} className="text-base font-semibold text-brand hover:underline">
+            {supportEmail}
           </a>
           <div className="mt-5">
             <SupportCta subject="Support request" />
@@ -99,8 +102,8 @@ export default async function ContactPage() {
           <p className="mt-3 text-sm text-neutral-700">
             For partnerships, advertising, or media enquiries, contact:
           </p>
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-1 block text-base font-semibold text-brand hover:underline">
-            {SUPPORT_EMAIL}
+          <a href={`mailto:${supportEmail}`} className="mt-1 block text-base font-semibold text-brand hover:underline">
+            {supportEmail}
           </a>
           <div className="mt-5">
             <SupportCta label="Contact Business Team" subject="Business enquiry" />

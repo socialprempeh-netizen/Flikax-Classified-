@@ -32,16 +32,20 @@ function TrendTooltip({
   active,
   payload,
   label,
+  valueLabel = "total",
 }: {
   active?: boolean;
   payload?: { value: number }[];
   label?: string;
+  valueLabel?: string;
 }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-neutral-100 bg-white px-3 py-2 text-xs shadow-md">
       <p className="font-semibold text-neutral-800">{label}</p>
-      <p className="text-neutral-500">{payload[0].value} total</p>
+      <p className="text-neutral-500">
+        {payload[0].value} {valueLabel}
+      </p>
     </div>
   );
 }
@@ -49,13 +53,17 @@ function TrendTooltip({
 export function TrendChart({
   data,
   color,
+  title,
+  valueLabel,
 }: {
   data: { date: string; count: number }[];
   color: "blue" | "aqua";
+  title?: string;
+  valueLabel?: string;
 }) {
   const stroke = color === "blue" ? "#2a78d6" : "#1baf7a";
   return (
-    <ChartCard title={color === "blue" ? "Listing growth (30 days)" : "User growth (30 days)"}>
+    <ChartCard title={title ?? (color === "blue" ? "Listing growth (30 days)" : "User growth (30 days)")}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid stroke={GRIDLINE} vertical={false} />
@@ -73,7 +81,7 @@ export function TrendChart({
             allowDecimals={false}
             width={30}
           />
-          <Tooltip content={<TrendTooltip />} cursor={{ stroke: BASELINE, strokeWidth: 1 }} />
+          <Tooltip content={<TrendTooltip valueLabel={valueLabel} />} cursor={{ stroke: BASELINE, strokeWidth: 1 }} />
           <Line
             type="monotone"
             dataKey="count"
@@ -91,16 +99,20 @@ export function TrendChart({
 function RankTooltip({
   active,
   payload,
+  unit = "listings",
 }: {
   active?: boolean;
   payload?: { payload: { name: string; count: number } }[];
+  unit?: string;
 }) {
   if (!active || !payload?.length) return null;
   const { name, count } = payload[0].payload;
   return (
     <div className="rounded-lg border border-neutral-100 bg-white px-3 py-2 text-xs shadow-md">
       <p className="font-semibold text-neutral-800">{name}</p>
-      <p className="text-neutral-500">{count} listings</p>
+      <p className="text-neutral-500">
+        {count} {unit}
+      </p>
     </div>
   );
 }
@@ -108,9 +120,11 @@ function RankTooltip({
 export function RankBarChart({
   title,
   data,
+  unit,
 }: {
   title: string;
   data: { name: string; count: number }[];
+  unit?: string;
 }) {
   if (data.length === 0) {
     return (
@@ -136,7 +150,7 @@ export function RankBarChart({
             tickLine={false}
             width={110}
           />
-          <Tooltip content={<RankTooltip />} cursor={{ fill: "rgba(11,11,11,0.04)" }} />
+          <Tooltip content={<RankTooltip unit={unit} />} cursor={{ fill: "rgba(11,11,11,0.04)" }} />
           <Bar dataKey="count" radius={[0, 4, 4, 0]} maxBarSize={22}>
             {data.map((entry, index) => (
               <Cell key={entry.name} fill={CATEGORICAL[index % CATEGORICAL.length]} />

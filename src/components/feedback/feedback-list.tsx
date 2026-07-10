@@ -1,6 +1,7 @@
 import { Smile, Meh, Frown, type LucideIcon } from "lucide-react";
 import { formatRelativeTime } from "@/lib/format-time";
 import { ReplyForm } from "@/components/feedback/reply-form";
+import { ReportFeedbackButton } from "@/components/feedback/report-feedback-button";
 
 const SENTIMENT_ICON: Record<string, LucideIcon> = { positive: Smile, neutral: Meh, negative: Frown };
 const SENTIMENT_COLOR: Record<string, string> = {
@@ -54,6 +55,7 @@ export function FeedbackList({
             ))}
 
             {isOwner && entry.replies.length === 0 && <ReplyForm feedbackId={entry.id} profileId={profileId} />}
+            <ReportFeedbackButton feedbackId={entry.id} />
           </div>
         );
       })}

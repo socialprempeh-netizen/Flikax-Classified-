@@ -1,7 +1,36 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+// A direct REST call rather than the full SSR client — feature_flags has a
+// public read policy, so no cookies/session are needed for this check, and
+// middleware runs on every request so it should stay as cheap as possible.
+async function isMaintenanceModeOn(): Promise<boolean> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return false;
+
+  try {
+    const res = await fetch(`${url}/rest/v1/feature_flags?key=eq.maintenance_mode&select=enabled`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+    });
+    if (!res.ok) return false;
+    const rows: { enabled: boolean }[] = await res.json();
+    return rows[0]?.enabled ?? false;
+  } catch {
+    return false;
+  }
+}
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  if (
+    pathname !== "/maintenance" &&
+    !pathname.startsWith("/admin") &&
+    (await isMaintenanceModeOn())
+  ) {
+    return NextResponse.redirect(new URL("/maintenance", request.url));
+  }
+
   // Server Actions (every startTransition(() => someAction()) call and every
   // <form action={...}>) POST to the same page route a normal navigation
   // uses, so they aren't caught by the /api/* exclusion below — but the

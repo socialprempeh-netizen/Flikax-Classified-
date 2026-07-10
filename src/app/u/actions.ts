@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
+import { FEEDBACK_REPORT_REASONS, type FeedbackReportReason } from "@/lib/feedback-report-reasons";
 
 export type Sentiment = "positive" | "neutral" | "negative";
 
@@ -30,6 +31,35 @@ export async function submitFeedbackAction(
 
   revalidatePath(`/u/${profileId}`);
   revalidatePath("/dashboard/feedback");
+  return {};
+}
+
+export async function reportFeedbackAction(
+  feedbackId: string,
+  reason: FeedbackReportReason
+): Promise<{ error?: string }> {
+  if (!FEEDBACK_REPORT_REASONS.includes(reason)) return { error: "Invalid report reason" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await getUser();
+
+  if (!user) return { error: "You must be logged in to report feedback." };
+
+  const { error } = await supabase
+    .from("feedback_reports")
+    .insert({ feedback_id: feedbackId, reporter_id: user.id, reason });
+
+  if (error) {
+    if (error.code === "23505") {
+      return { error: "You've already reported this feedback. We'll review it soon." };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/reviews");
+  revalidatePath("/admin");
   return {};
 }
 

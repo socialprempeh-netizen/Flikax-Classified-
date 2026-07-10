@@ -5,6 +5,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { markPaymentSuccess } from "@/lib/payments/mark-payment-success";
 import { clearFeaturedAction, clearBumpAction } from "@/app/admin/listings/actions";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 // purchases/payments have no admin-read/write RLS policy for plain "admin"
 // (only "Super admins can view all purchases" exists, and payments has no
@@ -26,7 +27,7 @@ async function requireAdminActor() {
   const adminClient = createAdminClient();
   if (!adminClient) throw new Error("Admin operations aren't configured on this environment.");
 
-  return { adminClient };
+  return { adminClient, actorId: user.id };
 }
 
 function revalidatePayments() {
@@ -37,7 +38,7 @@ function revalidatePayments() {
 /** For edge cases where a payment succeeded on the provider side but never webhooked. Reuses the same
  * effect-application logic the real webhook uses, rather than duplicating it. */
 export async function markPurchaseActiveAction(purchaseId: string) {
-  const { adminClient } = await requireAdminActor();
+  const { adminClient, actorId } = await requireAdminActor();
 
   const { data: purchase } = await adminClient
     .from("purchases")
@@ -57,13 +58,14 @@ export async function markPurchaseActiveAction(purchaseId: string) {
   const result = await markPaymentSuccess(payment.reference);
   if (!result.ok) throw new Error(result.reason ?? "Could not activate purchase");
 
+  await logAdminAction({ actorId, action: "payment.mark_active", targetType: "purchase", targetId: purchaseId });
   revalidatePayments();
 }
 
 /** Ends an active purchase early and reverses its listing effect via the same functions the admin listings
  * page already uses for this (clearFeaturedAction/clearBumpAction) — not duplicated here. */
 export async function revokePurchaseAction(purchaseId: string) {
-  const { adminClient } = await requireAdminActor();
+  const { adminClient, actorId } = await requireAdminActor();
 
   const { data: purchase } = await adminClient
     .from("purchases")
@@ -93,5 +95,6 @@ export async function revokePurchaseAction(purchaseId: string) {
     }
   }
 
+  await logAdminAction({ actorId, action: "payment.revoke", targetType: "purchase", targetId: purchaseId });
   revalidatePayments();
 }

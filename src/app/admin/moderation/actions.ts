@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { updateListingStatusAction } from "@/app/admin/listings/actions";
 import { ADMIN_MODERATION_STATUSES } from "@/lib/admin-moderation";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 async function requireAdminActor() {
   const {
@@ -46,5 +47,8 @@ export async function updateModerationFlagStatusAction(ids: string[], status: st
     await updateListingStatusAction(listingIds, "removed");
   }
 
+  for (const id of ids) {
+    await logAdminAction({ actorId, action: "moderation.flag_status_change", targetType: "moderation_flag", targetId: id, detail: { status } });
+  }
   revalidateModeration();
 }

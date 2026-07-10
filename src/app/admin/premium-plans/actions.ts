@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import type { PlanType } from "@/lib/premium-plans";
+import { logAdminAction } from "@/lib/admin-audit-log";
 
 async function requireSuperAdminActor() {
   const {
@@ -14,7 +15,7 @@ async function requireSuperAdminActor() {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (profile?.role !== "super_admin") throw new Error("Not authorized");
 
-  return { supabase };
+  return { supabase, actorId: user.id };
 }
 
 export type PlanFormInput = {
@@ -29,7 +30,7 @@ export type PlanFormInput = {
 };
 
 export async function createPlanAction(input: PlanFormInput) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data, error } = await supabase
     .from("premium_plans")
@@ -47,12 +48,13 @@ export async function createPlanAction(input: PlanFormInput) {
     .single();
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "plan.create", targetType: "premium_plan", targetId: data.id, detail: { name: input.name } });
   revalidatePath("/admin/premium-plans");
   return data;
 }
 
 export async function updatePlanAction(planId: string, input: PlanFormInput) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { data, error } = await supabase
     .from("premium_plans")
@@ -72,13 +74,14 @@ export async function updatePlanAction(planId: string, input: PlanFormInput) {
     .single();
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "plan.update", targetType: "premium_plan", targetId: planId, detail: { name: input.name } });
   revalidatePath("/admin/premium-plans");
   revalidatePath("/premium");
   return data;
 }
 
 export async function togglePlanEnabledAction(planId: string, enabled: boolean) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { error } = await supabase
     .from("premium_plans")
@@ -86,16 +89,18 @@ export async function togglePlanEnabledAction(planId: string, enabled: boolean) 
     .eq("id", planId);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "plan.toggle_enabled", targetType: "premium_plan", targetId: planId, detail: { enabled } });
   revalidatePath("/admin/premium-plans");
   revalidatePath("/premium");
 }
 
 export async function deletePlanAction(planId: string) {
-  const { supabase } = await requireSuperAdminActor();
+  const { supabase, actorId } = await requireSuperAdminActor();
 
   const { error } = await supabase.from("premium_plans").delete().eq("id", planId);
   if (error) throw new Error(error.message);
 
+  await logAdminAction({ actorId, action: "plan.delete", targetType: "premium_plan", targetId: planId });
   revalidatePath("/admin/premium-plans");
   revalidatePath("/premium");
 }
