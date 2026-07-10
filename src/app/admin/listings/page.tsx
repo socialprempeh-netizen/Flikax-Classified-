@@ -40,7 +40,12 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
   const nowIso = new Date().toISOString();
   const bumpCutoffIso = new Date(Date.now() - BUMP_BADGE_DISPLAY_HOURS * 3600 * 1000).toISOString();
 
-  const { data: categories } = await supabase.from("categories").select("id, name").order("name");
+  // Not awaited here — Supabase query builders are lazily thenable, so this
+  // doesn't dispatch yet. It's independent of the listings query below (only
+  // used later for the filter dropdown), so both fire together in the
+  // Promise.all once `query` is fully built, instead of this one paying its
+  // own serialized round-trip in front of everything else.
+  const categoriesPromise = supabase.from("categories").select("id, name").order("name");
 
   let query = supabase
     .from("listings")
@@ -100,7 +105,7 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
   const to = from + PAGE_SIZE - 1;
   query = query.range(from, to);
 
-  const { data: listingRows, count } = await query;
+  const [{ data: categories }, { data: listingRows, count }] = await Promise.all([categoriesPromise, query]);
 
   const now = Date.now();
   const listings: AdminListingRow[] = (listingRows ?? []).map((row) => {

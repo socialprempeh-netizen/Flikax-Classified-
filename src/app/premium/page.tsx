@@ -20,11 +20,12 @@ const SECTION_LABELS: Record<PlanType, string> = {
 };
 
 export default async function PremiumPage() {
-  const {
-    data: { user },
-  } = await getUser();
-
-  const featuredTierEnabled = await getFeatureFlag("featured_tier_enabled");
+  const [
+    {
+      data: { user },
+    },
+    featuredTierEnabled,
+  ] = await Promise.all([getUser(), getFeatureFlag("featured_tier_enabled")]);
 
   if (!featuredTierEnabled) {
     return (

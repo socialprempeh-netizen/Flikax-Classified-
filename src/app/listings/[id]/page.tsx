@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import {
   MessageCircle,
   Star,
@@ -93,19 +94,40 @@ export default async function ListingDetailPage({
     .map((img) => resolveListingImageUrl(supabase, img.storage_path));
 
   const category = listing.categories;
-  let parentCategory: { name: string; slug: string } | null = null;
-  let topLevelSlug = category?.slug;
-  if (category?.parent_id) {
-    const { data: parent } = await supabase
-      .from("categories")
-      .select("name, slug")
-      .eq("id", category.parent_id)
-      .maybeSingle();
-    if (parent) {
-      parentCategory = parent;
-      topLevelSlug = parent.slug;
-    }
-  }
+
+  // These three don't depend on each other's results (only on the listing
+  // fetched above), so they were previously paying their round-trip latency
+  // one after another for no reason — with Vercel and Supabase in different
+  // regions that's ~150-200ms each, purely serialized. Promise.all collapses
+  // them into one round-trip's worth of wall time instead of three.
+  const [parentResult, savedResult, similarSameLocationResult] = await Promise.all([
+    category?.parent_id
+      ? supabase.from("categories").select("name, slug").eq("id", category.parent_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    viewerId
+      ? supabase
+          .from("saved_listings")
+          .select("id")
+          .eq("user_id", viewerId)
+          .eq("listing_id", listing.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("listings")
+      .select(
+        "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position)"
+      )
+      .eq("category_id", listing.category_id)
+      .eq("status", "active")
+      .eq("location", listing.location)
+      .neq("id", listing.id)
+      .order("created_at", { ascending: false })
+      .limit(SIMILAR_LIMIT),
+  ]);
+
+  const parentCategory = parentResult.data as { name: string; slug: string } | null;
+  const topLevelSlug = parentCategory?.slug ?? category?.slug;
+  const initialSaved = Boolean(savedResult.data);
 
   const fields = getFieldsForCategory(topLevelSlug ?? undefined);
   const attributes = (listing.attributes ?? {}) as Record<string, string>;
@@ -116,36 +138,14 @@ export default async function ListingDetailPage({
   const headlineKeys = topLevelSlug ? (HEADLINE_FIELD_KEYS[topLevelSlug] ?? []) : [];
   const headlineSpecs = specs.filter((spec) => headlineKeys.includes(spec.key));
 
-  let initialSaved = false;
-  if (viewerId) {
-    const { data: savedRow } = await supabase
-      .from("saved_listings")
-      .select("id")
-      .eq("user_id", viewerId)
-      .eq("listing_id", listing.id)
-      .maybeSingle();
-    initialSaved = Boolean(savedRow);
-  }
-
+  // A pure side effect that the render doesn't wait on — after() defers it
+  // until the response has already been sent, taking it off the critical
+  // path entirely rather than just parallelizing it.
   if (!isOwner) {
-    await supabase.rpc("increment_listing_views", { listing_id: listing.id });
+    after(() => supabase.rpc("increment_listing_views", { listing_id: listing.id }));
   }
 
-  // Same category + same city ranks first; broaden to same category (any
-  // city) only if that's not enough to fill out the row.
-  const { data: similarSameLocation } = await supabase
-    .from("listings")
-    .select(
-      "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position)"
-    )
-    .eq("category_id", listing.category_id)
-    .eq("status", "active")
-    .eq("location", listing.location)
-    .neq("id", listing.id)
-    .order("created_at", { ascending: false })
-    .limit(SIMILAR_LIMIT);
-
-  let similarRows = similarSameLocation ?? [];
+  let similarRows = similarSameLocationResult.data ?? [];
 
   if (similarRows.length < SIMILAR_LIMIT) {
     const excludeIds = [listing.id, ...similarRows.map((r) => r.id)];
