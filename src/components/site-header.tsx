@@ -2,10 +2,12 @@ import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { Bookmark, MessageSquare, Bell, ClipboardList, UserRound } from "lucide-react";
 import { getInitials } from "@/lib/avatar";
+import { createClient } from "@/lib/supabase/server";
+import { isConversationUnread } from "@/lib/messages";
 
-type HeaderUser = Pick<User, "phone" | "user_metadata">;
+type HeaderUser = Pick<User, "id" | "phone" | "user_metadata">;
 
-export function SiteHeader({ user }: { user?: HeaderUser | null }) {
+export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
   const isLoggedIn = Boolean(user);
   const meta = (user?.user_metadata ?? {}) as { avatar_url?: string; full_name?: string; name?: string };
   const displayName = meta.full_name || meta.name || undefined;
@@ -14,6 +16,16 @@ export function SiteHeader({ user }: { user?: HeaderUser | null }) {
 
   const accountHref = isLoggedIn ? "/settings" : "/auth/login";
   const gatedHref = isLoggedIn ? undefined : "/auth/login";
+
+  let hasUnreadMessages = false;
+  if (user) {
+    const supabase = await createClient();
+    const { data: conversations } = await supabase
+      .from("conversations")
+      .select("buyer_id, seller_id, last_message_at, last_read_by_buyer_at, last_read_by_seller_at")
+      .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`);
+    hasUnreadMessages = (conversations ?? []).some((c) => isConversationUnread(c, user.id));
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-brand">
@@ -36,9 +48,12 @@ export function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/messages"}
             title="Messages"
             aria-label="Messages"
-            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="relative flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
           >
             <MessageSquare className="size-4 sm:size-5" />
+            {hasUnreadMessages && (
+              <span className="absolute right-1 top-1 size-2 rounded-full bg-red-500 ring-2 ring-brand" />
+            )}
           </Link>
 
           <Link

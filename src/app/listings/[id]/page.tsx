@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import {
-  MessageCircle,
   Star,
   TrendingUp,
   Eye,
@@ -35,6 +34,7 @@ import { ListingGallery } from "@/components/listings/listing-gallery";
 import { SaveListingButton } from "@/components/listings/save-listing-button";
 import { MarkUnavailableButton } from "@/components/listings/mark-unavailable-button";
 import { RevealPhoneButton } from "@/components/listings/reveal-phone-button";
+import { StartChatButton } from "@/components/listings/start-chat-button";
 import { ShareButtons } from "@/components/listings/share-buttons";
 import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
@@ -239,7 +239,6 @@ export default async function ListingDetailPage({
   const sellerName = listing.profiles?.full_name || "Flikax user";
   const sellerPhoneDigits = (listing.contact_phone || listing.profiles?.phone)?.replace(/^\+/, "");
   const sellerPhone = sellerPhoneDigits ? `+${sellerPhoneDigits}` : null;
-  const whatsappHref = sellerPhoneDigits ? `https://wa.me/${sellerPhoneDigits}` : null;
   const feedbackHref = `mailto:feedback@flikax.com?subject=${encodeURIComponent(
     `Feedback on listing: ${listing.title}`
   )}&body=${encodeURIComponent(`Listing ID: ${listing.id}`)}`;
@@ -407,24 +406,13 @@ export default async function ListingDetailPage({
                 </div>
               </div>
 
-              {sellerPhone ? (
-                <div className="mt-4 flex flex-col gap-2">
-                  <RevealPhoneButton phone={sellerPhone} label="Contact Seller" />
-                  {whatsappHref && (
-                    <a
-                      href={whatsappHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 px-4 py-2.5 text-base font-bold text-neutral-700 hover:bg-neutral-50"
-                    >
-                      <MessageCircle className="size-4" />
-                      Send Message
-                    </a>
-                  )}
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-neutral-400">No contact info available.</p>
-              )}
+              <div className="mt-4 flex flex-col gap-2">
+                {sellerPhone && <RevealPhoneButton phone={sellerPhone} label="Contact Seller" />}
+                {!isOwner && <StartChatButton listingId={listing.id} />}
+                {!sellerPhone && isOwner && (
+                  <p className="text-sm text-neutral-400">No contact info available.</p>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
