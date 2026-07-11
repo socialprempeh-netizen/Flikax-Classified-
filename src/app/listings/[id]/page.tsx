@@ -16,12 +16,18 @@ import {
   Tag,
   Layers,
   BadgeCheck,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getFieldsForCategory, HEADLINE_FIELD_KEYS } from "@/lib/listing-fields";
+import {
+  computeMarketPriceRange,
+  MARKET_PRICE_MIN_SAMPLE,
+  MARKET_PRICE_WINDOW_DAYS,
+} from "@/lib/market-price";
 import { formatRelativeTime } from "@/lib/format-time";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -150,6 +156,44 @@ export default async function ListingDetailPage({
   const headlineKeys = topLevelSlug ? (HEADLINE_FIELD_KEYS[topLevelSlug] ?? []) : [];
   const headlineSpecs = specs.filter((spec) => headlineKeys.includes(spec.key));
 
+  // Tiered comparable-listings lookup for the "Market Price" range: same
+  // make+model first (vehicles only, since that's the only category with a
+  // structured model field), falling back to same leaf category if that tier
+  // doesn't clear the minimum sample size. Only ever a plain aggregate query
+  // at this data volume — no precomputation/caching needed.
+  const marketPriceSinceIso = new Date(
+    Date.now() - MARKET_PRICE_WINDOW_DAYS * 24 * 3600 * 1000
+  ).toISOString();
+  let comparablePrices: number[] = [];
+
+  const make = attributes.make as string | undefined;
+  const model = attributes.model as string | undefined;
+  if (topLevelSlug === "vehicles" && make && model) {
+    const { data: makeModelRows } = await supabase
+      .from("listings")
+      .select("price")
+      .eq("category_id", listing.category_id)
+      .eq("status", "active")
+      .neq("id", listing.id)
+      .gte("created_at", marketPriceSinceIso)
+      .ilike("attributes->>make", make)
+      .ilike("attributes->>model", model);
+    comparablePrices = (makeModelRows ?? []).map((row) => row.price);
+  }
+
+  if (comparablePrices.length < MARKET_PRICE_MIN_SAMPLE) {
+    const { data: categoryRows } = await supabase
+      .from("listings")
+      .select("price")
+      .eq("category_id", listing.category_id)
+      .eq("status", "active")
+      .neq("id", listing.id)
+      .gte("created_at", marketPriceSinceIso);
+    comparablePrices = (categoryRows ?? []).map((row) => row.price);
+  }
+
+  const marketPrice = computeMarketPriceRange(comparablePrices);
+
   // A pure side effect that the render doesn't wait on — after() defers it
   // until the response has already been sent, taking it off the critical
   // path entirely rather than just parallelizing it.
@@ -273,6 +317,13 @@ export default async function ListingDetailPage({
                   <span className="ml-2 text-base font-medium text-neutral-500">Negotiable</span>
                 )}
               </p>
+
+              {marketPrice && (
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500">
+                  <BarChart3 className="size-4 text-neutral-400" />
+                  Market price: {currency.format(marketPrice.low)} ~ {currency.format(marketPrice.high)}
+                </p>
+              )}
 
               {headlineSpecs.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-4 border-t border-neutral-100 pt-4">
