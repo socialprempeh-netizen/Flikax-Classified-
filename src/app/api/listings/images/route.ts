@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { watermarkImage } from "@/lib/watermark";
 import { computeAverageHash, computeBlurScore } from "@/lib/image-hash";
@@ -32,6 +33,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  // supabase.auth.getUser(bearerToken) only verifies who the caller is — it
+  // doesn't change which credentials the rest of this `supabase` client's
+  // requests (like the storage upload below) carry. Those still ride on
+  // whatever cookie session `createClient()` picked up, which can be stale
+  // or absent in exactly the scenario the bearer token exists to route
+  // around (batch uploads, races). Storage RLS checks `auth.uid()` against
+  // the request's own JWT, so a cookie-less/stale-cookie request would
+  // authenticate as the right user above and then get rejected as anonymous
+  // on the actual upload. A token-scoped client carries the verified bearer
+  // token on every request it makes, independent of cookie state.
+  const storageClient = bearerToken
+    ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+        global: { headers: { Authorization: `Bearer ${bearerToken}` } },
+        auth: { persistSession: false },
+      })
+    : supabase;
+
   const formData = await request.formData();
   const file = formData.get("file");
 
@@ -61,7 +79,7 @@ export async function POST(request: Request) {
   }
 
   const path = `${user.id}/${randomUUID()}.webp`;
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await storageClient.storage
     .from("listing-images")
     .upload(path, watermarked, { contentType: "image/webp", upsert: false });
 
@@ -71,7 +89,7 @@ export async function POST(request: Request) {
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from("listing-images").getPublicUrl(path);
+  } = storageClient.storage.from("listing-images").getPublicUrl(path);
 
   return NextResponse.json({ path, url: publicUrl, phash, blurScore });
 }
