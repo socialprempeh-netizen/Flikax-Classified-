@@ -14,6 +14,7 @@ type PageProps = {
   searchParams: Promise<{
     q?: string;
     location?: string;
+    excludeLocation?: string;
     category?: string;
     minPrice?: string;
     maxPrice?: string;
@@ -25,6 +26,7 @@ export default async function Home({ searchParams }: PageProps) {
   const filters: ListingFilters = {
     q: params.q || undefined,
     location: params.location || undefined,
+    excludeLocation: params.excludeLocation || undefined,
     category: params.category || undefined,
     minPrice: params.minPrice || undefined,
     maxPrice: params.maxPrice || undefined,
@@ -45,6 +47,7 @@ export default async function Home({ searchParams }: PageProps) {
         search_query: filters.q,
         category_slug: filters.category,
         location_filter: filters.location,
+        exclude_location: filters.excludeLocation,
         min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
         max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
       }),

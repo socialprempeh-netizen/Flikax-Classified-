@@ -961,6 +961,25 @@ export type Database = {
           listing_count: number
         }[]
       }
+      get_seller_listing_stats: {
+        Args: { p_user_id: string }
+        Returns: {
+          category_id: string
+          category_name: string
+          category_slug: string
+          conversation_count: number
+          cover_image_path: string
+          id: string
+          location: string
+          rank: number
+          save_count: number
+          short_id: number
+          status: string
+          title: string
+          total_in_category: number
+          views: number
+        }[]
+      }
       increment_listing_views: {
         Args: { listing_id: string }
         Returns: undefined
@@ -976,6 +995,7 @@ export type Database = {
       search_listings: {
         Args: {
           category_slug?: string
+          exclude_location?: string
           location_filter?: string
           max_price?: number
           min_price?: number

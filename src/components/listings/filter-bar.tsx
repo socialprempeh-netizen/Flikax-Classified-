@@ -4,7 +4,12 @@ import type { ListingFilters } from "@/lib/filters";
 
 export function FilterBar({ filters }: { filters: ListingFilters }) {
   const hasFilters = Boolean(
-    filters.q || filters.location || filters.category || filters.minPrice || filters.maxPrice
+    filters.q ||
+      filters.location ||
+      filters.excludeLocation ||
+      filters.category ||
+      filters.minPrice ||
+      filters.maxPrice
   );
 
   if (!hasFilters) return null;

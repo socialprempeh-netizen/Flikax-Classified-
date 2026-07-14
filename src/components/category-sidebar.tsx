@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import { LocationPicker } from "@/components/location-picker";
+import { ExcludeLocationPicker } from "@/components/exclude-location-picker";
 import { CategoryNav } from "@/components/category-nav";
 
 // Featured categories are pinned first in the sidebar; the rest keep their existing order.
@@ -90,8 +91,13 @@ export function CategorySidebar({
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-100 bg-white shadow-sm">
+      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm">
         <LocationPicker
+          filters={filters}
+          locationCounts={locationCounts}
+          totalListingsCount={totalListingsCount}
+        />
+        <ExcludeLocationPicker
           filters={filters}
           locationCounts={locationCounts}
           totalListingsCount={totalListingsCount}
