@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImageOff, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function ListingGallery({ images, title }: { images: string[]; title: string }) {
@@ -24,12 +25,14 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
 
   return (
     <div>
-      <div className="relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+        <Image
           src={images[activeIndex]}
           alt={title}
-          className="aspect-video w-full rounded-xl object-cover"
+          fill
+          priority={activeIndex === 0}
+          sizes="(min-width: 640px) 66vw, 100vw"
+          className="object-cover"
         />
         {images.length > 1 && (
           <>
@@ -61,12 +64,11 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`View image ${index + 1}`}
-              className={`size-20 shrink-0 overflow-hidden rounded-lg border-2 sm:size-28 ${
+              className={`relative size-20 shrink-0 overflow-hidden rounded-lg border-2 sm:size-28 ${
                 index === activeIndex ? "border-brand" : "border-transparent"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="size-full object-cover" />
+              <Image src={url} alt="" fill sizes="112px" className="object-cover" />
             </button>
           ))}
         </div>

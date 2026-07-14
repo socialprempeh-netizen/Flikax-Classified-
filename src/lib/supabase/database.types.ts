@@ -999,6 +999,7 @@ export type Database = {
           location_filter?: string
           max_price?: number
           min_price?: number
+          p_page?: number
           search_query?: string
         }
         Returns: {
@@ -1014,6 +1015,7 @@ export type Database = {
           price: number
           short_id: number
           title: string
+          total_count: number
         }[]
       }
     }

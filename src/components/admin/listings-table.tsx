@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ImageOff, Star, TrendingUp, AlertTriangle } from "lucide-react";
 import { ADMIN_STATUS_LABELS, ADMIN_STATUS_STYLES } from "@/lib/admin-listings";
@@ -171,10 +172,9 @@ export function ListingsTable({ listings }: { listings: AdminListingRow[] }) {
               className="size-4 shrink-0 accent-brand"
             />
 
-            <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
+            <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
               {listing.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={listing.imageUrl} alt={listing.title} className="size-full object-cover" />
+                <Image src={listing.imageUrl} alt={listing.title} fill sizes="64px" className="object-cover" />
               ) : (
                 <ImageOff className="size-5" />
               )}

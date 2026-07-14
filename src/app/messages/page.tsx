@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { MessageSquare, ImageOff } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
@@ -79,10 +80,9 @@ export default async function MessagesPage() {
                   href={`/messages/${conversation.id}`}
                   className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm hover:shadow-md"
                 >
-                  <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
+                  <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
                     {coverUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={coverUrl} alt="" className="size-full object-cover" />
+                      <Image src={coverUrl} alt="" fill sizes="56px" className="object-cover" />
                     ) : (
                       <ImageOff className="size-5" />
                     )}

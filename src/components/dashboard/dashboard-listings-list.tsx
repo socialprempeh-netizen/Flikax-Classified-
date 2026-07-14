@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ImageOff, Star, RefreshCw } from "lucide-react";
 import { deleteListingAction } from "@/app/my-adverts/actions";
 import { DeleteListingButton } from "@/components/listings/delete-listing-button";
@@ -60,8 +61,7 @@ export function DashboardListingsList({
           <Link href={listing.href} aria-label={listing.title} className="absolute inset-0 z-0" />
           <div className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
             {listing.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={listing.imageUrl} alt={listing.title} className="size-full object-cover" />
+              <Image src={listing.imageUrl} alt={listing.title} fill sizes="96px" className="object-cover" />
             ) : (
               <ImageOff className="size-6" />
             )}

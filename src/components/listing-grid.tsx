@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ImageOff, Star, TrendingUp } from "lucide-react";
 
 export type ListingCard = {
@@ -41,8 +42,13 @@ export function ListingGrid({ listings }: { listings: ListingCard[] }) {
           >
             <div className="relative flex aspect-square items-center justify-center bg-brand-light text-brand/40">
               {listing.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={listing.imageUrl} alt={listing.title} className="size-full object-cover" />
+                <Image
+                  src={listing.imageUrl}
+                  alt={listing.title}
+                  fill
+                  sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+                  className="object-cover"
+                />
               ) : (
                 <ImageOff className="size-8" />
               )}

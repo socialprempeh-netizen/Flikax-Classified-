@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { after } from "next/server";
 import { ImageOff } from "lucide-react";
@@ -27,27 +28,33 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     redirect(`/auth/login?redirect=/messages/${id}`);
   }
 
-  const { data: conversation } = await supabase
-    .from("conversations")
-    .select(
-      `id, buyer_id, seller_id, phone_revealed_by_buyer, phone_revealed_by_seller,
-       listing:listings(id, title, price, location, status, contact_phone, short_id, listing_images(storage_path, position), categories(slug)),
-       buyer:profiles!conversations_buyer_id_fkey(full_name, phone),
-       seller:profiles!conversations_seller_id_fkey(full_name, phone)`
-    )
-    .eq("id", id)
-    .maybeSingle();
+  // Both queries filter on the route id directly — messages doesn't depend on
+  // the conversation lookup's result, so there's no reason to pay their
+  // round-trip latency serially. RLS on `messages` already scopes rows to
+  // participants regardless of query order, so firing this even for a
+  // request that turns out unauthorized is a wasted query, not a security gap.
+  const [{ data: conversation }, { data: messages }] = await Promise.all([
+    supabase
+      .from("conversations")
+      .select(
+        `id, buyer_id, seller_id, phone_revealed_by_buyer, phone_revealed_by_seller,
+         listing:listings(id, title, price, location, status, contact_phone, short_id, listing_images(storage_path, position), categories(slug)),
+         buyer:profiles!conversations_buyer_id_fkey(full_name, phone),
+         seller:profiles!conversations_seller_id_fkey(full_name, phone)`
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("messages")
+      .select("id, sender_id, body, created_at")
+      .eq("conversation_id", id)
+      .order("created_at", { ascending: true })
+      .limit(50),
+  ]);
 
   if (!conversation || (user.id !== conversation.buyer_id && user.id !== conversation.seller_id)) {
     notFound();
   }
-
-  const { data: messages } = await supabase
-    .from("messages")
-    .select("id, sender_id, body, created_at")
-    .eq("conversation_id", id)
-    .order("created_at", { ascending: true })
-    .limit(50);
 
   // Deferred until after the response is sent, same as the listing page's view-count bump.
   after(() => markConversationReadAction(id));
@@ -83,10 +90,9 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
             })}
             className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm hover:shadow-md"
           >
-            <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
+            <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
               {coverUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={coverUrl} alt={conversation.listing.title} className="size-full object-cover" />
+                <Image src={coverUrl} alt={conversation.listing.title} fill sizes="56px" className="object-cover" />
               ) : (
                 <ImageOff className="size-5" />
               )}

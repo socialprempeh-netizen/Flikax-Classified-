@@ -47,6 +47,6 @@ export async function watermarkImage(input: Buffer): Promise<Buffer> {
         top: Math.max(0, height - wmHeight - margin),
       },
     ])
-    .jpeg({ quality: 82 })
+    .webp({ quality: 80 })
     .toBuffer();
 }

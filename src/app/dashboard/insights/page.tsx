@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { ImageOff } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
@@ -68,10 +69,9 @@ export default async function PerformanceInsightsPage() {
                   <tr key={row.id} className="hover:bg-brand-light/20">
                     <td className="px-4 py-3">
                       <Link href={href} className="flex items-center gap-3">
-                        <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
+                        <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
                           {imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={imageUrl} alt={row.title} className="size-full object-cover" />
+                            <Image src={imageUrl} alt={row.title} fill sizes="48px" className="object-cover" />
                           ) : (
                             <ImageOff className="size-5" />
                           )}

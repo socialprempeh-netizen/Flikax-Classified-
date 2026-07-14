@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { CategorySidebar } from "@/components/category-sidebar";
@@ -8,7 +9,9 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getListingPath } from "@/lib/listing-url";
-import type { ListingFilters } from "@/lib/filters";
+import { buildListingsHref, type ListingFilters } from "@/lib/filters";
+
+const PAGE_SIZE = 24;
 
 type PageProps = {
   searchParams: Promise<{
@@ -18,6 +21,7 @@ type PageProps = {
     category?: string;
     minPrice?: string;
     maxPrice?: string;
+    page?: string;
   }>;
 };
 
@@ -31,6 +35,7 @@ export default async function Home({ searchParams }: PageProps) {
     minPrice: params.minPrice || undefined,
     maxPrice: params.maxPrice || undefined,
   };
+  const page = Math.max(1, Number(params.page) || 1);
 
   const supabase = await createClient();
 
@@ -50,6 +55,7 @@ export default async function Home({ searchParams }: PageProps) {
         exclude_location: filters.excludeLocation,
         min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
         max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+        p_page: page,
       }),
       supabase.from("listings").select("location").eq("status", "active"),
     ]);
@@ -79,6 +85,9 @@ export default async function Home({ searchParams }: PageProps) {
     isFeatured: listing.is_featured,
     isBumped: isRecentlyBumped(listing.bumped_at),
   }));
+
+  const totalCount = results?.[0]?.total_count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const selectedCategory = categories?.find((c) => c.slug === filters.category);
   const heading = selectedCategory ? selectedCategory.name : "All listings";
@@ -114,6 +123,30 @@ export default async function Home({ searchParams }: PageProps) {
           <h2 className="mb-4 text-lg font-bold text-neutral-800">{heading}</h2>
           <FilterBar filters={filters} />
           <ListingGrid listings={listings} />
+
+          {totalPages > 1 && (
+            <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
+              {page > 1 && (
+                <Link
+                  href={buildListingsHref(filters, page - 1)}
+                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Previous
+                </Link>
+              )}
+              <span className="text-neutral-500">
+                Page {page} of {totalPages}
+              </span>
+              {page < totalPages && (
+                <Link
+                  href={buildListingsHref(filters, page + 1)}
+                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Next
+                </Link>
+              )}
+            </nav>
+          )}
         </div>
       </main>
 
