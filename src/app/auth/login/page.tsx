@@ -7,9 +7,9 @@ import { AuthMethodTabs } from "@/components/auth/auth-method-tabs";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string }>;
+  searchParams: Promise<{ redirect?: string; error?: string }>;
 }) {
-  const { redirect: redirectParam } = await searchParams;
+  const { redirect: redirectParam, error } = await searchParams;
   const redirectTo = redirectParam?.startsWith("/") ? redirectParam : "/";
 
   const {
@@ -33,6 +33,12 @@ export default async function LoginPage({
               Buy and sell anything, anywhere in Ghana. Log in or create an account to get started.
             </p>
           </div>
+
+          {error && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
 
           <div className="flex flex-col items-center gap-3">
             <GoogleSignInButton redirectTo={redirectTo} />
