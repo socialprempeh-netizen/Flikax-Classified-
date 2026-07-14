@@ -4,6 +4,7 @@ import { Bookmark, MessageSquare, Bell, Gem, ClipboardList, UserRound } from "lu
 import { getInitials } from "@/lib/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { isConversationUnread } from "@/lib/messages";
+import { MobileNavDrawer } from "@/components/mobile-nav-drawer";
 
 type HeaderUser = Pick<User, "id" | "phone" | "user_metadata">;
 
@@ -17,9 +18,10 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
   const accountHref = isLoggedIn ? "/settings" : "/auth/login";
   const gatedHref = isLoggedIn ? undefined : "/auth/login";
 
+  const supabase = await createClient();
+
   let hasUnreadMessages = false;
   if (user) {
-    const supabase = await createClient();
     const { data: conversations } = await supabase
       .from("conversations")
       .select("buyer_id, seller_id, last_message_at, last_read_by_buyer_at, last_read_by_seller_at")
@@ -27,12 +29,24 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
     hasUnreadMessages = (conversations ?? []).some((c) => isConversationUnread(c, user.id));
   }
 
+  // Fetched here (rather than threaded in as a prop) so every page that
+  // renders SiteHeader gets the drawer's category list for free — this
+  // component is mounted on nearly every route in the app.
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name, slug, parent_id, icon")
+    .order("display_order")
+    .order("name");
+
   return (
     <header className="sticky top-0 z-50 bg-brand">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
-        <Link href="/" className="font-logo text-2xl font-extrabold lowercase text-white sm:text-4xl">
-          flikax
-        </Link>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <MobileNavDrawer categories={categories ?? []} isLoggedIn={isLoggedIn} hasUnreadMessages={hasUnreadMessages} />
+          <Link href="/" className="font-logo text-2xl font-extrabold lowercase text-white sm:text-4xl">
+            flikax
+          </Link>
+        </div>
 
         <div className="flex items-center gap-1.5 sm:gap-3">
           <Link

@@ -3,6 +3,7 @@ import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import { LocationPicker } from "@/components/location-picker";
 import { ExcludeLocationPicker } from "@/components/exclude-location-picker";
 import { CategoryNav } from "@/components/category-nav";
+import { MobileCategoryGrid } from "@/components/mobile-category-grid";
 
 // Featured categories are pinned first in the sidebar; the rest keep their existing order.
 const FEATURED_SLUGS = ["phones-tablets", "vehicles", "property"];
@@ -55,14 +56,21 @@ export function CategorySidebar({
 
   if (!activeParent) {
     return (
-      <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
+      <div className="w-full shrink-0 lg:w-72">
+        <div className="hidden lg:block">
+          <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
+        </div>
+        <div className="lg:hidden">
+          <MobileCategoryGrid parents={parents} filters={filters} />
+        </div>
+      </div>
     );
   }
 
   const children = categories.filter((c) => c.parent_id === activeParent.id);
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-4 sm:w-72">
+    <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
       <div className="rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Categories</h3>
         <Link
