@@ -65,12 +65,18 @@ export function ShareButtons({ title, priceLabel }: { title: string; priceLabel:
         onClick={copyForTikTok}
         aria-label="Copy link to share on TikTok"
         title="TikTok doesn't support pre-filled link sharing — this copies the listing details instead"
-        className={ICON_BUTTON_CLASS}
+        className={
+          copied
+            ? "flex size-9 items-center justify-center rounded-full bg-green-100 text-green-600"
+            : ICON_BUTTON_CLASS
+        }
       >
         {copied ? <Check className="size-4" /> : <TikTokIcon className="size-4" />}
       </button>
 
-      {copied && <span className="text-xs font-medium text-green-600">Copied for TikTok!</span>}
+      {copied && (
+        <span className="text-xs font-medium text-green-600">Copied! Paste it in your TikTok caption.</span>
+      )}
     </div>
   );
 }

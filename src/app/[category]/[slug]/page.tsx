@@ -185,6 +185,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: canonicalPath,
+      siteName: "Flikax",
+      type: "website",
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
       images: imageUrl ? [imageUrl] : undefined,
     },
   };
