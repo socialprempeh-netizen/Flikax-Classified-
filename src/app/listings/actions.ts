@@ -20,13 +20,15 @@ export async function toggleSavedListingAction(listingId: string): Promise<{ sav
     .maybeSingle();
 
   if (existing) {
-    await supabase.from("saved_listings").delete().eq("id", existing.id);
+    const { error } = await supabase.from("saved_listings").delete().eq("id", existing.id);
+    if (error) throw new Error(error.message);
     revalidatePath("/[category]/[slug]", "page");
     revalidatePath("/saved");
     return { saved: false };
   }
 
-  await supabase.from("saved_listings").insert({ user_id: user.id, listing_id: listingId });
+  const { error } = await supabase.from("saved_listings").insert({ user_id: user.id, listing_id: listingId });
+  if (error) throw new Error(error.message);
   revalidatePath("/[category]/[slug]", "page");
   revalidatePath("/saved");
   return { saved: true };
