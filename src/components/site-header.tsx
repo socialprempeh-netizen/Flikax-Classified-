@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
-import { Bookmark, MessageSquare, Bell, ClipboardList, UserRound } from "lucide-react";
+import { Bookmark, MessageSquare, Bell, Gem, ClipboardList, UserRound } from "lucide-react";
 import { getInitials } from "@/lib/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { isConversationUnread } from "@/lib/messages";
@@ -63,6 +63,15 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
           >
             <Bell className="size-4 sm:size-5" />
+          </Link>
+
+          <Link
+            href="/premium"
+            title="Premium"
+            aria-label="Premium"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+          >
+            <Gem className="size-4 sm:size-5" />
           </Link>
 
           <Link

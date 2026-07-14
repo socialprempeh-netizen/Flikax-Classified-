@@ -15,6 +15,7 @@ import {
   Gift,
   ShieldAlert,
   Lock,
+  Gem,
   type LucideIcon,
 } from "lucide-react";
 import { getInitials } from "@/lib/avatar";
@@ -22,6 +23,7 @@ import { getInitials } from "@/lib/avatar";
 const MENU_ITEMS: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My Listings", href: "/dashboard", icon: ClipboardList },
+  { label: "Premium", href: "/premium", icon: Gem },
   { label: "Active Offers", href: "/dashboard/offers", icon: Handshake },
   { label: "Messaging", href: "/messages", icon: MessageSquare },
   { label: "Verified User Badge", href: "/dashboard/verified-badge", icon: ShieldCheck },
