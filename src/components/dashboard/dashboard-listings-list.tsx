@@ -13,6 +13,7 @@ const currency = new Intl.NumberFormat("en-GH", {
 
 export type DashboardListingRow = {
   id: string;
+  href: string;
   title: string;
   price: number;
   status: string;
@@ -56,11 +57,7 @@ export function DashboardListingsList({
     <div className="divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-md">
       {listings.map((listing) => (
         <div key={listing.id} className="relative flex gap-4 p-4 hover:bg-brand-light/30">
-          <Link
-            href={`/listings/${listing.id}`}
-            aria-label={listing.title}
-            className="absolute inset-0 z-0"
-          />
+          <Link href={listing.href} aria-label={listing.title} className="absolute inset-0 z-0" />
           <div className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
             {listing.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element

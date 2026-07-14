@@ -21,13 +21,13 @@ export async function toggleSavedListingAction(listingId: string): Promise<{ sav
 
   if (existing) {
     await supabase.from("saved_listings").delete().eq("id", existing.id);
-    revalidatePath(`/listings/${listingId}`);
+    revalidatePath("/[category]/[slug]", "page");
     revalidatePath("/saved");
     return { saved: false };
   }
 
   await supabase.from("saved_listings").insert({ user_id: user.id, listing_id: listingId });
-  revalidatePath(`/listings/${listingId}`);
+  revalidatePath("/[category]/[slug]", "page");
   revalidatePath("/saved");
   return { saved: true };
 }
@@ -46,7 +46,7 @@ export async function markListingUnavailableAction(listingId: string): Promise<v
     .eq("id", listingId)
     .eq("user_id", user.id);
 
-  revalidatePath(`/listings/${listingId}`);
+  revalidatePath("/[category]/[slug]", "page");
   revalidatePath("/dashboard");
 }
 

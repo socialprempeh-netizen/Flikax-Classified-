@@ -3,6 +3,7 @@ import { ImageOff, Star, TrendingUp } from "lucide-react";
 
 export type ListingCard = {
   id: string;
+  href: string;
   title: string;
   price: number;
   location: string;
@@ -35,7 +36,7 @@ export function ListingGrid({ listings }: { listings: ListingCard[] }) {
         {listings.map((listing) => (
           <Link
             key={listing.id}
-            href={`/listings/${listing.id}`}
+            href={listing.href}
             className="block overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-sm hover:shadow-md"
           >
             <div className="relative flex aspect-square items-center justify-center bg-brand-light text-brand/40">

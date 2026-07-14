@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
+import { getListingPath } from "@/lib/listing-url";
 import type { ListingFilters } from "@/lib/filters";
 
 type PageProps = {
@@ -60,6 +61,12 @@ export default async function Home({ searchParams }: PageProps) {
 
   const listings: ListingCard[] = (results ?? []).map((listing) => ({
     id: listing.id,
+    href: getListingPath({
+      title: listing.title,
+      location: listing.location,
+      short_id: listing.short_id,
+      categorySlug: listing.category_slug,
+    }),
     title: listing.title,
     price: listing.price,
     location: listing.location,

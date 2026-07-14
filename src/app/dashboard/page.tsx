@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
+import { getListingPath } from "@/lib/listing-url";
 import { PAYMENTS_ENABLED } from "@/lib/payments/config";
 import { getEnabledPlans, LISTING_SCOPED_PLAN_TYPES } from "@/lib/premium-plans";
 import { DashboardListingsList, type DashboardListingRow } from "@/components/dashboard/dashboard-listings-list";
@@ -29,7 +30,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     supabase
       .from("listings")
       .select(
-        "id, title, price, status, declined_reason, category_id, is_featured, featured_until, listing_images(storage_path, position)"
+        "id, title, price, location, status, declined_reason, category_id, is_featured, featured_until, short_id, listing_images(storage_path, position), categories(slug)"
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
@@ -67,6 +68,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     const cover = [...(listing.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
     return {
       id: listing.id,
+      href: getListingPath({
+        title: listing.title,
+        location: listing.location,
+        short_id: listing.short_id,
+        categorySlug: listing.categories?.slug ?? "listing",
+      }),
       title: listing.title,
       price: listing.price,
       status: listing.status,

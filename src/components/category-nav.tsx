@@ -91,7 +91,7 @@ export function CategoryNav({
                   {children.map((child) => (
                     <Link
                       key={child.id}
-                      href={buildListingsHref({ ...filters, category: child.slug })}
+                      href={`/${child.slug}`}
                       className="flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-neutral-50"
                     >
                       <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-light text-brand">

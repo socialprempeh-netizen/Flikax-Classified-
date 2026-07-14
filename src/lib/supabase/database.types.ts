@@ -355,6 +355,7 @@ export type Database = {
           location: string
           negotiable: string | null
           price: number
+          short_id: number
           status: string
           title: string
           updated_at: string
@@ -377,6 +378,7 @@ export type Database = {
           location: string
           negotiable?: string | null
           price: number
+          short_id?: never
           status?: string
           title: string
           updated_at?: string
@@ -399,6 +401,7 @@ export type Database = {
           location?: string
           negotiable?: string | null
           price?: number
+          short_id?: never
           status?: string
           title?: string
           updated_at?: string
@@ -989,6 +992,7 @@ export type Database = {
           is_featured: boolean
           location: string
           price: number
+          short_id: number
           title: string
         }[]
       }

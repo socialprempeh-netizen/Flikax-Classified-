@@ -2,6 +2,21 @@ import Link from "next/link";
 import { PencilLine } from "lucide-react";
 import { PAYMENTS_ENABLED } from "@/lib/payments/config";
 import { SellCta } from "@/components/cta/sell-cta";
+import { JsonLd } from "@/components/seo/json-ld";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Flikax",
+  url: SITE_URL,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Tema, Accra",
+    addressCountry: "GH",
+  },
+};
 
 const exploreLinks = [
   { label: "Vehicles", href: "/?category=vehicles" },
@@ -22,6 +37,7 @@ const legalLinks = [
 export function SiteFooter() {
   return (
     <footer className="rounded-t-[2.5rem] bg-brand-dark px-6 py-10 text-white sm:px-10 sm:py-12">
+      <JsonLd data={localBusinessJsonLd} />
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="font-logo text-4xl font-extrabold lowercase sm:text-5xl">flikax</span>

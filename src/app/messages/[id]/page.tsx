@@ -4,6 +4,7 @@ import { after } from "next/server";
 import { ImageOff } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
+import { getListingPath } from "@/lib/listing-url";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ChatThread } from "@/components/messages/chat-thread";
@@ -30,7 +31,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     .from("conversations")
     .select(
       `id, buyer_id, seller_id, phone_revealed_by_buyer, phone_revealed_by_seller,
-       listing:listings(id, title, price, status, contact_phone, listing_images(storage_path, position)),
+       listing:listings(id, title, price, location, status, contact_phone, short_id, listing_images(storage_path, position), categories(slug)),
        buyer:profiles!conversations_buyer_id_fkey(full_name, phone),
        seller:profiles!conversations_seller_id_fkey(full_name, phone)`
     )
@@ -74,7 +75,12 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
 
         {conversation.listing && (
           <Link
-            href={`/listings/${conversation.listing.id}`}
+            href={getListingPath({
+              title: conversation.listing.title,
+              location: conversation.listing.location,
+              short_id: conversation.listing.short_id,
+              categorySlug: conversation.listing.categories?.slug ?? "listing",
+            })}
             className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm hover:shadow-md"
           >
             <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
