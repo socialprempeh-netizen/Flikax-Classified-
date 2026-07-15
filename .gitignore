@@ -43,3 +43,6 @@ next-env.d.ts
 # claude code (local-only; settings.json/agents would be committed if present)
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+
+# one-time migration script progress state
+scripts/.backfill-progress.json
