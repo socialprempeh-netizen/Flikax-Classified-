@@ -74,7 +74,12 @@ export async function POST(request: Request) {
       computeAverageHash(inputBuffer),
       computeBlurScore(inputBuffer),
     ]);
-  } catch {
+  } catch (err) {
+    // Logged server-side rather than surfaced to the client: this catch also
+    // covers a missing/misconfigured watermark asset (a deploy/config
+    // problem), which looks identical to "this photo is corrupt" from the
+    // client's perspective but needs to be diagnosable in server logs.
+    console.error("Image processing failed:", err);
     return NextResponse.json({ error: "Could not process image" }, { status: 400 });
   }
 
