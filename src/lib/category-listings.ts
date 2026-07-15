@@ -11,11 +11,21 @@ export const CATEGORY_PAGE_SIZE = 24;
  * friendly empty state) but kept out of the sitemap and marked noindex. */
 export const MIN_INDEXABLE_LISTINGS = 3;
 
-type CategoryListingsFilter = { categoryId: string; location?: string; page?: number };
+export type CategorySort = "recommended" | "newest" | "price_asc" | "price_desc";
+
+type CategoryListingsFilter = {
+  categoryId: string;
+  location?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  q?: string;
+  sort?: CategorySort;
+  page?: number;
+};
 
 export async function fetchCategoryListings(
   supabase: SupabaseClient<Database>,
-  { categoryId, location, page = 1 }: CategoryListingsFilter
+  { categoryId, location, minPrice, maxPrice, q, sort = "recommended", page = 1 }: CategoryListingsFilter
 ): Promise<{ listings: ListingCard[]; totalCount: number }> {
   let query = supabase
     .from("listings")
@@ -27,13 +37,32 @@ export async function fetchCategoryListings(
     .eq("status", "active");
 
   if (location) query = query.eq("location", location);
+  if (minPrice !== undefined) query = query.gte("price", minPrice);
+  if (maxPrice !== undefined) query = query.lte("price", maxPrice);
+  // A plain ilike is enough for "narrow this category by keyword" -- unlike
+  // the homepage's search_listings RPC, this isn't cross-category fuzzy
+  // search, just a title filter on top of a category the user already
+  // picked, so it doesn't need word_similarity ranking.
+  if (q) query = query.ilike("title", `%${q}%`);
+
+  // "Recommended" keeps the featured/bumped-first ordering; the other three
+  // sorts are what a user explicitly picked, so they override it entirely
+  // rather than layering underneath.
+  if (sort === "newest") {
+    query = query.order("created_at", { ascending: false });
+  } else if (sort === "price_asc") {
+    query = query.order("price", { ascending: true });
+  } else if (sort === "price_desc") {
+    query = query.order("price", { ascending: false });
+  } else {
+    query = query
+      .order("is_featured", { ascending: false })
+      .order("bumped_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
+  }
 
   const from = (page - 1) * CATEGORY_PAGE_SIZE;
-  const { data, count } = await query
-    .order("is_featured", { ascending: false })
-    .order("bumped_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false })
-    .range(from, from + CATEGORY_PAGE_SIZE - 1);
+  const { data, count } = await query.range(from, from + CATEGORY_PAGE_SIZE - 1);
 
   const now = Date.now();
   const listings: ListingCard[] = (data ?? []).map((row) => {

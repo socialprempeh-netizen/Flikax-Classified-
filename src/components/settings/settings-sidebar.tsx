@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 
 const NAV_GROUPS: { label: string; href: string; badge?: string }[][] = [
@@ -53,12 +53,15 @@ export function SettingsSidebar() {
                     isActive ? "bg-brand text-white" : "text-neutral-700 hover:bg-brand-light hover:text-brand"
                   }`}
                 >
-                  {item.label}
-                  {item.badge && (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                      {item.badge}
-                    </span>
-                  )}
+                  <span className="truncate">{item.label}</span>
+                  <span className="flex shrink-0 items-center gap-2">
+                    {item.badge && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`size-4 ${isActive ? "text-white" : "text-neutral-300"}`} />
+                  </span>
                 </Link>
               );
             })}

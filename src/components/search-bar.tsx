@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { SearchLocationField } from "@/components/search-location-field";
+import { SearchQueryField } from "@/components/search-query-field";
 
 export function SearchBar({
   defaultQuery,
@@ -27,13 +28,7 @@ export function SearchBar({
 
       <span className="h-6 w-px shrink-0 bg-neutral-200" />
 
-      <input
-        type="text"
-        name="q"
-        defaultValue={defaultQuery}
-        placeholder="I am looking for..."
-        className="min-w-0 flex-1 bg-transparent px-1 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 outline-none"
-      />
+      <SearchQueryField defaultQuery={defaultQuery} />
 
       <button
         type="submit"

@@ -4,6 +4,7 @@ import { LocationPicker } from "@/components/location-picker";
 import { ExcludeLocationPicker } from "@/components/exclude-location-picker";
 import { CategoryNav } from "@/components/category-nav";
 import { MobileCategoryGrid } from "@/components/mobile-category-grid";
+import { MobileCategoryList } from "@/components/mobile-category-list";
 
 // Featured categories are pinned first in the sidebar; the rest keep their existing order.
 const FEATURED_SLUGS = ["phones-tablets", "vehicles", "property"];
@@ -71,7 +72,7 @@ export function CategorySidebar({
 
   return (
     <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
-      <div className="rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
+      <div className="hidden lg:block rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Categories</h3>
         <Link
           href={buildListingsHref({ ...filters, category: undefined })}
@@ -97,6 +98,26 @@ export function CategorySidebar({
             );
           })}
         </div>
+      </div>
+
+      <div className="lg:hidden">
+        <div className="mb-2 flex items-center gap-2 px-1">
+          <Link
+            href={buildListingsHref({ ...filters, category: undefined })}
+            className="text-xs font-medium text-neutral-500 hover:text-brand"
+          >
+            All categories
+          </Link>
+          <span className="text-xs text-neutral-300">/</span>
+          <span className="truncate text-xs font-semibold text-brand">{activeParent.name}</span>
+        </div>
+        <MobileCategoryList
+          categories={children}
+          counts={counts}
+          filters={filters}
+          selectedSlug={selectedSlug}
+          activeParentSlug={activeParent.slug}
+        />
       </div>
 
       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm">

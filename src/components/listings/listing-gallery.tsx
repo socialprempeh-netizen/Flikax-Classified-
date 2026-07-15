@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ImageOff, ChevronLeft, ChevronRight } from "lucide-react";
+import { ImageOff, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 
 export function ListingGallery({ images, title }: { images: string[]; title: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -52,12 +52,16 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
             >
               <ChevronRight className="size-5" />
             </button>
+            <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white sm:hidden">
+              <Camera className="size-3.5" />
+              {activeIndex + 1}/{images.length}
+            </span>
           </>
         )}
       </div>
 
       {images.length > 1 && (
-        <div className="mt-3 flex flex-wrap gap-3">
+        <div className="mt-3 hidden flex-wrap gap-3 sm:flex">
           {images.map((url, index) => (
             <button
               key={url + index}

@@ -79,19 +79,21 @@ export function DashboardSidebar({
         </div>
       )}
 
-      <nav className="flex flex-col overflow-hidden rounded-xl bg-white shadow-lg">
+      <nav className="grid grid-cols-2 gap-2 sm:flex sm:flex-col sm:gap-0 sm:overflow-hidden sm:rounded-xl sm:bg-white sm:shadow-lg">
         {MENU_ITEMS.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.label}
               href={item.href}
-              className={`flex items-center gap-3 border-b border-neutral-50 px-4 py-3 text-sm font-medium last:border-b-0 ${
-                isActive ? "bg-brand text-white" : "text-neutral-700 hover:bg-brand-light hover:text-brand"
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium shadow-sm sm:rounded-none sm:border-b sm:border-neutral-50 sm:shadow-none sm:last:border-b-0 ${
+                isActive
+                  ? "bg-brand text-white"
+                  : "bg-white text-neutral-700 hover:bg-brand-light hover:text-brand"
               }`}
             >
               <item.icon className="size-4.5 shrink-0" />
-              {item.label}
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}

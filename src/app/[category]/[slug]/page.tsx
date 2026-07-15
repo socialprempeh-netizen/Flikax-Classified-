@@ -48,6 +48,7 @@ import { ShareButtons } from "@/components/listings/share-buttons";
 import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
+import { TrackRecentlyViewed } from "@/components/track-recently-viewed";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -542,6 +543,14 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           <span className="truncate text-neutral-700">{listing.title}</span>
         </div>
 
+        <TrackRecentlyViewed
+          id={listing.id}
+          href={listingPath(listing)}
+          title={listing.title}
+          priceLabel={currency.format(listing.price)}
+          imageUrl={images[0] ?? null}
+        />
+
         <div className="grid gap-6 sm:grid-cols-3">
           <div className="sm:col-span-2">
             <ListingGallery images={images} title={listing.title} />
@@ -592,6 +601,13 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                   <BarChart3 className="size-4 text-neutral-400" />
                   Market price: {currency.format(marketPrice.low)} ~ {currency.format(marketPrice.high)}
                 </p>
+              )}
+
+              {sellerPhone && (
+                <div className="mt-4 flex gap-2 sm:hidden">
+                  <RevealPhoneButton phone={sellerPhone} label="Show contact" variant="outline" />
+                  <StartChatButton listingId={listing.id} />
+                </div>
               )}
 
               {headlineSpecs.length > 0 && (
@@ -645,7 +661,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               )}
 
               {sellerPhone && (
-                <div className="mt-5 sm:w-64">
+                <div className="mt-5 hidden sm:block sm:w-64">
                   <RevealPhoneButton phone={sellerPhone} label="Show contact" />
                 </div>
               )}

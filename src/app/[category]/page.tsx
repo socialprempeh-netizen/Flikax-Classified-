@@ -2,17 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient, getUser } from "@/lib/supabase/server";
-import { fetchCategoryListings, CATEGORY_PAGE_SIZE } from "@/lib/category-listings";
+import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingGrid } from "@/components/listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
+import { CategorySearchHeader } from "@/components/category-search-header";
+import { CategoryFilterRow } from "@/components/category-filter-row";
+
+const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 type PageProps = {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; minPrice?: string; maxPrice?: string; sort?: string }>;
 };
 
 async function getLeafCategory(categorySlug: string) {
@@ -47,8 +51,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   if (!category) notFound();
 
   const supabase = await createClient();
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
+    ? (sortParam as CategorySort)
+    : "recommended";
 
   const [{ data: userData }, parentCategory, { listings, totalCount }] = await Promise.all([
     getUser(),
@@ -60,10 +67,28 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           .maybeSingle()
           .then((r) => r.data)
       : Promise.resolve(null),
-    fetchCategoryListings(supabase, { categoryId: category.id, page }),
+    fetchCategoryListings(supabase, {
+      categoryId: category.id,
+      page,
+      q,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      sort,
+    }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
+
+  const carryParams = new URLSearchParams();
+  if (q) carryParams.set("q", q);
+  if (minPrice) carryParams.set("minPrice", minPrice);
+  if (maxPrice) carryParams.set("maxPrice", maxPrice);
+  if (sort !== "recommended") carryParams.set("sort", sort);
+  function pageHref(targetPage: number) {
+    const params = new URLSearchParams(carryParams);
+    params.set("page", String(targetPage));
+    return `?${params.toString()}`;
+  }
 
   const breadcrumbItems = [
     { name: "Home", item: SITE_URL },
@@ -80,8 +105,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     <div className="flex flex-1 flex-col bg-neutral-50">
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader user={userData.user} />
+      <CategorySearchHeader categoryName={category.name} categorySlug={category.slug} query={q} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
-        <div className="mb-4 flex flex-wrap items-center gap-1 text-sm text-neutral-500">
+        <div className="mb-4 hidden flex-wrap items-center gap-1 text-sm text-neutral-500 lg:flex">
           <Link href="/" className="hover:text-brand">
             Home
           </Link>
@@ -101,13 +127,17 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           {category.name} for Sale in Ghana
         </h1>
 
+        <div className="mb-4">
+          <CategoryFilterRow sort={sort} />
+        </div>
+
         <ListingGrid listings={listings} />
 
         {totalPages > 1 && (
           <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
             {page > 1 && (
               <Link
-                href={`?page=${page - 1}`}
+                href={pageHref(page - 1)}
                 className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
               >
                 Previous
@@ -118,7 +148,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
             </span>
             {page < totalPages && (
               <Link
-                href={`?page=${page + 1}`}
+                href={pageHref(page + 1)}
                 className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
               >
                 Next
