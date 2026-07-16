@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
-import { Bookmark, MessageSquare, Bell, Gem, ClipboardList, UserRound } from "lucide-react";
+import { Bookmark, MessageSquare, Bell, Gem, ClipboardList, UserRound, UserPlus } from "lucide-react";
 import { getInitials } from "@/lib/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { isConversationUnread } from "@/lib/messages";
@@ -48,7 +48,38 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
           </Link>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        {/* Mobile: everything else lives in the hamburger drawer already, so the
+            header itself only needs one action -- sign up when logged out,
+            or the account avatar when logged in. Desktop keeps the full row. */}
+        <div className="flex items-center gap-1.5 sm:hidden">
+          {isLoggedIn ? (
+            <Link
+              href={accountHref}
+              title="My Account"
+              aria-label="My Account"
+              className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/15 text-white hover:bg-white/25"
+            >
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarUrl} alt="" className="size-full object-cover" />
+              ) : initials ? (
+                <span className="text-xs font-bold">{initials}</span>
+              ) : (
+                <UserRound className="size-4" />
+              )}
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-brand hover:bg-brand-light"
+            >
+              <UserPlus className="size-4" />
+              Sign up
+            </Link>
+          )}
+        </div>
+
+        <div className="hidden items-center gap-1.5 sm:flex sm:gap-3">
           <Link
             href={gatedHref ?? "/saved"}
             title="Saved"
@@ -92,7 +123,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/dashboard"}
             title="My Adverts"
             aria-label="My Adverts"
-            className="hidden size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:flex sm:size-11"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
           >
             <ClipboardList className="size-4 sm:size-5" />
           </Link>

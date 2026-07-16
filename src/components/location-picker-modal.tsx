@@ -107,8 +107,14 @@ export function LocationPickerModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-900/70 p-4">
-      <div className="flex max-h-[65vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-900/70 p-4"
+      onClick={close}
+    >
+      <div
+        className="flex max-h-[65vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center gap-2 border-b border-neutral-100 px-4 py-3">
           {activeRegion ? (
             <button

@@ -39,6 +39,7 @@ import {
 } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { ListingGallery } from "@/components/listings/listing-gallery";
 import { SaveListingButton } from "@/components/listings/save-listing-button";
 import { MarkUnavailableButton } from "@/components/listings/mark-unavailable-button";
@@ -513,7 +514,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
       <JsonLd data={productJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader user={userData.user} />
@@ -753,6 +754,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
       </main>
 
       <SiteFooter />
+      <BottomTabBar activeHref="" />
     </div>
   );
 }

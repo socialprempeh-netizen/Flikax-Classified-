@@ -5,10 +5,12 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { ListingGrid } from "@/components/listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CategorySearchHeader } from "@/components/category-search-header";
 import { CategoryFilterRow } from "@/components/category-filter-row";
+import { SiblingCategoryRow } from "@/components/sibling-category-row";
 
 const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
 
@@ -57,7 +59,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     ? (sortParam as CategorySort)
     : "recommended";
 
-  const [{ data: userData }, parentCategory, { listings, totalCount }] = await Promise.all([
+  const [{ data: userData }, parentCategory, { data: siblings }, { listings, totalCount }] = await Promise.all([
     getUser(),
     category.parent_id
       ? supabase
@@ -67,6 +69,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           .maybeSingle()
           .then((r) => r.data)
       : Promise.resolve(null),
+    supabase.from("categories").select("id, name, slug, icon").eq("parent_id", category.parent_id).order("name"),
     fetchCategoryListings(supabase, {
       categoryId: category.id,
       page,
@@ -102,7 +105,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader user={userData.user} />
       <CategorySearchHeader categoryName={category.name} categorySlug={category.slug} query={q} />
@@ -126,6 +129,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         <h1 className="mb-6 border-l-4 border-brand pl-3 text-xl font-bold text-neutral-800">
           {category.name} for Sale in Ghana
         </h1>
+
+        <SiblingCategoryRow siblings={siblings ?? []} activeSlug={category.slug} />
 
         <div className="mb-4">
           <CategoryFilterRow sort={sort} />
@@ -158,6 +163,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         )}
       </main>
       <SiteFooter />
+      <BottomTabBar activeHref={`/${category.slug}`} />
     </div>
   );
 }

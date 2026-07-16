@@ -1,0 +1,45 @@
+import Link from "next/link";
+import { resolveCategoryIcon } from "@/lib/category-icons";
+import { getCategoryColor } from "@/lib/category-colors";
+
+export type SiblingCategory = { id: string; name: string; slug: string; icon?: string | null };
+
+/** Quick lateral nav between sibling categories (children of the same parent) -- every
+ * category in this app is exactly two levels deep, so a leaf page has no children of its
+ * own to show here; these are its siblings instead. */
+export function SiblingCategoryRow({
+  siblings,
+  activeSlug,
+}: {
+  siblings: SiblingCategory[];
+  activeSlug: string;
+}) {
+  if (siblings.length === 0) return null;
+
+  return (
+    <div className="lg:hidden -mx-4 mb-4 flex gap-3 overflow-x-auto px-4 pb-1">
+      {siblings.map((sibling, index) => {
+        const Icon = resolveCategoryIcon(sibling);
+        const isActive = sibling.slug === activeSlug;
+        return (
+          <Link key={sibling.id} href={`/${sibling.slug}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
+            <span
+              className={`flex size-12 shrink-0 items-center justify-center rounded-lg ${getCategoryColor(index)} ${
+                isActive ? "ring-2 ring-brand ring-offset-1" : ""
+              }`}
+            >
+              <Icon className="size-5" />
+            </span>
+            <span
+              className={`line-clamp-2 text-center text-[11px] leading-tight ${
+                isActive ? "font-bold text-brand" : "font-medium text-neutral-600"
+              }`}
+            >
+              {sibling.name}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import { CategorySidebar } from "@/components/category-sidebar";
 import { FilterBar } from "@/components/listings/filter-bar";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { SiteFooter } from "@/components/site-footer";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
@@ -93,7 +94,7 @@ export default async function Home({ searchParams }: PageProps) {
   const heading = selectedCategory ? selectedCategory.name : "All listings";
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
       <SiteHeader user={userData.user} />
 
       <section className="bg-brand pb-10 pt-6">
@@ -151,6 +152,7 @@ export default async function Home({ searchParams }: PageProps) {
       </main>
 
       <SiteFooter />
+      <BottomTabBar activeHref="/" />
     </div>
   );
 }

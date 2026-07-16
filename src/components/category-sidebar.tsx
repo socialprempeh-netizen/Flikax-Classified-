@@ -87,7 +87,7 @@ export function CategorySidebar({
             return (
               <Link
                 key={child.id}
-                href={buildListingsHref({ ...filters, category: isActive ? activeParent.slug : child.slug })}
+                href={`/${child.slug}`}
                 className={`flex items-center justify-between rounded-md px-2 py-1.5 text-sm ${
                   isActive ? "bg-brand-light font-semibold text-brand" : "text-neutral-600 hover:bg-neutral-50"
                 }`}
@@ -111,13 +111,7 @@ export function CategorySidebar({
           <span className="text-xs text-neutral-300">/</span>
           <span className="truncate text-xs font-semibold text-brand">{activeParent.name}</span>
         </div>
-        <MobileCategoryList
-          categories={children}
-          counts={counts}
-          filters={filters}
-          selectedSlug={selectedSlug}
-          activeParentSlug={activeParent.slug}
-        />
+        <MobileCategoryList categories={children} counts={counts} />
       </div>
 
       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm">
