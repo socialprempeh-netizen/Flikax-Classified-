@@ -5,6 +5,7 @@ export type ListingFilters = {
   category?: string;
   minPrice?: string;
   maxPrice?: string;
+  sort?: string;
 };
 
 // `page` is intentionally not part of ListingFilters itself — every existing
@@ -20,6 +21,7 @@ export function buildListingsHref(filters: ListingFilters, page?: number): strin
   if (filters.category) params.set("category", filters.category);
   if (filters.minPrice) params.set("minPrice", filters.minPrice);
   if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+  if (filters.sort && filters.sort !== "recommended") params.set("sort", filters.sort);
   if (page && page > 1) params.set("page", String(page));
 
   const qs = params.toString();

@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { FilterBar } from "@/components/listings/filter-bar";
+import { HomeFilterRow } from "@/components/home-filter-row";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -13,6 +14,7 @@ import { getListingPath } from "@/lib/listing-url";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 
 const PAGE_SIZE = 24;
+const VALID_SORTS = ["recommended", "newest", "price_asc", "price_desc"];
 
 type PageProps = {
   searchParams: Promise<{
@@ -22,6 +24,7 @@ type PageProps = {
     category?: string;
     minPrice?: string;
     maxPrice?: string;
+    sort?: string;
     page?: string;
   }>;
 };
@@ -35,31 +38,49 @@ export default async function Home({ searchParams }: PageProps) {
     category: params.category || undefined,
     minPrice: params.minPrice || undefined,
     maxPrice: params.maxPrice || undefined,
+    sort: VALID_SORTS.includes(params.sort ?? "") ? params.sort : undefined,
   };
   const page = Math.max(1, Number(params.page) || 1);
 
   const supabase = await createClient();
 
-  const [{ data: userData }, { data: categories }, { data: countRows }, { data: results }, { data: locationRows }] =
-    await Promise.all([
-      getUser(),
-      supabase
-        .from("categories")
-        .select("id, name, slug, parent_id, icon")
-        .order("display_order")
-        .order("name"),
-      supabase.rpc("category_counts"),
-      supabase.rpc("search_listings", {
-        search_query: filters.q,
-        category_slug: filters.category,
-        location_filter: filters.location,
-        exclude_location: filters.excludeLocation,
-        min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
-        max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-        p_page: page,
-      }),
-      supabase.from("listings").select("location").eq("status", "active"),
-    ]);
+  const [
+    { data: userData },
+    { data: categories },
+    { data: countRows },
+    { data: results },
+    { data: locationRows },
+  ] = await Promise.all([
+    getUser(),
+    supabase
+      .from("categories")
+      .select("id, name, slug, parent_id, icon")
+      .order("display_order")
+      .order("name"),
+    supabase.rpc("category_counts"),
+    supabase.rpc("search_listings", {
+      search_query: filters.q,
+      category_slug: filters.category,
+      location_filter: filters.location,
+      exclude_location: filters.excludeLocation,
+      min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
+      max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+      p_page: page,
+      sort: filters.sort,
+    }),
+    supabase.from("listings").select("location").eq("status", "active"),
+  ]);
+
+  // Only fetched when logged in -- ListingGrid hides the save button entirely
+  // rather than risk showing the wrong "not saved" state when we don't know.
+  let savedIds: Set<string> | undefined;
+  if (userData.user) {
+    const { data: savedRows } = await supabase
+      .from("saved_listings")
+      .select("listing_id")
+      .eq("user_id", userData.user.id);
+    savedIds = new Set((savedRows ?? []).map((r) => r.listing_id));
+  }
 
   const counts = new Map((countRows ?? []).map((row) => [row.category_id, row.listing_count]));
 
@@ -85,6 +106,8 @@ export default async function Home({ searchParams }: PageProps) {
       : null,
     isFeatured: listing.is_featured,
     isBumped: isRecentlyBumped(listing.bumped_at),
+    negotiable: listing.negotiable === "yes",
+    createdAt: listing.created_at,
   }));
 
   const totalCount = results?.[0]?.total_count ?? 0;
@@ -121,9 +144,13 @@ export default async function Home({ searchParams }: PageProps) {
           totalListingsCount={totalListingsCount}
         />
         <div className="flex-1">
-          <h2 className="mb-4 text-lg font-bold text-neutral-800">{heading}</h2>
+          <div className="mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-neutral-800">{heading}</h2>
+            <span className="rounded bg-brand px-2 py-0.5 text-xs font-bold text-white">{totalCount}</span>
+          </div>
           <FilterBar filters={filters} />
-          <ListingGrid listings={listings} />
+          <HomeFilterRow filters={filters} />
+          <ListingGrid listings={listings} savedIds={savedIds} />
 
           {totalPages > 1 && (
             <nav className="mt-6 flex items-center justify-center gap-3 text-sm">

@@ -1001,6 +1001,7 @@ export type Database = {
           min_price?: number
           p_page?: number
           search_query?: string
+          sort?: string
         }
         Returns: {
           bumped_at: string
@@ -1012,6 +1013,7 @@ export type Database = {
           id: string
           is_featured: boolean
           location: string
+          negotiable: string
           price: number
           short_id: number
           title: string

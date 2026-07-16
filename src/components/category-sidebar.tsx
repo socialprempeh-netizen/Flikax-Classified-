@@ -5,6 +5,7 @@ import { ExcludeLocationPicker } from "@/components/exclude-location-picker";
 import { CategoryNav } from "@/components/category-nav";
 import { MobileCategoryGrid } from "@/components/mobile-category-grid";
 import { MobileCategoryList } from "@/components/mobile-category-list";
+import { SellCta } from "@/components/cta/sell-cta";
 
 // Featured categories are pinned first in the sidebar; the rest keep their existing order.
 const FEATURED_SLUGS = ["phones-tablets", "vehicles", "property"];
@@ -57,12 +58,20 @@ export function CategorySidebar({
 
   if (!activeParent) {
     return (
-      <div className="w-full shrink-0 lg:w-72">
+      <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
         <div className="hidden lg:block">
           <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
         </div>
         <div className="lg:hidden">
           <MobileCategoryGrid parents={parents} filters={filters} />
+        </div>
+
+        <div className="hidden rounded-xl bg-brand p-4 text-white lg:block">
+          <h3 className="mb-1 text-sm font-bold">Sell Something?</h3>
+          <p className="mb-3 text-xs text-white/80">
+            Post your ad free and reach thousands of buyers today.
+          </p>
+          <SellCta label="+ Post Free Ad" variant="footer" size="sm" className="w-full" />
         </div>
       </div>
     );
