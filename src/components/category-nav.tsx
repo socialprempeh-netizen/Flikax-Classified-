@@ -25,6 +25,7 @@ export function CategoryNav({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number; maxHeight: number } | null>(null);
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function totalFor(parent: Category) {
     const ownCount = counts.get(parent.id) ?? 0;
@@ -42,6 +43,10 @@ export function CategoryNav({
   // (scrollable past that) so a category with many children can never push
   // the panel below the bottom edge of the screen.
   function handleEnter(catId: string) {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
     setHoveredId(catId);
     const rowEl = rowRefs.current[catId];
     if (!rowEl) return;
@@ -56,10 +61,25 @@ export function CategoryNav({
     setFlyoutPos({ top, left: Math.max(VIEWPORT_MARGIN, left), maxHeight });
   }
 
+  // Moving the mouse diagonally from the row toward the flyout crosses page
+  // background in between (the flyout is `position: fixed`, spatially
+  // detached from the row), which would fire this on the way there and close
+  // the panel before the cursor ever arrives. Delaying the close -- and
+  // cancelling it from either the row's or the flyout's own onMouseEnter --
+  // gives the cursor time to land on either without the panel vanishing.
   function handleLeave() {
-    setHoveredId(null);
-    setFlyoutPos(null);
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setHoveredId(null);
+      setFlyoutPos(null);
+    }, 250);
   }
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   // Belt-and-braces alongside mouse-out: a trackpad tap or a click that
   // lands without a preceding hover-out (e.g. via keyboard focus jumping
@@ -121,6 +141,8 @@ export function CategoryNav({
                   width: FLYOUT_WIDTH,
                   maxHeight: flyoutPos.maxHeight,
                 }}
+                onMouseEnter={() => handleEnter(cat.id)}
+                onMouseLeave={handleLeave}
                 className="z-40 overflow-y-auto rounded-xl border border-neutral-100 bg-white p-2 shadow-lg"
               >
                 {children.map((child) => (

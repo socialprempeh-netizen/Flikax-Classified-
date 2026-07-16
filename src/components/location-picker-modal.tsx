@@ -112,10 +112,10 @@ export function LocationPickerModal({
       onClick={close}
     >
       <div
-        className="flex max-h-[65vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+        className="flex max-h-[75vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2 border-b border-neutral-100 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-neutral-100 px-5 py-4">
           {activeRegion ? (
             <button
               type="button"
@@ -123,7 +123,7 @@ export function LocationPickerModal({
                 setActiveRegionSlug(null);
                 setQuery("");
               }}
-              className="flex shrink-0 items-center gap-1 text-base font-medium text-neutral-700 hover:text-brand"
+              className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-base font-medium text-neutral-700 hover:bg-neutral-50 hover:text-brand"
             >
               <ChevronLeft className="size-4" />
               Back
@@ -147,15 +147,15 @@ export function LocationPickerModal({
             type="button"
             onClick={close}
             aria-label="Close"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
           >
             <X className="size-4.5" />
           </button>
         </div>
 
-        <div className="overflow-y-auto p-4">
+        <div className="overflow-y-auto p-5">
           {searchResults ? (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col divide-y divide-neutral-100">
               {searchResults.length === 0 && (
                 <p className="py-6 text-center text-base text-neutral-400">No matches found.</p>
               )}
@@ -165,7 +165,7 @@ export function LocationPickerModal({
                     key={`region-${result.region.slug}`}
                     type="button"
                     onClick={() => openRegion(result.region.slug)}
-                    className="flex items-center justify-between rounded-lg px-3 py-2 text-left hover:bg-neutral-50"
+                    className="flex cursor-pointer items-center justify-between px-2 py-3 text-left transition-colors hover:bg-neutral-50"
                   >
                     <span className="text-base font-medium text-neutral-800">{result.region.name}</span>
                     <ChevronRight className="size-4 text-neutral-400" />
@@ -175,7 +175,7 @@ export function LocationPickerModal({
                     key={`district-${result.district.slug}`}
                     type="button"
                     onClick={() => selectLocation(result.district.name)}
-                    className="rounded-lg px-3 py-2 text-left hover:bg-neutral-50"
+                    className="block cursor-pointer px-2 py-3 text-left transition-colors hover:bg-neutral-50"
                   >
                     <div className="text-base text-neutral-800">{result.district.name}</div>
                     <div className="text-sm text-neutral-400">{result.region.name}</div>
@@ -188,27 +188,27 @@ export function LocationPickerModal({
               <button
                 type="button"
                 onClick={() => selectLocation(activeRegion.name)}
-                className="mb-3 block w-full rounded-lg px-2 py-1.5 text-left text-base font-semibold text-brand hover:bg-brand-light"
+                className="mb-4 block w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
                 All {activeRegion.name} · {regionCount(activeRegion)} ads
               </button>
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex flex-col gap-6 sm:flex-row">
                 {districtColumns.map((groups, columnIndex) => (
                   <div key={columnIndex} className="flex-1">
                     {groups.map((group) => (
-                      <div key={group.letter} className="mb-3 flex gap-2">
-                        <span className="w-4 shrink-0 pt-0.5 text-sm font-semibold text-neutral-400">
+                      <div key={group.letter} className="mb-4">
+                        <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                           {group.letter}
-                        </span>
-                        <div className="flex-1 space-y-2">
+                        </div>
+                        <div className="flex flex-col divide-y divide-neutral-100">
                           {group.items.map((district) => (
                             <button
                               key={district.slug}
                               type="button"
                               onClick={() => selectLocation(district.name)}
-                              className="block text-left"
+                              className="block cursor-pointer rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
                             >
-                              <div className="text-sm leading-tight text-neutral-700 hover:text-brand">
+                              <div className="text-sm leading-tight text-neutral-700">
                                 {district.name} · {districtCount(district.name)} ads
                               </div>
                               <div className="text-xs text-neutral-400">{activeRegion.name}</div>
@@ -226,27 +226,27 @@ export function LocationPickerModal({
               <button
                 type="button"
                 onClick={() => selectLocation(undefined)}
-                className="mb-3 block w-full rounded-lg px-2 py-1.5 text-left text-base font-semibold text-brand hover:bg-brand-light"
+                className="mb-4 block w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
                 All Ghana · {totalListingsCount} Ads
               </button>
-              <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="flex flex-col gap-6 sm:flex-row">
                 {regionColumns.map((groups, columnIndex) => (
                   <div key={columnIndex} className="flex-1">
                     {groups.map((group) => (
-                      <div key={group.letter} className="mb-3 flex gap-2">
-                        <span className="w-4 shrink-0 pt-0.5 text-sm font-semibold text-neutral-400">
+                      <div key={group.letter} className="mb-4">
+                        <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                           {group.letter}
-                        </span>
-                        <div className="flex-1 space-y-2">
+                        </div>
+                        <div className="flex flex-col divide-y divide-neutral-100">
                           {group.items.map((region) => (
                             <button
                               key={region.slug}
                               type="button"
                               onClick={() => openRegion(region.slug)}
-                              className="flex w-full items-center justify-between text-left"
+                              className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
                             >
-                              <span className="text-base text-neutral-700 hover:text-brand">
+                              <span className="text-base text-neutral-700">
                                 {region.name} · {regionCount(region)} ads
                               </span>
                               <ChevronRight className="size-3.5 shrink-0 text-neutral-300" />
