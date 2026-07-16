@@ -349,3 +349,45 @@ export const GHANA_REGIONS: Region[] = [
 ];
 
 export const GHANA_ALL_DISTRICTS: District[] = GHANA_REGIONS.flatMap((r) => r.districts);
+
+// Real listing.location values don't always match a district's full official
+// name -- e.g. a listing might say "Kumasi" while the district is named
+// "Kumasi Metropolitan", or "Takoradi" while the district is
+// "Sekondi Takoradi Metropolitan". Two-pass matching: exact name first (so
+// "Tema" resolves to the district literally named "Tema" rather than also
+// catching "Tema Motorway"), then falls back to a whole-word match against
+// the district name's space-separated tokens.
+export function matchLocationToDistrict(location: string, regions: Region[]): District | null {
+  const loc = location.trim().toLowerCase();
+  if (!loc) return null;
+
+  for (const region of regions) {
+    for (const district of region.districts) {
+      if (district.name.toLowerCase() === loc) return district;
+    }
+  }
+  for (const region of regions) {
+    for (const district of region.districts) {
+      const tokens = district.name.toLowerCase().split(/[\s/]+/);
+      if (tokens.includes(loc)) return district;
+    }
+  }
+  return null;
+}
+
+// Aggregates raw location->count pairs (exact strings as stored on listings)
+// into per-district counts, keyed by district slug so districts with the
+// same name in different regions can't collide.
+export function buildDistrictCounts(
+  locationCounts: Record<string, number>,
+  regions: Region[]
+): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const [location, count] of Object.entries(locationCounts)) {
+    const district = matchLocationToDistrict(location, regions);
+    if (district) {
+      result[district.slug] = (result[district.slug] ?? 0) + count;
+    }
+  }
+  return result;
+}
