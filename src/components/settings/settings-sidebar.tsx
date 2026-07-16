@@ -60,7 +60,7 @@ export function SettingsSidebar() {
                         {item.badge}
                       </span>
                     )}
-                    <ChevronRight className={`size-4 ${isActive ? "text-white" : "text-neutral-300"}`} />
+                    <ChevronRight className={`size-4 ${isActive ? "text-white" : "text-neutral-500"}`} />
                   </span>
                 </Link>
               );

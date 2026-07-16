@@ -556,7 +556,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           <div className="sm:col-span-2">
             <ListingGallery images={images} title={listing.title} />
 
-            <div className="mt-6 rounded-xl border border-neutral-100 bg-white p-5 shadow-sm">
+            <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
               {(isFeatured || isBumped) && (
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   {isFeatured && (
@@ -674,7 +674,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           </div>
 
           <div className="flex flex-col gap-4 sm:col-span-1">
-            <div className="rounded-xl border border-neutral-100 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-3">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg font-bold text-brand">
                   {sellerName[0]?.toUpperCase() ?? "F"}
@@ -702,7 +702,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
               <a
                 href={feedbackHref}
                 className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-base font-bold text-neutral-700 hover:bg-neutral-50"
@@ -732,7 +732,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </Link>
             </div>
 
-            <div className="rounded-xl border border-neutral-100 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
               <h3 className="mb-3 text-sm font-bold text-neutral-800">Safety First - Read This Before Proceeding</h3>
               <ul className="list-disc space-y-2 pl-4 marker:text-brand">
                 {SAFETY_TIPS.map((tip) => (

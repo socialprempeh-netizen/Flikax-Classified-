@@ -98,7 +98,7 @@ export function CategoryNav({
   }, [hoveredId]);
 
   return (
-    <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm sm:w-72">
+    <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white shadow-sm sm:w-72">
       {parents.map((cat) => {
         const Icon = resolveCategoryIcon(cat);
         const children = categories.filter((c) => c.parent_id === cat.id);
@@ -129,7 +129,7 @@ export function CategoryNav({
                 </span>
                 <span className="block text-xs text-neutral-500">{totalFor(cat)} ads</span>
               </span>
-              <ChevronRight className="size-4 shrink-0 text-neutral-400" />
+              <ChevronRight className="size-4 shrink-0 text-neutral-600" />
             </Link>
 
             {isHovered && children.length > 0 && flyoutPos && (

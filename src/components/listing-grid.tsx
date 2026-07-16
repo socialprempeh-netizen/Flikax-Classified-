@@ -52,7 +52,7 @@ export function ListingGrid({
           <Link
             key={listing.id}
             href={listing.href}
-            className="block overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-sm hover:shadow-md"
+            className="block overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md"
           >
             <div className="relative aspect-video overflow-hidden bg-brand-light text-brand/40">
               {listing.imageUrl ? (

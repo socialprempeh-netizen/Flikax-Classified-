@@ -17,12 +17,13 @@
   --font-sans: var(--font-manrope);
   --font-logo: var(--font-baloo-2);
 
-  /* Softer than Tailwind's defaults: white cards on our light neutral-50
-     background were reading as harsh dark boxes rather than a subtle lift. */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-  --shadow-md: 0 3px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-  --shadow-lg: 0 6px 10px -3px rgb(0 0 0 / 0.06), 0 3px 5px -4px rgb(0 0 0 / 0.04);
-  --shadow-xl: 0 10px 15px -5px rgb(0 0 0 / 0.07), 0 4px 6px -6px rgb(0 0 0 / 0.05);
+  /* Between Tailwind's defaults and flat: the previous values (0.03-0.07
+     opacity) were tuned down from harsh dark boxes but ended up reading as
+     no shadow at all on our light neutral-50 background. */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.09), 0 2px 5px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 8px 14px -3px rgb(0 0 0 / 0.1), 0 4px 7px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 14px 20px -5px rgb(0 0 0 / 0.12), 0 6px 8px -6px rgb(0 0 0 / 0.09);
 }
 
 @media (prefers-color-scheme: dark) {

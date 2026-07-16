@@ -79,7 +79,7 @@ export function MobileNavDrawer({
                     href={isLoggedIn ? item.href : "/auth/login"}
                     className="relative flex items-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                   >
-                    <item.icon className="size-4.5 shrink-0 text-neutral-400" />
+                    <item.icon className="size-4.5 shrink-0 text-neutral-600" />
                     {item.label}
                     {item.href === "/messages" && hasUnreadMessages && (
                       <span className="size-2 rounded-full bg-red-500" />

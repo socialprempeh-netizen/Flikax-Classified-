@@ -149,7 +149,7 @@ export function AdminShell({
           <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-neutral-500">
             {crumbs.map((crumb, i) => (
               <span key={crumb.href} className="flex items-center gap-1">
-                {i > 0 && <ChevronRight className="size-3.5 text-neutral-300" />}
+                {i > 0 && <ChevronRight className="size-3.5 text-neutral-500" />}
                 {crumb.isLast ? (
                   <span className="font-semibold text-neutral-800">{crumb.label}</span>
                 ) : (

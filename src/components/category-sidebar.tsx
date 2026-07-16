@@ -81,7 +81,7 @@ export function CategorySidebar({
 
   return (
     <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
-      <div className="hidden lg:block rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
+      <div className="hidden lg:block rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Categories</h3>
         <Link
           href={buildListingsHref({ ...filters, category: undefined })}
@@ -123,7 +123,7 @@ export function CategorySidebar({
         <MobileCategoryList categories={children} counts={counts} />
       </div>
 
-      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-100 bg-white shadow-sm">
+      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white shadow-sm">
         <LocationPicker
           filters={filters}
           locationCounts={locationCounts}
@@ -136,7 +136,7 @@ export function CategorySidebar({
         />
       </div>
 
-      <div className="rounded-xl border border-neutral-100 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
         <h3 className="mb-3 text-sm font-bold text-neutral-800">Price, GH₵</h3>
         <form action="/" method="get" className="mb-3 flex items-center gap-2">
           <input type="hidden" name="q" value={filters.q ?? ""} />
