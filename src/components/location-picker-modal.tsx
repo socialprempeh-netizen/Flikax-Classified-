@@ -160,7 +160,7 @@ export function LocationPickerModal({
         className="flex max-h-[75vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2 border-b border-neutral-100 px-5 py-4">
+        <div className="flex items-center gap-2 border-b border-neutral-100 px-4 py-3">
           {activeRegion ? (
             <button
               type="button"
@@ -198,7 +198,7 @@ export function LocationPickerModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto p-5">
+        <div className="overflow-y-auto p-4">
           {searchResults ? (
             <div className="flex flex-col divide-y divide-neutral-100">
               {searchResults.length === 0 && (
@@ -210,7 +210,7 @@ export function LocationPickerModal({
                     key={`region-${result.region.slug}`}
                     type="button"
                     onClick={() => openRegion(result.region.slug)}
-                    className="flex cursor-pointer items-center justify-between px-2 py-3 text-left transition-colors hover:bg-neutral-50"
+                    className="flex cursor-pointer items-center justify-between px-2 py-2 text-left transition-colors hover:bg-neutral-50"
                   >
                     <span className="text-base font-medium text-neutral-800">{result.region.name}</span>
                     <ChevronRight className="size-4 text-neutral-400" />
@@ -220,7 +220,7 @@ export function LocationPickerModal({
                     key={`district-${result.district.slug}`}
                     type="button"
                     onClick={() => selectLocation(result.district.name)}
-                    className="block cursor-pointer px-2 py-3 text-left transition-colors hover:bg-neutral-50"
+                    className="block cursor-pointer px-2 py-2 text-left transition-colors hover:bg-neutral-50"
                   >
                     <div className="text-base text-neutral-800">{result.district.name}</div>
                     <div className="text-sm text-neutral-400">{result.region.name}</div>
@@ -233,23 +233,23 @@ export function LocationPickerModal({
               <button
                 type="button"
                 onClick={() => selectLocation(activeRegion.name)}
-                className="mb-4 block w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
+                className="mb-3 block w-full cursor-pointer rounded-lg px-3 py-2 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
                 All {activeRegion.name} · {regionCount(activeRegion)} ads
               </button>
 
               {popularDistricts.length > 0 && (
-                <div className="mb-5">
-                  <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
+                <div className="mb-3">
+                  <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                     Popular
                   </div>
-                  <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                     {popularDistricts.map((district) => (
                       <button
                         key={district.slug}
                         type="button"
                         onClick={() => selectLocation(district.name)}
-                        className="block cursor-pointer rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
+                        className="block cursor-pointer rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
                       >
                         <div className="text-sm leading-tight text-neutral-700">
                           {district.name} · {districtCount(district)} ads
@@ -261,12 +261,12 @@ export function LocationPickerModal({
                 </div>
               )}
 
-              <div className="flex flex-col gap-6 sm:flex-row">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 {districtColumns.map((groups, columnIndex) => (
                   <div key={columnIndex} className="flex-1">
                     {groups.map((group) => (
-                      <div key={group.letter} className="mb-4">
-                        <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
+                      <div key={group.letter} className="mb-2.5">
+                        <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                           {group.letter}
                         </div>
                         <div className="flex flex-col divide-y divide-neutral-100">
@@ -275,7 +275,7 @@ export function LocationPickerModal({
                               key={district.slug}
                               type="button"
                               onClick={() => selectLocation(district.name)}
-                              className="block cursor-pointer rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
+                              className="block cursor-pointer rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
                             >
                               <div className="text-sm leading-tight text-neutral-700">
                                 {district.name} · {districtCount(district)} ads
@@ -295,23 +295,23 @@ export function LocationPickerModal({
               <button
                 type="button"
                 onClick={() => selectLocation(undefined)}
-                className="mb-4 block w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
+                className="mb-3 block w-full cursor-pointer rounded-lg px-3 py-2 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
                 All Ghana · {totalListingsCount} Ads
               </button>
 
               {popularRegions.length > 0 && (
-                <div className="mb-5">
-                  <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
+                <div className="mb-3">
+                  <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                     Popular
                   </div>
-                  <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                     {popularRegions.map((region) => (
                       <button
                         key={region.slug}
                         type="button"
                         onClick={() => openRegion(region.slug)}
-                        className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
+                        className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
                       >
                         <span className="text-base text-neutral-700">
                           {region.name} · {regionCount(region)} ads
@@ -323,12 +323,12 @@ export function LocationPickerModal({
                 </div>
               )}
 
-              <div className="flex flex-col gap-6 sm:flex-row">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 {regionColumns.map((groups, columnIndex) => (
                   <div key={columnIndex} className="flex-1">
                     {groups.map((group) => (
-                      <div key={group.letter} className="mb-4">
-                        <div className="mb-1 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
+                      <div key={group.letter} className="mb-2.5">
+                        <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
                           {group.letter}
                         </div>
                         <div className="flex flex-col divide-y divide-neutral-100">
@@ -337,7 +337,7 @@ export function LocationPickerModal({
                               key={region.slug}
                               type="button"
                               onClick={() => openRegion(region.slug)}
-                              className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-2.5 text-left transition-colors hover:bg-neutral-50"
+                              className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
                             >
                               <span className="text-base text-neutral-700">
                                 {region.name} · {regionCount(region)} ads
