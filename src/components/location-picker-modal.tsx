@@ -19,20 +19,6 @@ function topByCount<T>(items: T[], countFn: (item: T) => number, max: number): T
     .map((x) => x.item);
 }
 
-function groupByLetter<T extends { name: string }>(items: T[]) {
-  const groups: { letter: string; items: T[] }[] = [];
-  for (const item of items) {
-    const letter = item.name[0]?.toUpperCase() ?? "#";
-    const last = groups[groups.length - 1];
-    if (last && last.letter === letter) {
-      last.items.push(item);
-    } else {
-      groups.push({ letter, items: [item] });
-    }
-  }
-  return groups;
-}
-
 // Split an already-sorted list into `columnCount` contiguous chunks so columns
 // render reliably across browsers, instead of relying on CSS column-balancing
 // (which doesn't distribute evenly when items use break-inside-avoid).
@@ -129,7 +115,7 @@ export function LocationPickerModal({
     const popularSlugs = new Set(popularRegions.map((r) => r.slug));
     const remaining = regions.filter((r) => !popularSlugs.has(r.slug));
     const sorted = [...remaining].sort((a, b) => a.name.localeCompare(b.name));
-    return splitIntoColumns(sorted, 2).map(groupByLetter);
+    return splitIntoColumns(sorted, 2);
   }, [regions, popularRegions]);
 
   const popularDistricts = useMemo(() => {
@@ -146,7 +132,7 @@ export function LocationPickerModal({
     const popularSlugs = new Set(popularDistricts.map((d) => d.slug));
     const remaining = activeRegion.districts.filter((d) => !popularSlugs.has(d.slug));
     const sorted = [...remaining].sort((a, b) => a.name.localeCompare(b.name));
-    return splitIntoColumns(sorted, 3).map(groupByLetter);
+    return splitIntoColumns(sorted, 3);
   }, [activeRegion, popularDistricts]);
 
   if (!open) return null;
@@ -262,29 +248,20 @@ export function LocationPickerModal({
               )}
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                {districtColumns.map((groups, columnIndex) => (
-                  <div key={columnIndex} className="flex-1">
-                    {groups.map((group) => (
-                      <div key={group.letter} className="mb-2.5">
-                        <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
-                          {group.letter}
+                {districtColumns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex flex-1 flex-col divide-y divide-neutral-100">
+                    {column.map((district) => (
+                      <button
+                        key={district.slug}
+                        type="button"
+                        onClick={() => selectLocation(district.name)}
+                        className="block cursor-pointer px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
+                      >
+                        <div className="text-sm leading-tight text-neutral-700">
+                          {district.name} · {districtCount(district)} ads
                         </div>
-                        <div className="flex flex-col divide-y divide-neutral-100">
-                          {group.items.map((district) => (
-                            <button
-                              key={district.slug}
-                              type="button"
-                              onClick={() => selectLocation(district.name)}
-                              className="block cursor-pointer rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
-                            >
-                              <div className="text-sm leading-tight text-neutral-700">
-                                {district.name} · {districtCount(district)} ads
-                              </div>
-                              <div className="text-xs text-neutral-400">{activeRegion.name}</div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                        <div className="text-xs text-neutral-400">{activeRegion.name}</div>
+                      </button>
                     ))}
                   </div>
                 ))}
@@ -324,29 +301,20 @@ export function LocationPickerModal({
               )}
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                {regionColumns.map((groups, columnIndex) => (
-                  <div key={columnIndex} className="flex-1">
-                    {groups.map((group) => (
-                      <div key={group.letter} className="mb-2.5">
-                        <div className="mb-0.5 px-2 text-xs font-bold uppercase tracking-wide text-neutral-400">
-                          {group.letter}
-                        </div>
-                        <div className="flex flex-col divide-y divide-neutral-100">
-                          {group.items.map((region) => (
-                            <button
-                              key={region.slug}
-                              type="button"
-                              onClick={() => openRegion(region.slug)}
-                              className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
-                            >
-                              <span className="text-base text-neutral-700">
-                                {region.name} · {regionCount(region)} ads
-                              </span>
-                              <ChevronRight className="size-3.5 shrink-0 text-neutral-300" />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                {regionColumns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex flex-1 flex-col divide-y divide-neutral-100">
+                    {column.map((region) => (
+                      <button
+                        key={region.slug}
+                        type="button"
+                        onClick={() => openRegion(region.slug)}
+                        className="flex w-full cursor-pointer items-center justify-between px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
+                      >
+                        <span className="text-base text-neutral-700">
+                          {region.name} · {regionCount(region)} ads
+                        </span>
+                        <ChevronRight className="size-3.5 shrink-0 text-neutral-300" />
+                      </button>
                     ))}
                   </div>
                 ))}
