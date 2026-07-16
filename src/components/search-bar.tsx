@@ -18,7 +18,7 @@ export function SearchBar({
       role="search"
       action="/"
       method="get"
-      className="mx-auto flex w-full max-w-2xl items-center gap-2 rounded-full border border-brand/20 bg-white p-1.5 shadow-[0_0_0_4px_rgba(29,161,242,0.12)] focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_rgba(29,161,242,0.2)]"
+      className="mx-auto flex w-full max-w-lg items-center gap-2 rounded-full border border-brand/20 bg-white p-1.5 shadow-[0_0_0_4px_rgba(29,161,242,0.12)] focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_rgba(29,161,242,0.2)]"
     >
       <SearchLocationField
         defaultLocation={defaultLocation}

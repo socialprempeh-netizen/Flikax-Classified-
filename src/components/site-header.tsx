@@ -40,10 +40,10 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
 
   return (
     <header className="sticky top-0 z-50 bg-brand">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:py-4 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2 sm:gap-4 sm:py-2.5 sm:px-6">
         <div className="flex items-center gap-2 sm:gap-3">
           <MobileNavDrawer categories={categories ?? []} isLoggedIn={isLoggedIn} hasUnreadMessages={hasUnreadMessages} />
-          <Link href="/" className="font-logo text-2xl font-extrabold lowercase text-white sm:text-4xl">
+          <Link href="/" className="font-logo text-2xl font-extrabold lowercase text-white sm:text-3xl">
             flikax
           </Link>
         </div>
@@ -57,7 +57,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
               href={accountHref}
               title="My Account"
               aria-label="My Account"
-              className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/15 text-white hover:bg-white/25"
+              className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-white/15 text-white hover:bg-white/25"
             >
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -84,7 +84,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/saved"}
             title="Saved"
             aria-label="Saved"
-            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             <Bookmark className="size-4 sm:size-5" />
           </Link>
@@ -93,7 +93,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/messages"}
             title="Messages"
             aria-label="Messages"
-            className="relative flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="relative flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             <MessageSquare className="size-4 sm:size-5" />
             {hasUnreadMessages && (
@@ -105,7 +105,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/notifications"}
             title="Notifications"
             aria-label="Notifications"
-            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             <Bell className="size-4 sm:size-5" />
           </Link>
@@ -114,7 +114,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href="/premium"
             title="Premium"
             aria-label="Premium"
-            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             <Gem className="size-4 sm:size-5" />
           </Link>
@@ -123,7 +123,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={gatedHref ?? "/dashboard"}
             title="My Adverts"
             aria-label="My Adverts"
-            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             <ClipboardList className="size-4 sm:size-5" />
           </Link>
@@ -132,7 +132,7 @@ export async function SiteHeader({ user }: { user?: HeaderUser | null }) {
             href={accountHref}
             title="My Account"
             aria-label="My Account"
-            className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-11"
+            className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
           >
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
