@@ -355,6 +355,12 @@ export function ListingForm({
       }
     }
 
+    // Fire-and-forget: the write already succeeded, so this shouldn't block
+    // the success screen from showing even if the revalidation call itself
+    // fails for some reason (worst case, the cache just expires normally
+    // after the usual 60s window instead of clearing instantly).
+    fetch("/api/listings/revalidate", { method: "POST" }).catch(() => {});
+
     setSubmitting(false);
     setPosted(true);
   }

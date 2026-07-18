@@ -23,17 +23,7 @@ const currency = new Intl.NumberFormat("en-GH", {
   maximumFractionDigits: 0,
 });
 
-export function ListingGrid({
-  listings,
-  savedIds,
-}: {
-  listings: ListingCard[];
-  /** Only pass this when the caller has actually fetched the current user's
-   * saved-listing IDs -- omitting it (rather than passing an empty Set)
-   * hides the save button entirely instead of risking a wrong "not saved"
-   * state for listings that are, in fact, already saved. */
-  savedIds?: Set<string>;
-}) {
+export function ListingGrid({ listings }: { listings: ListingCard[] }) {
   if (listings.length === 0) {
     return (
       <section className="flex-1">
@@ -61,6 +51,7 @@ export function ListingGrid({
                   alt={listing.title}
                   fill
                   sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+                  quality={82}
                   className="object-cover"
                 />
               ) : (
@@ -84,9 +75,7 @@ export function ListingGrid({
                   )}
                 </div>
               )}
-              {savedIds && (
-                <CompactSaveButton listingId={listing.id} initialSaved={savedIds.has(listing.id)} />
-              )}
+              <CompactSaveButton listingId={listing.id} />
             </div>
             <div className="space-y-1 p-3">
               <div className="flex items-baseline gap-2">

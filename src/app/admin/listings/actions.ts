@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { ADMIN_LISTING_STATUSES } from "@/lib/admin-listings";
 import { logAdminAction } from "@/lib/admin-audit-log";
@@ -21,6 +21,10 @@ async function requireAdminActor() {
 }
 
 function revalidateListings(ids: string[]) {
+  revalidateTag("listings");
+  revalidatePath("/", "page");
+  revalidatePath("/[category]", "page");
+  revalidatePath("/[category]/[slug]", "page");
   revalidatePath("/admin/listings");
   revalidatePath("/admin");
   for (const id of ids) revalidatePath(`/admin/listings/${id}`);

@@ -48,7 +48,7 @@ export default async function MessagesPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="mb-6 border-l-4 border-brand pl-3 text-xl font-bold text-neutral-800">Messages</h1>
 
@@ -82,7 +82,7 @@ export default async function MessagesPage() {
                 >
                   <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
                     {coverUrl ? (
-                      <Image src={coverUrl} alt="" fill sizes="56px" className="object-cover" />
+                      <Image src={coverUrl} alt="" fill sizes="56px" quality={82} className="object-cover" />
                     ) : (
                       <ImageOff className="size-5" />
                     )}

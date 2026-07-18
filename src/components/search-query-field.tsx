@@ -44,7 +44,7 @@ export function SearchQueryField({ defaultQuery }: { defaultQuery?: string }) {
               <Link key={item.id} href={item.href} className="w-24 shrink-0">
                 <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-neutral-100 text-neutral-300">
                   {item.imageUrl ? (
-                    <Image src={item.imageUrl} alt="" fill sizes="96px" className="object-cover" />
+                    <Image src={item.imageUrl} alt="" fill sizes="96px" quality={82} className="object-cover" />
                   ) : (
                     <ImageOff className="size-5" />
                   )}

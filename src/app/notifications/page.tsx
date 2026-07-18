@@ -15,7 +15,7 @@ export default async function NotificationsPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="mb-6 border-l-4 border-brand pl-3 text-xl font-bold text-neutral-800">Notifications</h1>
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white py-20 text-center shadow-lg">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { CategorySidebar } from "@/components/category-sidebar";
@@ -7,7 +8,8 @@ import { HomeFilterRow } from "@/components/home-filter-row";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
-import { createClient, getUser } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { getCategories } from "@/lib/categories";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getListingPath } from "@/lib/listing-url";
@@ -15,6 +17,60 @@ import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 
 const PAGE_SIZE = 24;
 const VALID_SORTS = ["recommended", "newest", "price_asc", "price_desc"];
+
+// The route itself still opts into dynamic rendering (it reads searchParams
+// for filters/sort/pagination, which is a Next.js "dynamic API" like
+// cookies()), so this export doesn't make the page's HTML itself
+// cacheable -- but the expensive Supabase calls below are wrapped in
+// unstable_cache with this same window, which is what actually delivers
+// the "results are at most 60s stale, DB isn't re-queried on every
+// request" behavior in practice. See the profiling notes for why full
+// route-level ISR isn't achievable here without dropping query-string
+// filtering.
+export const revalidate = 60;
+
+// None of these need a signed-in viewer's session -- using the cookie-free
+// public client here (rather than the auth-aware one) is what keeps this
+// data fetchable via unstable_cache; a client that reads cookies() can't be
+// safely shared across requests/visitors.
+const getHomeCategoryCounts = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data } = await supabase.rpc("category_counts");
+    return data ?? [];
+  },
+  ["home-category-counts"],
+  { revalidate: 60, tags: ["listings"] }
+);
+
+const getHomeLocationRows = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data } = await supabase.from("listings").select("location").eq("status", "active");
+    return data ?? [];
+  },
+  ["home-location-rows"],
+  { revalidate: 60, tags: ["listings"] }
+);
+
+const getHomeSearchResults = unstable_cache(
+  async (filters: ListingFilters, page: number) => {
+    const supabase = createPublicClient();
+    const { data } = await supabase.rpc("search_listings", {
+      search_query: filters.q,
+      category_slug: filters.category,
+      location_filter: filters.location,
+      exclude_location: filters.excludeLocation,
+      min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
+      max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+      p_page: page,
+      sort: filters.sort,
+    });
+    return data ?? [];
+  },
+  ["home-search-listings"],
+  { revalidate: 60, tags: ["listings"] }
+);
 
 type PageProps = {
   searchParams: Promise<{
@@ -42,45 +98,14 @@ export default async function Home({ searchParams }: PageProps) {
   };
   const page = Math.max(1, Number(params.page) || 1);
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
-  const [
-    { data: userData },
-    { data: categories },
-    { data: countRows },
-    { data: results },
-    { data: locationRows },
-  ] = await Promise.all([
-    getUser(),
-    supabase
-      .from("categories")
-      .select("id, name, slug, parent_id, icon")
-      .order("display_order")
-      .order("name"),
-    supabase.rpc("category_counts"),
-    supabase.rpc("search_listings", {
-      search_query: filters.q,
-      category_slug: filters.category,
-      location_filter: filters.location,
-      exclude_location: filters.excludeLocation,
-      min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
-      max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-      p_page: page,
-      sort: filters.sort,
-    }),
-    supabase.from("listings").select("location").eq("status", "active"),
+  const [categories, countRows, results, locationRows] = await Promise.all([
+    getCategories(),
+    getHomeCategoryCounts(),
+    getHomeSearchResults(filters, page),
+    getHomeLocationRows(),
   ]);
-
-  // Only fetched when logged in -- ListingGrid hides the save button entirely
-  // rather than risk showing the wrong "not saved" state when we don't know.
-  let savedIds: Set<string> | undefined;
-  if (userData.user) {
-    const { data: savedRows } = await supabase
-      .from("saved_listings")
-      .select("listing_id")
-      .eq("user_id", userData.user.id);
-    savedIds = new Set((savedRows ?? []).map((r) => r.listing_id));
-  }
 
   const counts = new Map((countRows ?? []).map((row) => [row.category_id, row.listing_count]));
 
@@ -118,7 +143,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
-      <SiteHeader user={userData.user} />
+      <SiteHeader categories={categories} />
 
       <section className="bg-brand pb-10 pt-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -150,7 +175,7 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
           <FilterBar filters={filters} />
           <HomeFilterRow filters={filters} />
-          <ListingGrid listings={listings} savedIds={savedIds} />
+          <ListingGrid listings={listings} />
 
           {totalPages > 1 && (
             <nav className="mt-6 flex items-center justify-center gap-3 text-sm">

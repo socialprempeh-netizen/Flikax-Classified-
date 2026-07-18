@@ -32,6 +32,7 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
           fill
           priority={activeIndex === 0}
           sizes="(min-width: 640px) 66vw, 100vw"
+          quality={82}
           className="object-cover"
         />
         {images.length > 1 && (
@@ -72,7 +73,7 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
                 index === activeIndex ? "border-brand" : "border-transparent"
               }`}
             >
-              <Image src={url} alt="" fill sizes="112px" className="object-cover" />
+              <Image src={url} alt="" fill sizes="112px" quality={82} className="object-cover" />
             </button>
           ))}
         </div>

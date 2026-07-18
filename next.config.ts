@@ -2,6 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // Explicit allowlist rather than leaving arbitrary quality values open
+    // (Next.js otherwise accepts any integer, which is an easy resource-
+    // exhaustion vector -- an attacker requesting a distinct quality on
+    // every request generates a fresh cached variant each time). 75 is
+    // Next's own default for anything that doesn't set `quality`; 82 is
+    // used specifically for listing photos, which are already a
+    // once-compressed WebP (see watermark.ts) -- re-encoding them a second
+    // time at the framework default of 75 would compound quality loss more
+    // than necessary for source images that were already optimized once.
+    qualities: [75, 82],
     remotePatterns: [
       {
         protocol: "https",

@@ -1,5 +1,4 @@
 import { Lock } from "lucide-react";
-import { getUser } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { TocLayout } from "@/components/legal/toc-layout";
@@ -21,13 +20,9 @@ const TOC = [
 ];
 
 export default async function PrivacyPolicyPage() {
-  const {
-    data: { user },
-  } = await getUser();
-
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
 
       <TocLayout toc={TOC}>
         <div className="mb-8 flex items-center gap-3">

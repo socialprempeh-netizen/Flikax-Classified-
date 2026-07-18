@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 
 export async function deleteListingAction(formData: FormData) {
@@ -14,5 +14,8 @@ export async function deleteListingAction(formData: FormData) {
   if (!user) return;
 
   await supabase.from("listings").delete().eq("id", id).eq("user_id", user.id);
+  revalidateTag("listings");
   revalidatePath("/dashboard");
+  revalidatePath("/", "page");
+  revalidatePath("/[category]", "page");
 }

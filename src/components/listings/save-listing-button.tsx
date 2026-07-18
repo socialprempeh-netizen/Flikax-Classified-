@@ -1,26 +1,29 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Bookmark } from "lucide-react";
 import { toggleSavedListingAction } from "@/app/listings/actions";
 import { withAuthRetry } from "@/lib/auth-retry";
+import { useSavedListingIds } from "@/lib/use-saved-listing-ids";
 
-export function SaveListingButton({
-  listingId,
-  initialSaved,
-}: {
-  listingId: string;
-  initialSaved: boolean;
-}) {
-  const [saved, setSaved] = useState(initialSaved);
+export function SaveListingButton({ listingId }: { listingId: string }) {
+  const savedIds = useSavedListingIds();
+  const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // See CompactSaveButton for why this guard exists.
+  const [hasToggled, setHasToggled] = useState(false);
+
+  useEffect(() => {
+    if (!hasToggled) setSaved(savedIds.has(listingId));
+  }, [savedIds, listingId, hasToggled]);
 
   function toggle() {
     setError(null);
     startTransition(async () => {
       try {
         const result = await withAuthRetry(() => toggleSavedListingAction(listingId));
+        setHasToggled(true);
         setSaved(result.saved);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not save this listing.");

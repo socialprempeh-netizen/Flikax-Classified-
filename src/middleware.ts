@@ -4,6 +4,12 @@ import { updateSession } from "@/lib/supabase/middleware";
 // A direct REST call rather than the full SSR client — feature_flags has a
 // public read policy, so no cookies/session are needed for this check, and
 // middleware runs on every request so it should stay as cheap as possible.
+// `next: { revalidate }` uses Next's Edge-compatible fetch cache so this
+// only actually hits Supabase once per 30s across all traffic, instead of
+// being a blocking round-trip on every single request -- the flag is off
+// 99.9% of the time and a 30s-stale read is a fine tradeoff for a manual
+// maintenance toggle (operators can still force it via the Vercel Data
+// Cache purge if an instant flip is ever needed).
 async function isMaintenanceModeOn(): Promise<boolean> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -12,6 +18,7 @@ async function isMaintenanceModeOn(): Promise<boolean> {
   try {
     const res = await fetch(`${url}/rest/v1/feature_flags?key=eq.maintenance_mode&select=enabled`, {
       headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+      next: { revalidate: 30, tags: ["maintenance-mode"] },
     });
     if (!res.ok) return false;
     const rows: { enabled: boolean }[] = await res.json();

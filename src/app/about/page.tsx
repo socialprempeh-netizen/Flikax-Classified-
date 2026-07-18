@@ -15,7 +15,6 @@ import {
   Rocket,
   Sparkles,
 } from "lucide-react";
-import { getUser } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SellCta } from "@/components/cta/sell-cta";
@@ -100,13 +99,9 @@ function StepList({ steps }: { steps: { title: string; body: string }[] }) {
 }
 
 export default async function AboutPage() {
-  const {
-    data: { user },
-  } = await getUser();
-
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
 
       {/* Hero */}
       <section className="bg-brand px-4 py-16 text-center text-white sm:px-6">

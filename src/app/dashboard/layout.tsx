@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:flex-row sm:px-6">
         <DashboardSidebar
           fullName={profile?.full_name ?? meta.full_name ?? meta.name ?? null}

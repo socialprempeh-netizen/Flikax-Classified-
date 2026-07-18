@@ -71,7 +71,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-6 sm:px-6">
         <Link
           href="/messages"
@@ -92,7 +92,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
           >
             <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
               {coverUrl ? (
-                <Image src={coverUrl} alt={conversation.listing.title} fill sizes="56px" className="object-cover" />
+                <Image src={coverUrl} alt={conversation.listing.title} fill sizes="56px" quality={82} className="object-cover" />
               ) : (
                 <ImageOff className="size-5" />
               )}

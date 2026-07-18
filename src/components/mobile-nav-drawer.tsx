@@ -15,6 +15,7 @@ import {
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { LogoutButton } from "@/components/auth/logout-button";
 import type { Category } from "@/components/category-sidebar";
+import { useSessionSummary } from "@/lib/use-session-summary";
 
 const ACCOUNT_LINKS = [
   { label: "Saved", href: "/saved", icon: Bookmark },
@@ -25,16 +26,9 @@ const ACCOUNT_LINKS = [
   { label: "Help & Support", href: "/contact", icon: LifeBuoy },
 ];
 
-export function MobileNavDrawer({
-  categories,
-  isLoggedIn,
-  hasUnreadMessages,
-}: {
-  categories: Category[];
-  isLoggedIn: boolean;
-  hasUnreadMessages: boolean;
-}) {
+export function MobileNavDrawer({ categories }: { categories: Category[] }) {
   const [open, setOpen] = useState(false);
+  const { isLoggedIn, hasUnreadMessages } = useSessionSummary();
   const parents = categories.filter((c) => c.parent_id === null);
 
   return (

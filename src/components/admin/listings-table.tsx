@@ -174,7 +174,7 @@ export function ListingsTable({ listings }: { listings: AdminListingRow[] }) {
 
             <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
               {listing.imageUrl ? (
-                <Image src={listing.imageUrl} alt={listing.title} fill sizes="64px" className="object-cover" />
+                <Image src={listing.imageUrl} alt={listing.title} fill sizes="64px" quality={82} className="object-cover" />
               ) : (
                 <ImageOff className="size-5" />
               )}

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient, getUser } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
 import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -16,21 +17,44 @@ const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "pric
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+// Same caveat as the homepage: this route reads searchParams (q/sort/page),
+// which forces it dynamic regardless of this export -- the actual "results
+// no more than 60s stale, DB not re-queried every request" behavior comes
+// from the unstable_cache wrapping below.
+export const revalidate = 60;
+
 type PageProps = {
   params: Promise<{ category: string }>;
   searchParams: Promise<{ page?: string; q?: string; minPrice?: string; maxPrice?: string; sort?: string }>;
 };
 
-async function getLeafCategory(categorySlug: string) {
-  const supabase = await createClient();
-  const { data: category } = await supabase
-    .from("categories")
-    .select("id, name, slug, parent_id")
-    .eq("slug", categorySlug)
-    .not("parent_id", "is", null)
-    .maybeSingle();
-  return category;
-}
+const getLeafCategory = unstable_cache(
+  async (categorySlug: string) => {
+    const supabase = createPublicClient();
+    const { data: category } = await supabase
+      .from("categories")
+      .select("id, name, slug, parent_id")
+      .eq("slug", categorySlug)
+      .not("parent_id", "is", null)
+      .maybeSingle();
+    return category;
+  },
+  ["leaf-category"],
+  { revalidate: 300, tags: ["categories"] }
+);
+
+// The category-page equivalent of the homepage's getHomeSearchResults --
+// same reasoning: fetchCategoryListings itself takes a live Supabase client,
+// which isn't something unstable_cache can use as part of a cache key, so
+// this wraps it with only the plain filter values as arguments.
+const getCachedCategoryListings = unstable_cache(
+  async (filter: Parameters<typeof fetchCategoryListings>[1]) => {
+    const supabase = createPublicClient();
+    return fetchCategoryListings(supabase, filter);
+  },
+  ["category-listings"],
+  { revalidate: 60, tags: ["listings"] }
+);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category: categorySlug } = await params;
@@ -52,15 +76,14 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   const category = await getLeafCategory(categorySlug);
   if (!category) notFound();
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { page: pageParam, q, minPrice, maxPrice, sort: sortParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
     : "recommended";
 
-  const [{ data: userData }, parentCategory, { data: siblings }, { listings, totalCount }] = await Promise.all([
-    getUser(),
+  const [parentCategory, { data: siblings }, { listings, totalCount }] = await Promise.all([
     category.parent_id
       ? supabase
           .from("categories")
@@ -70,7 +93,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           .then((r) => r.data)
       : Promise.resolve(null),
     supabase.from("categories").select("id, name, slug, icon").eq("parent_id", category.parent_id).order("name"),
-    fetchCategoryListings(supabase, {
+    getCachedCategoryListings({
       categoryId: category.id,
       page,
       q,
@@ -107,7 +130,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
       <JsonLd data={breadcrumbJsonLd} />
-      <SiteHeader user={userData.user} />
+      <SiteHeader />
       <CategorySearchHeader categoryName={category.name} categorySlug={category.slug} query={q} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
         <div className="mb-4 hidden flex-wrap items-center gap-1 text-sm text-neutral-500 lg:flex">

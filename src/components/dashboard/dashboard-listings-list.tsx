@@ -61,7 +61,7 @@ export function DashboardListingsList({
           <Link href={listing.href} aria-label={listing.title} className="absolute inset-0 z-0" />
           <div className="relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
             {listing.imageUrl ? (
-              <Image src={listing.imageUrl} alt={listing.title} fill sizes="96px" className="object-cover" />
+              <Image src={listing.imageUrl} alt={listing.title} fill sizes="96px" quality={82} className="object-cover" />
             ) : (
               <ImageOff className="size-6" />
             )}

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { REPORT_REASONS, type ReportReason } from "@/lib/report-reasons";
 
@@ -48,8 +48,11 @@ export async function markListingUnavailableAction(listingId: string): Promise<v
     .eq("id", listingId)
     .eq("user_id", user.id);
 
+  revalidateTag("listings");
   revalidatePath("/[category]/[slug]", "page");
   revalidatePath("/dashboard");
+  revalidatePath("/", "page");
+  revalidatePath("/[category]", "page");
 }
 
 export async function submitReportAction(listingId: string, reason: ReportReason): Promise<void> {

@@ -33,7 +33,7 @@ export default async function ContactPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
-      <SiteHeader user={user} />
+      <SiteHeader />
 
       <main className="mx-auto w-full max-w-2xl flex-1 space-y-10 px-4 py-12 sm:px-6">
         {/* Header */}

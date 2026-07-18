@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { after } from "next/server";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import type { Metadata } from "next";
 import {
@@ -20,7 +21,8 @@ import {
   BarChart3,
   type LucideIcon,
 } from "lucide-react";
-import { createClient, getUser } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getFieldsForCategory, HEADLINE_FIELD_KEYS } from "@/lib/listing-fields";
@@ -42,14 +44,19 @@ import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { ListingGallery } from "@/components/listings/listing-gallery";
 import { SaveListingButton } from "@/components/listings/save-listing-button";
-import { MarkUnavailableButton } from "@/components/listings/mark-unavailable-button";
 import { RevealPhoneButton } from "@/components/listings/reveal-phone-button";
 import { StartChatButton } from "@/components/listings/start-chat-button";
+import { ContactSellerActions } from "@/components/listings/contact-seller-actions";
+import { ListingOwnerActions } from "@/components/listings/listing-owner-actions";
 import { ShareButtons } from "@/components/listings/share-buttons";
-import { ReportListingButton } from "@/components/listings/report-listing-button";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentlyViewed } from "@/components/track-recently-viewed";
+
+// Only actually applies to the listing-detail branch of this route (the
+// location-scoped listing branch reads searchParams for pagination, which
+// forces it dynamic regardless of this export -- see CategoryLocationPage).
+export const revalidate = 60;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -101,7 +108,7 @@ type PageProps = { params: Promise<PageParams>; searchParams: Promise<{ page?: s
 // regardless of what the second segment looks like — checked first so a typo'd
 // category can't accidentally fall through to a coincidental short-id decode.
 const resolveRoute = cache(async (categorySlug: string, slug: string): Promise<Route> => {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const { data: category } = await supabase
     .from("categories")
@@ -126,16 +133,27 @@ const resolveRoute = cache(async (categorySlug: string, slug: string): Promise<R
   return { kind: "listing", shortId };
 });
 
+// cache() dedupes repeat calls within a single request; unstable_cache is
+// what actually persists the result *across* requests for up to 60s, so a
+// burst of views on the same listing shares one Supabase round-trip instead
+// of one each. Tagged "listings" so create/update/delete actions can purge
+// it immediately via revalidateTag instead of waiting out the 60s window.
 const getListingByShortId = cache(async (shortId: number) => {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("listings")
-    .select(
-      "*, categories(id, name, slug, parent_id), listing_images(storage_path, position), profiles(full_name, phone, verified)"
-    )
-    .eq("short_id", shortId)
-    .maybeSingle();
-  return data;
+  return unstable_cache(
+    async () => {
+      const supabase = createPublicClient();
+      const { data } = await supabase
+        .from("listings")
+        .select(
+          "*, categories(id, name, slug, parent_id), listing_images(storage_path, position), profiles(full_name, phone, verified)"
+        )
+        .eq("short_id", shortId)
+        .maybeSingle();
+      return data;
+    },
+    ["listing-by-short-id", String(shortId)],
+    { revalidate: 60, tags: ["listings"] }
+  )();
 });
 
 function listingPath(listing: { title: string; location: string; short_id: number; categories: { slug: string } | null }) {
@@ -154,7 +172,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (route.kind === "not-found") return {};
 
   if (route.kind === "location") {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const count = await countCategoryListings(supabase, route.category.id, route.location.district_name);
     const title = `${route.category.name} for Sale in ${route.location.district_name} | Flikax`;
     const description = `Browse ${route.category.name} listings in ${route.location.district_name}, Ghana on Flikax — Ghana's classifieds marketplace.`;
@@ -169,7 +187,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const listing = await getListingByShortId(route.shortId);
   if (!listing) return {};
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const cover = [...(listing.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
   const imageUrl = cover ? resolveListingImageUrl(supabase, cover.storage_path) : undefined;
   const title = `${listing.title} for Sale in ${listing.location} | Flikax Ghana`;
@@ -230,12 +248,11 @@ async function CategoryLocationPage({
   location: LocationRow;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const [{ data: userData }, parentCategory, { listings, totalCount }] = await Promise.all([
-    getUser(),
+  const [parentCategory, { listings, totalCount }] = await Promise.all([
     category.parent_id
       ? supabase
           .from("categories")
@@ -265,7 +282,7 @@ async function CategoryLocationPage({
   return (
     <div className="flex flex-1 flex-col bg-neutral-50">
       <JsonLd data={breadcrumbJsonLd} />
-      <SiteHeader user={userData.user} />
+      <SiteHeader />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
         <div className="mb-4 flex flex-wrap items-center gap-1 text-sm text-neutral-500">
           <Link href="/" className="hover:text-brand">
@@ -337,12 +354,20 @@ async function CategoryLocationPage({
 type ListingRow = NonNullable<Awaited<ReturnType<typeof getListingByShortId>>>;
 
 async function ListingDetail({ listing }: { listing: ListingRow }) {
-  const supabase = await createClient();
-  const { data: userData } = await getUser();
+  // Security-sensitive, and deliberately isolated: a non-active (sold/
+  // removed) listing is only visible to its own owner. getUser() is only
+  // called for that rare branch -- for the hot path (an active listing,
+  // the overwhelming majority of views), this render never touches
+  // cookies(), which is what keeps that path cache-eligible. Ownership for
+  // the *active*-listing UI (Mark Unavailable, hiding "Message Seller" from
+  // yourself, etc.) is resolved client-side instead -- see
+  // ContactSellerActions/ListingOwnerActions.
+  if (listing.status !== "active") {
+    const { data: userData } = await getUser();
+    if (userData.user?.id !== listing.user_id) notFound();
+  }
 
-  const viewerId = userData.user?.id;
-  const isOwner = viewerId === listing.user_id;
-  if (listing.status !== "active" && !isOwner) notFound();
+  const supabase = createPublicClient();
 
   const images = [...(listing.listing_images ?? [])]
     .sort((a, b) => a.position - b.position)
@@ -350,17 +375,9 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const category = listing.categories;
 
-  const [parentResult, savedResult, similarSameLocationResult] = await Promise.all([
+  const [parentResult, similarSameLocationResult] = await Promise.all([
     category?.parent_id
       ? supabase.from("categories").select("name, slug").eq("id", category.parent_id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    viewerId
-      ? supabase
-          .from("saved_listings")
-          .select("id")
-          .eq("user_id", viewerId)
-          .eq("listing_id", listing.id)
-          .maybeSingle()
       : Promise.resolve({ data: null }),
     supabase
       .from("listings")
@@ -377,7 +394,6 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const parentCategory = parentResult.data as { name: string; slug: string } | null;
   const topLevelSlug = parentCategory?.slug ?? category?.slug;
-  const initialSaved = Boolean(savedResult.data);
 
   const fields = getFieldsForCategory(topLevelSlug ?? undefined);
   const attributes = (listing.attributes ?? {}) as Record<string, string | string[]>;
@@ -432,9 +448,12 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const marketPrice = computeMarketPriceRange(comparablePrices);
 
-  if (!isOwner) {
-    after(() => supabase.rpc("increment_listing_views", { listing_id: listing.id }));
-  }
+  // Ownership is no longer known server-side for an active listing (see
+  // above) -- the previous "don't count the owner's own view" exclusion
+  // isn't checkable here anymore. Counting it unconditionally very slightly
+  // inflates a listing's own-owner view count, a materially smaller cost
+  // than reintroducing a per-viewer cookies() check into this hot path.
+  after(() => supabase.rpc("increment_listing_views", { listing_id: listing.id }));
 
   let similarRows = similarSameLocationResult.data ?? [];
 
@@ -517,7 +536,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
     <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
       <JsonLd data={productJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <SiteHeader user={userData.user} />
+      <SiteHeader />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
         <div className="mb-4 flex flex-wrap items-center gap-1 text-sm text-neutral-500">
@@ -576,7 +595,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
               <div className="flex items-start justify-between gap-3">
                 <h1 className="text-2xl font-bold text-neutral-800">{listing.title}</h1>
-                <SaveListingButton listingId={listing.id} initialSaved={initialSaved} />
+                <SaveListingButton listingId={listing.id} />
               </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-3 text-base text-neutral-500">
@@ -695,10 +714,11 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
               <div className="mt-4 flex flex-col gap-2">
                 {sellerPhone && <RevealPhoneButton phone={sellerPhone} label="Contact Seller" />}
-                {!isOwner && <StartChatButton listingId={listing.id} />}
-                {!sellerPhone && isOwner && (
-                  <p className="text-sm text-neutral-400">No contact info available.</p>
-                )}
+                <ContactSellerActions
+                  listingId={listing.id}
+                  sellerId={listing.user_id}
+                  hasPhone={Boolean(sellerPhone)}
+                />
               </div>
             </div>
 
@@ -716,9 +736,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                 Status: {STATUS_LABELS[listing.status] ?? listing.status}
               </span>
 
-              {isOwner && listing.status === "active" && <MarkUnavailableButton listingId={listing.id} />}
-
-              {!isOwner && <ReportListingButton listingId={listing.id} />}
+              <ListingOwnerActions listingId={listing.id} sellerId={listing.user_id} status={listing.status} />
             </div>
 
             <div className="rounded-xl border border-dashed border-brand/30 bg-brand-light p-5 text-center">

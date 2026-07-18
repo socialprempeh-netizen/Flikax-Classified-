@@ -71,7 +71,7 @@ export default async function PerformanceInsightsPage() {
                       <Link href={href} className="flex items-center gap-3">
                         <span className="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
                           {imageUrl ? (
-                            <Image src={imageUrl} alt={row.title} fill sizes="48px" className="object-cover" />
+                            <Image src={imageUrl} alt={row.title} fill sizes="48px" quality={82} className="object-cover" />
                           ) : (
                             <ImageOff className="size-5" />
                           )}
