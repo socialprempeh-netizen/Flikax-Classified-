@@ -47,3 +47,6 @@ next-env.d.ts
 # one-time migration script progress state
 scripts/.backfill-progress.json
 scripts/.revert-progress.json
+
+# supabase CLI local project state (linked-project.json, pooler-url, etc.)
+supabase/.temp/

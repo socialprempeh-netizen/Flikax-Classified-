@@ -16,6 +16,8 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose 
 import { LogoutButton } from "@/components/auth/logout-button";
 import type { Category } from "@/components/category-sidebar";
 import { useSessionSummary } from "@/lib/use-session-summary";
+import { resolveCategoryIcon } from "@/lib/category-icons";
+import { getTopLevelColorClasses } from "@/lib/category-colors";
 
 const ACCOUNT_LINKS = [
   { label: "Saved", href: "/saved", icon: Bookmark },
@@ -53,16 +55,24 @@ export function MobileNavDrawer({ categories }: { categories: Category[] }) {
             Categories
           </p>
           <nav className="mb-4 flex flex-col">
-            {parents.map((cat) => (
-              <SheetClose asChild key={cat.id}>
-                <Link
-                  href={`/${cat.slug}`}
-                  className="rounded-lg px-2 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  {cat.name}
-                </Link>
-              </SheetClose>
-            ))}
+            {parents.map((cat) => {
+              const Icon = resolveCategoryIcon(cat);
+              return (
+                <SheetClose asChild key={cat.id}>
+                  <Link
+                    href={`/${cat.slug}`}
+                    className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    <span
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${getTopLevelColorClasses(cat.slug)}`}
+                    >
+                      <Icon className="size-4" />
+                    </span>
+                    {cat.name}
+                  </Link>
+                </SheetClose>
+              );
+            })}
           </nav>
 
           <div className="border-t border-neutral-100 pt-3">

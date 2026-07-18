@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import type { Category } from "@/components/category-sidebar";
 import { resolveCategoryIcon } from "@/lib/category-icons";
+import { getCategoryColorClasses } from "@/lib/category-colors";
 
 const FLYOUT_WIDTH = 260;
 const FLYOUT_GAP = 8;
@@ -120,7 +121,9 @@ export function CategoryNav({
                 isHovered ? "bg-brand-light" : ""
               }`}
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-light text-brand">
+              <span
+                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${getCategoryColorClasses(cat)}`}
+              >
                 <Icon className="size-4.5" />
               </span>
               <span className="min-w-0 flex-1">
@@ -145,25 +148,30 @@ export function CategoryNav({
                 onMouseLeave={handleLeave}
                 className="z-40 overflow-y-auto rounded-xl border border-neutral-100 bg-white p-2 shadow-lg"
               >
-                {children.map((child) => (
-                  <Link
-                    key={child.id}
-                    href={`/${child.slug}`}
-                    className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-neutral-50"
-                  >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-brand-light text-brand">
-                      <Icon className="size-4" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-neutral-800">
-                        {child.name}
+                {children.map((child) => {
+                  const ChildIcon = resolveCategoryIcon(child);
+                  return (
+                    <Link
+                      key={child.id}
+                      href={`/${child.slug}`}
+                      className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-neutral-50"
+                    >
+                      <span
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-md ${getCategoryColorClasses(child)}`}
+                      >
+                        <ChildIcon className="size-4" />
                       </span>
-                      <span className="block text-xs text-neutral-400">
-                        {counts.get(child.id) ?? 0} ads
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-neutral-800">
+                          {child.name}
+                        </span>
+                        <span className="block text-xs text-neutral-400">
+                          {counts.get(child.id) ?? 0} ads
+                        </span>
                       </span>
-                    </span>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>

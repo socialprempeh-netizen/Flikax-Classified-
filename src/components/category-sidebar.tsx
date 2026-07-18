@@ -6,6 +6,8 @@ import { CategoryNav } from "@/components/category-nav";
 import { MobileCategoryGrid } from "@/components/mobile-category-grid";
 import { MobileCategoryList } from "@/components/mobile-category-list";
 import { SellCta } from "@/components/cta/sell-cta";
+import { resolveCategoryIcon } from "@/lib/category-icons";
+import { getSubcategoryColorClasses } from "@/lib/category-colors";
 
 // Featured categories are pinned first in the sidebar; the rest keep their existing order.
 const FEATURED_SLUGS = ["phones-tablets", "vehicles", "property"];
@@ -93,15 +95,21 @@ export function CategorySidebar({
         <div className="flex flex-col gap-1">
           {children.map((child) => {
             const isActive = child.slug === selectedSlug;
+            const Icon = resolveCategoryIcon(child);
             return (
               <Link
                 key={child.id}
                 href={`/${child.slug}`}
-                className={`flex items-center justify-between rounded-md px-2 py-1.5 text-sm ${
+                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
                   isActive ? "bg-brand-light font-semibold text-brand" : "text-neutral-600 hover:bg-neutral-50"
                 }`}
               >
-                <span className="truncate">{child.name}</span>
+                <span
+                  className={`flex size-6 shrink-0 items-center justify-center rounded-md ${getSubcategoryColorClasses(child.slug)}`}
+                >
+                  <Icon className="size-3.5" />
+                </span>
+                <span className="min-w-0 flex-1 truncate">{child.name}</span>
                 <span className="ml-2 shrink-0 text-xs text-neutral-400">{counts.get(child.id) ?? 0}</span>
               </Link>
             );

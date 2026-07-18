@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import type { Category } from "@/components/category-sidebar";
 import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getCategoryColor } from "@/lib/category-colors";
+import { getSubcategoryColorClasses } from "@/lib/category-colors";
 
 // Every category in this app is exactly two levels deep (verified: no leaf
 // category ever has children of its own), so a click here always means
@@ -37,12 +37,12 @@ export function MobileCategoryList({ categories, counts }: { categories: Categor
       </div>
 
       <div className="divide-y divide-neutral-100 px-4">
-        {filtered.map((child, index) => {
+        {filtered.map((child) => {
           const Icon = resolveCategoryIcon(child);
           return (
             <Link key={child.id} href={`/${child.slug}`} className="flex items-center gap-3 py-3">
               <span
-                className={`flex size-11 shrink-0 items-center justify-center rounded-lg ${getCategoryColor(index)}`}
+                className={`flex size-11 shrink-0 items-center justify-center rounded-lg ${getSubcategoryColorClasses(child.slug)}`}
               >
                 <Icon className="size-5" />
               </span>

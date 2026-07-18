@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import type { Category } from "@/components/category-sidebar";
 import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getCategoryColor } from "@/lib/category-colors";
+import { getTopLevelColorClasses } from "@/lib/category-colors";
 
 export function MobileCategoryGrid({
   parents,
@@ -26,7 +26,7 @@ export function MobileCategoryGrid({
         </span>
       </Link>
 
-      {parents.map((cat, index) => {
+      {parents.map((cat) => {
         const Icon = resolveCategoryIcon(cat);
         return (
           <Link
@@ -35,7 +35,7 @@ export function MobileCategoryGrid({
             className="flex min-h-16 flex-col items-center justify-start gap-1.5 text-center"
           >
             <span
-              className={`flex size-14 shrink-0 items-center justify-center rounded-2xl ${getCategoryColor(index)}`}
+              className={`flex size-14 shrink-0 items-center justify-center rounded-2xl ${getTopLevelColorClasses(cat.slug)}`}
             >
               <Icon className="size-6" />
             </span>

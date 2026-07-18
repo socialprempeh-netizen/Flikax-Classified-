@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getCategoryColor } from "@/lib/category-colors";
+import { getSubcategoryColorClasses } from "@/lib/category-colors";
 
 export type SiblingCategory = { id: string; name: string; slug: string; icon?: string | null };
 
@@ -18,13 +18,13 @@ export function SiblingCategoryRow({
 
   return (
     <div className="lg:hidden -mx-4 mb-4 flex gap-3 overflow-x-auto px-4 pb-1">
-      {siblings.map((sibling, index) => {
+      {siblings.map((sibling) => {
         const Icon = resolveCategoryIcon(sibling);
         const isActive = sibling.slug === activeSlug;
         return (
           <Link key={sibling.id} href={`/${sibling.slug}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
             <span
-              className={`flex size-12 shrink-0 items-center justify-center rounded-lg ${getCategoryColor(index)} ${
+              className={`flex size-12 shrink-0 items-center justify-center rounded-lg ${getSubcategoryColorClasses(sibling.slug)} ${
                 isActive ? "ring-2 ring-brand ring-offset-1" : ""
               }`}
             >
