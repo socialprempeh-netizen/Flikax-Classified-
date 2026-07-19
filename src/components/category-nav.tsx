@@ -5,8 +5,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import type { Category } from "@/components/category-sidebar";
-import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getCategoryColorClasses } from "@/lib/category-colors";
+import { CategoryThumb } from "@/components/category-thumb";
 
 const FLYOUT_WIDTH = 260;
 const FLYOUT_GAP = 8;
@@ -101,7 +100,6 @@ export function CategoryNav({
   return (
     <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white shadow-sm sm:w-72">
       {parents.map((cat) => {
-        const Icon = resolveCategoryIcon(cat);
         const children = categories.filter((c) => c.parent_id === cat.id);
         const isHovered = hoveredId === cat.id;
 
@@ -121,11 +119,7 @@ export function CategoryNav({
                 isHovered ? "bg-brand-light" : ""
               }`}
             >
-              <span
-                className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${getCategoryColorClasses(cat)}`}
-              >
-                <Icon className="size-4.5" />
-              </span>
+              <CategoryThumb category={cat} size="size-9" iconSize="size-4.5" sizes="36px" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-neutral-800">
                   {cat.name}
@@ -149,18 +143,13 @@ export function CategoryNav({
                 className="z-40 overflow-y-auto rounded-xl border border-neutral-100 bg-white p-2 shadow-lg"
               >
                 {children.map((child) => {
-                  const ChildIcon = resolveCategoryIcon(child);
                   return (
                     <Link
                       key={child.id}
                       href={`/${child.slug}`}
                       className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-neutral-50"
                     >
-                      <span
-                        className={`flex size-8 shrink-0 items-center justify-center rounded-md ${getCategoryColorClasses(child)}`}
-                      >
-                        <ChildIcon className="size-4" />
-                      </span>
+                      <CategoryThumb category={child} size="size-8" iconSize="size-4" rounded="rounded-md" sizes="32px" />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium text-neutral-800">
                           {child.name}

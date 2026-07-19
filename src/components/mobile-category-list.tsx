@@ -4,8 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import type { Category } from "@/components/category-sidebar";
-import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getSubcategoryColorClasses } from "@/lib/category-colors";
+import { CategoryThumb } from "@/components/category-thumb";
 
 // Every category in this app is exactly two levels deep (verified: no leaf
 // category ever has children of its own), so a click here always means
@@ -38,14 +37,9 @@ export function MobileCategoryList({ categories, counts }: { categories: Categor
 
       <div className="divide-y divide-neutral-100 px-4">
         {filtered.map((child) => {
-          const Icon = resolveCategoryIcon(child);
           return (
             <Link key={child.id} href={`/${child.slug}`} className="flex items-center gap-3 py-3">
-              <span
-                className={`flex size-11 shrink-0 items-center justify-center rounded-lg ${getSubcategoryColorClasses(child.slug)}`}
-              >
-                <Icon className="size-5" />
-              </span>
+              <CategoryThumb category={child} size="size-11" iconSize="size-5" sizes="44px" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-neutral-800">{child.name}</span>
                 <span className="block text-xs text-neutral-400">{counts.get(child.id) ?? 0} ads</span>

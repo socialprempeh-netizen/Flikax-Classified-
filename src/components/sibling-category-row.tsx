@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { resolveCategoryIcon } from "@/lib/category-icons";
-import { getSubcategoryColorClasses } from "@/lib/category-colors";
+import { CategoryThumb } from "@/components/category-thumb";
 
 export type SiblingCategory = { id: string; name: string; slug: string; icon?: string | null };
 
@@ -19,17 +18,21 @@ export function SiblingCategoryRow({
   return (
     <div className="lg:hidden -mx-4 mb-4 flex gap-3 overflow-x-auto px-4 pb-1">
       {siblings.map((sibling) => {
-        const Icon = resolveCategoryIcon(sibling);
         const isActive = sibling.slug === activeSlug;
         return (
           <Link key={sibling.id} href={`/${sibling.slug}`} className="flex w-16 shrink-0 flex-col items-center gap-1">
-            <span
-              className={`flex size-12 shrink-0 items-center justify-center rounded-lg ${getSubcategoryColorClasses(sibling.slug)} ${
-                isActive ? "ring-2 ring-brand ring-offset-1" : ""
-              }`}
-            >
-              <Icon className="size-5" />
-            </span>
+            <CategoryThumb
+              // Siblings are always subcategories (every category is exactly
+              // two levels deep) -- a non-null placeholder is enough to
+              // resolve the subcategory branch without plumbing the real
+              // parent_id through this lightweight prop shape.
+              category={{ ...sibling, parent_id: "sibling" }}
+              size="size-12"
+              iconSize="size-5"
+              sizes="48px"
+              eager
+              className={isActive ? "ring-2 ring-brand ring-offset-1" : ""}
+            />
             <span
               className={`line-clamp-2 text-center text-[11px] leading-tight ${
                 isActive ? "font-bold text-brand" : "font-medium text-neutral-600"
