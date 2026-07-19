@@ -253,6 +253,45 @@ export type Database = {
           },
         ]
       }
+      homepage_slides: {
+        Row: {
+          created_at: string
+          display_order: number
+          ends_at: string | null
+          headline: string | null
+          id: string
+          image_path: string
+          is_active: boolean
+          link_url: string | null
+          starts_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          headline?: string | null
+          id?: string
+          image_path: string
+          is_active?: boolean
+          link_url?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          ends_at?: string | null
+          headline?: string | null
+          id?: string
+          image_path?: string
+          is_active?: boolean
+          link_url?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       listing_images: {
         Row: {
           blur_score: number | null
@@ -1010,6 +1049,7 @@ export type Database = {
           category_slug: string
           cover_image_path: string
           created_at: string
+          description: string
           id: string
           is_featured: boolean
           location: string

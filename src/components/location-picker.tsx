@@ -6,15 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { buildListingsHref, type ListingFilters } from "@/lib/filters";
 import { LocationPickerModal } from "@/components/location-picker-modal";
 
-export function LocationPicker({
-  filters,
-  locationCounts,
-  totalListingsCount,
-}: {
-  filters: ListingFilters;
-  locationCounts: Record<string, number>;
-  totalListingsCount: number;
-}) {
+export function LocationPicker({ filters }: { filters: ListingFilters }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -36,8 +28,6 @@ export function LocationPicker({
         open={open}
         onClose={() => setOpen(false)}
         onSelect={(name) => router.push(buildListingsHref({ ...filters, location: name }))}
-        locationCounts={locationCounts}
-        totalListingsCount={totalListingsCount}
       />
     </>
   );

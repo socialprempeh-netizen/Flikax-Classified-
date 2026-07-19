@@ -4,15 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { LocationPickerModal } from "@/components/location-picker-modal";
 
-export function SearchLocationField({
-  defaultLocation,
-  locationCounts,
-  totalListingsCount,
-}: {
-  defaultLocation?: string;
-  locationCounts: Record<string, number>;
-  totalListingsCount: number;
-}) {
+export function SearchLocationField({ defaultLocation }: { defaultLocation?: string }) {
   const [open, setOpen] = useState(false);
   const [location, setLocation] = useState(defaultLocation);
 
@@ -28,13 +20,7 @@ export function SearchLocationField({
         <ChevronDown className="pointer-events-none absolute right-2 size-4 text-neutral-500" />
       </button>
 
-      <LocationPickerModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onSelect={(name) => setLocation(name)}
-        locationCounts={locationCounts}
-        totalListingsCount={totalListingsCount}
-      />
+      <LocationPickerModal open={open} onClose={() => setOpen(false)} onSelect={(name) => setLocation(name)} />
     </>
   );
 }

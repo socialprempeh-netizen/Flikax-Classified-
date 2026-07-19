@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { buildDistrictCounts, type District, type Region } from "@/lib/locations";
+import type { District, Region } from "@/lib/locations";
 import { useRegions } from "@/lib/use-regions";
 
 // Split an already-sorted list into `columnCount` contiguous chunks so columns
@@ -23,36 +23,16 @@ export function LocationPickerModal({
   open,
   onClose,
   onSelect,
-  locationCounts,
-  totalListingsCount,
 }: {
   open: boolean;
   onClose: () => void;
   onSelect: (name?: string) => void;
-  locationCounts: Record<string, number>;
-  totalListingsCount: number;
 }) {
   const regions = useRegions();
   const [activeRegionSlug, setActiveRegionSlug] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
   const activeRegion = regions.find((r) => r.slug === activeRegionSlug) ?? null;
-
-  // Real listing.location values don't always match a district's official
-  // name exactly (e.g. "Kumasi" vs. district "Kumasi Metropolitan") -- see
-  // matchLocationToDistrict for the fuzzy-matching rules.
-  const districtCounts = useMemo(
-    () => buildDistrictCounts(locationCounts, regions),
-    [locationCounts, regions]
-  );
-
-  function districtCount(district: District) {
-    return districtCounts[district.slug] ?? 0;
-  }
-
-  function regionCount(region: Region) {
-    return region.districts.reduce((sum, district) => sum + districtCount(district), 0);
-  }
 
   function close() {
     onClose();
@@ -184,7 +164,7 @@ export function LocationPickerModal({
                 onClick={() => selectLocation(activeRegion.name)}
                 className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
-                All {activeRegion.name} · {regionCount(activeRegion)} ads
+                All {activeRegion.name}
               </button>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -197,9 +177,7 @@ export function LocationPickerModal({
                         onClick={() => selectLocation(district.name)}
                         className="block cursor-pointer px-2 py-1 text-left leading-tight transition-colors hover:bg-neutral-50"
                       >
-                        <div className="text-sm leading-tight text-neutral-700">
-                          {district.name} · {districtCount(district)} ads
-                        </div>
+                        <div className="text-sm leading-tight text-neutral-700">{district.name}</div>
                         <div className="text-xs text-neutral-400">{activeRegion.name}</div>
                       </button>
                     ))}
@@ -214,7 +192,7 @@ export function LocationPickerModal({
                 onClick={() => selectLocation(undefined)}
                 className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
-                All Ghana · {totalListingsCount} Ads
+                All Ghana
               </button>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -227,9 +205,7 @@ export function LocationPickerModal({
                         onClick={() => openRegion(region.slug)}
                         className="flex w-full cursor-pointer items-center justify-between px-2 py-1 text-left transition-colors hover:bg-neutral-50"
                       >
-                        <span className="text-base text-neutral-700">
-                          {region.name} · {regionCount(region)} ads
-                        </span>
+                        <span className="text-base text-neutral-700">{region.name}</span>
                         <ChevronRight className="size-3.5 shrink-0 text-neutral-600" />
                       </button>
                     ))}

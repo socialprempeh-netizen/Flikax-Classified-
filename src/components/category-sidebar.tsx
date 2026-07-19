@@ -32,15 +32,11 @@ export function CategorySidebar({
   counts,
   selectedSlug,
   filters,
-  locationCounts,
-  totalListingsCount,
 }: {
   categories: Category[];
   counts: Map<string, number>;
   selectedSlug?: string;
   filters: ListingFilters;
-  locationCounts: Record<string, number>;
-  totalListingsCount: number;
 }) {
   const parents = [...categories.filter((c) => c.parent_id === null)].sort((a, b) => {
     const aIndex = FEATURED_SLUGS.indexOf(a.slug);
@@ -126,16 +122,8 @@ export function CategorySidebar({
       </div>
 
       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white shadow-sm">
-        <LocationPicker
-          filters={filters}
-          locationCounts={locationCounts}
-          totalListingsCount={totalListingsCount}
-        />
-        <ExcludeLocationPicker
-          filters={filters}
-          locationCounts={locationCounts}
-          totalListingsCount={totalListingsCount}
-        />
+        <LocationPicker filters={filters} />
+        <ExcludeLocationPicker filters={filters} />
       </div>
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">

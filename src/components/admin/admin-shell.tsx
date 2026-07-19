@@ -23,6 +23,7 @@ import {
   Star,
   LifeBuoy,
   History,
+  GalleryHorizontal,
   type LucideIcon,
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -50,6 +51,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Admins", href: "/admin/admins", icon: ShieldCheck, superAdminOnly: true },
   { label: "Premium Plans", href: "/admin/premium-plans", icon: Gem, superAdminOnly: true },
   { label: "Categories", href: "/admin/categories", icon: FolderTree, superAdminOnly: true },
+  { label: "Homepage Slider", href: "/admin/homepage-slider", icon: GalleryHorizontal, superAdminOnly: true },
   { label: "Locations", href: "/admin/locations", icon: MapPin, superAdminOnly: true },
   { label: "Audit Logs", href: "/admin/audit-logs", icon: History, superAdminOnly: true },
   { label: "Settings", href: "/admin/settings", icon: ToggleLeft, superAdminOnly: true },

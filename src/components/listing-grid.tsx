@@ -8,6 +8,7 @@ export type ListingCard = {
   id: string;
   href: string;
   title: string;
+  description?: string | null;
   price: number;
   location: string;
   imageUrl: string | null;
@@ -23,7 +24,17 @@ const currency = new Intl.NumberFormat("en-GH", {
   maximumFractionDigits: 0,
 });
 
-export function ListingGrid({ listings }: { listings: ListingCard[] }) {
+// "home" is the homepage grid: a wider (more horizontal) image with a
+// colored frame around it, per the brief. "default" (everywhere else --
+// category/search results) gets a bigger card via fewer grid columns and a
+// heavier shadow/border instead.
+export function ListingGrid({
+  listings,
+  variant = "default",
+}: {
+  listings: ListingCard[];
+  variant?: "default" | "home";
+}) {
   if (listings.length === 0) {
     return (
       <section className="flex-1">
@@ -35,22 +46,40 @@ export function ListingGrid({ listings }: { listings: ListingCard[] }) {
     );
   }
 
+  const isHome = variant === "home";
+
   return (
     <section className="flex-1">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div
+        className={`grid gap-4 ${
+          isHome ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"
+        }`}
+      >
         {listings.map((listing) => (
           <Link
             key={listing.id}
             href={listing.href}
-            className="block overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm hover:shadow-md"
+            className={`block overflow-hidden rounded-xl bg-white ${
+              isHome
+                ? "border border-neutral-200 shadow-sm hover:shadow-md"
+                : "border border-neutral-300 shadow-md hover:shadow-lg"
+            }`}
           >
-            <div className="relative aspect-video overflow-hidden bg-brand-light text-brand/40">
+            <div
+              className={`relative overflow-hidden bg-brand-light text-brand/40 ${
+                isHome ? "aspect-[2/1] border-2 border-brand" : "aspect-video"
+              }`}
+            >
               {listing.imageUrl ? (
                 <Image
                   src={listing.imageUrl}
                   alt={listing.title}
                   fill
-                  sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+                  sizes={
+                    isHome
+                      ? "(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+                      : "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 45vw"
+                  }
                   quality={82}
                   className="object-cover"
                 />
@@ -87,6 +116,9 @@ export function ListingGrid({ listings }: { listings: ListingCard[] }) {
                 )}
               </div>
               <p className="line-clamp-2 text-sm font-semibold text-neutral-800">{listing.title}</p>
+              {listing.description && (
+                <p className="line-clamp-2 text-xs text-neutral-500">{listing.description}</p>
+              )}
               <div className="flex items-center justify-between gap-2 pt-0.5 text-xs text-neutral-400">
                 <span className="truncate">{listing.location}</span>
                 {listing.createdAt && (

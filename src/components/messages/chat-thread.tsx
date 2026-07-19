@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
-import { Phone, Send } from "lucide-react";
+import { Phone, Send, Tag } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { revealPhoneAction } from "@/app/messages/actions";
 import { formatRelativeTime } from "@/lib/format-time";
@@ -12,6 +12,14 @@ type Message = {
   body: string;
   created_at: string;
 };
+
+const QUICK_REPLIES = [
+  "Is this available now?",
+  "Last price?",
+  "More photos please",
+  "Reserve for me",
+  "Can you deliver?",
+];
 
 export function ChatThread({
   conversationId,
@@ -38,6 +46,8 @@ export function ChatThread({
   const [phoneRevealedByBuyer, setPhoneRevealedByBuyer] = useState(initialPhoneRevealedByBuyer);
   const [phoneRevealedBySeller, setPhoneRevealedBySeller] = useState(initialPhoneRevealedBySeller);
   const [draft, setDraft] = useState("");
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState("");
   const [isSending, startSendTransition] = useTransition();
   const [isRevealing, startRevealTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -75,24 +85,57 @@ export function ChatThread({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  // Previously this fired the insert and relied entirely on the realtime
+  // subscription above to reflect it back into `messages` -- so any blip in
+  // the websocket (a brief disconnect, reconnect delay, replication lag)
+  // meant a message that genuinely saved server-side never appeared in the
+  // sender's own thread, indistinguishable from a real failure. Selecting
+  // the inserted row back and appending it directly makes the sender's own
+  // message appear immediately regardless of realtime health; the dedupe
+  // check in the INSERT handler above still protects against a double-add
+  // if the realtime event also arrives for it.
+  function sendMessageBody(body: string) {
+    const trimmed = body.trim();
+    if (!trimmed) return;
+
+    setError(null);
+    startSendTransition(async () => {
+      const supabase = createClient();
+      const { data, error: sendError } = await supabase
+        .from("messages")
+        .insert({ conversation_id: conversationId, sender_id: currentUserId, body: trimmed })
+        .select("id, sender_id, body, created_at")
+        .single();
+
+      if (sendError || !data) {
+        setError("Message failed to send. Please try again.");
+        setDraft(trimmed);
+        return;
+      }
+
+      setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]));
+    });
+  }
+
   function handleSend(event: FormEvent) {
     event.preventDefault();
     const body = draft.trim();
     if (!body) return;
-
-    setError(null);
     setDraft("");
-    startSendTransition(async () => {
-      const supabase = createClient();
-      const { error: sendError } = await supabase
-        .from("messages")
-        .insert({ conversation_id: conversationId, sender_id: currentUserId, body });
+    sendMessageBody(body);
+  }
 
-      if (sendError) {
-        setError("Message failed to send. Please try again.");
-        setDraft(body);
-      }
-    });
+  function handleQuickReply(text: string) {
+    sendMessageBody(text);
+  }
+
+  function handleOfferSubmit(event: FormEvent) {
+    event.preventDefault();
+    const amount = offerAmount.trim();
+    if (!amount) return;
+    sendMessageBody(`Offer: GH₵${amount}`);
+    setOfferAmount("");
+    setOfferOpen(false);
   }
 
   function handleReveal() {
@@ -168,24 +211,85 @@ export function ChatThread({
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-neutral-100 p-3">
-        <input
-          type="text"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder="Type a message..."
-          maxLength={2000}
-          className="flex-1 rounded-full border border-neutral-200 px-4 py-2 text-sm outline-none focus:border-brand"
-        />
-        <button
-          type="submit"
-          disabled={isSending || !draft.trim()}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-white hover:bg-brand-dark disabled:opacity-50"
-        >
-          <Send className="size-4" />
-        </button>
-      </form>
-      {error && <p className="px-4 pb-2 text-xs text-red-600">{error}</p>}
+      <div className="border-t border-neutral-100 p-3 pb-2">
+        {offerOpen ? (
+          <form onSubmit={handleOfferSubmit} className="mb-2 flex items-center gap-2">
+            <span className="flex flex-1 items-center gap-1 rounded-full border border-brand/40 bg-brand-light px-4 py-2 text-sm font-semibold text-neutral-700 focus-within:border-brand">
+              GH₵
+              <input
+                autoFocus
+                type="number"
+                min="0"
+                step="1"
+                inputMode="decimal"
+                value={offerAmount}
+                onChange={(e) => setOfferAmount(e.target.value)}
+                placeholder="Amount"
+                className="w-full min-w-0 bg-transparent outline-none placeholder:text-neutral-400"
+              />
+            </span>
+            <button
+              type="submit"
+              disabled={isSending || !offerAmount.trim()}
+              className="rounded-full bg-brand px-4 py-2 text-sm font-bold text-white hover:bg-brand-dark disabled:opacity-50"
+            >
+              Send
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOfferOpen(false);
+                setOfferAmount("");
+              }}
+              className="text-sm font-medium text-neutral-400 hover:text-neutral-600"
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <div className="mb-2 flex gap-2 overflow-x-auto pb-1">
+            <button
+              type="button"
+              onClick={() => setOfferOpen(true)}
+              disabled={isSending}
+              className="flex shrink-0 items-center gap-1 rounded-full border border-brand/30 bg-brand-light px-3 py-1.5 text-xs font-semibold text-brand hover:bg-brand/10 disabled:opacity-50"
+            >
+              <Tag className="size-3" />
+              Make an offer
+            </button>
+            {QUICK_REPLIES.map((text) => (
+              <button
+                key={text}
+                type="button"
+                onClick={() => handleQuickReply(text)}
+                disabled={isSending}
+                className="shrink-0 rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:border-brand/40 hover:bg-brand-light hover:text-brand disabled:opacity-50"
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleSend} className="flex items-center gap-2">
+          <input
+            type="text"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Type a message..."
+            maxLength={2000}
+            className="flex-1 rounded-full border border-neutral-200 px-4 py-2 text-sm outline-none focus:border-brand"
+          />
+          <button
+            type="submit"
+            disabled={isSending || !draft.trim()}
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-white shadow-sm transition-all hover:bg-brand-dark hover:shadow-md active:scale-95 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none disabled:active:scale-100"
+          >
+            <Send className="size-4.5" />
+          </button>
+        </form>
+        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      </div>
     </div>
   );
 }

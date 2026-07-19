@@ -21,7 +21,7 @@ export default async function SavedListingsPage() {
   const { data: saved } = await supabase
     .from("saved_listings")
     .select(
-      "created_at, listings(id, title, price, location, status, is_featured, featured_until, short_id, listing_images(storage_path, position), categories(slug))"
+      "created_at, listings(id, title, description, price, location, status, is_featured, featured_until, short_id, listing_images(storage_path, position), categories(slug))"
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -41,6 +41,7 @@ export default async function SavedListingsPage() {
           categorySlug: listing.categories?.slug ?? "listing",
         }),
         title: listing.title,
+        description: listing.description,
         price: listing.price,
         location: listing.location,
         imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
