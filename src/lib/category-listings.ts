@@ -20,6 +20,14 @@ const DATE_POSTED_HOURS: Record<DatePosted, number> = {
   "30d": 24 * 30,
 };
 
+/** A sidebar attribute filter as actually applied to the query -- "select"/"text" carry
+ * `value`, "range" carries `min`/`max` (either end optional). Built by the caller from
+ * whichever SidebarFilterField (see category-filters.ts) the visitor filled in. */
+export type AttributeFilter =
+  | { key: string; kind: "select"; value: string }
+  | { key: string; kind: "text"; value: string }
+  | { key: string; kind: "range"; min?: number; max?: number };
+
 type CategoryListingsFilter = {
   categoryId: string;
   location?: string;
@@ -28,12 +36,23 @@ type CategoryListingsFilter = {
   q?: string;
   sort?: CategorySort;
   datePosted?: DatePosted;
+  attributeFilters?: AttributeFilter[];
   page?: number;
 };
 
 export async function fetchCategoryListings(
   supabase: SupabaseClient<Database>,
-  { categoryId, location, minPrice, maxPrice, q, sort = "recommended", datePosted, page = 1 }: CategoryListingsFilter
+  {
+    categoryId,
+    location,
+    minPrice,
+    maxPrice,
+    q,
+    sort = "recommended",
+    datePosted,
+    attributeFilters,
+    page = 1,
+  }: CategoryListingsFilter
 ): Promise<{ listings: ListingCard[]; totalCount: number }> {
   let query = supabase
     .from("listings")
@@ -50,6 +69,22 @@ export async function fetchCategoryListings(
   if (datePosted) {
     const cutoff = new Date(Date.now() - DATE_POSTED_HOURS[datePosted] * 3600 * 1000).toISOString();
     query = query.gte("created_at", cutoff);
+  }
+  // Range fields (year, mileage, ...) are saved as JSON *strings* on `attributes`
+  // (whatever the form input sent), not JSON numbers -- so both "->>' (text) and "->"
+  // (jsonb-vs-jsonb, where any string ranks above every number regardless of value)
+  // silently match nothing for a numeric range. The explicit ::numeric cast on the
+  // text-extracted value is what actually makes ">=" mean "greater than", not
+  // "sorts later as a string" or "wrong JSON type entirely".
+  for (const filter of attributeFilters ?? []) {
+    if (filter.kind === "select") {
+      query = query.eq(`attributes->>${filter.key}`, filter.value);
+    } else if (filter.kind === "text") {
+      query = query.ilike(`attributes->>${filter.key}`, `%${filter.value}%`);
+    } else {
+      if (filter.min !== undefined) query = query.gte(`attributes->>${filter.key}::numeric`, filter.min);
+      if (filter.max !== undefined) query = query.lte(`attributes->>${filter.key}::numeric`, filter.max);
+    }
   }
   // A plain ilike is enough for "narrow this category by keyword" -- unlike
   // the homepage's search_listings RPC, this isn't cross-category fuzzy
@@ -78,8 +113,7 @@ export async function fetchCategoryListings(
 
   const now = Date.now();
   const listings: ListingCard[] = (data ?? []).map((row) => {
-    const sortedImages = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position);
-    const [cover, ...rest] = sortedImages;
+    const cover = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
     return {
       id: row.id,
       href: getListingPath({
@@ -93,13 +127,42 @@ export async function fetchCategoryListings(
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
-      extraImages: rest.map((img) => resolveListingImageUrl(supabase, img.storage_path)),
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };
   });
 
   return { listings, totalCount: count ?? 0 };
+}
+
+/** The N most common values of one attribute among this category's active listings
+ * (e.g. "make" for vehicles), for the quick-filter icon row. Counted in JS rather than
+ * a SQL GROUP BY on a JSONB path -- categories run in the hundreds of listings, not
+ * enough to matter, and it avoids a bespoke RPC just for this. */
+export async function getTopAttributeValues(
+  supabase: SupabaseClient<Database>,
+  categoryId: string,
+  attributeKey: string,
+  limit = 7
+): Promise<{ value: string; count: number }[]> {
+  const { data } = await supabase
+    .from("listings")
+    .select("attributes")
+    .eq("category_id", categoryId)
+    .eq("status", "active")
+    .limit(500);
+
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    const value = (row.attributes as Record<string, unknown> | null)?.[attributeKey];
+    if (typeof value !== "string" || !value.trim()) continue;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([value, count]) => ({ value, count }));
 }
 
 /** Cheap head-only count, for generateMetadata's noindex decision — doesn't need row data. */

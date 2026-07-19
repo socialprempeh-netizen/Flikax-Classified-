@@ -35,12 +35,15 @@ import { formatRelativeTime } from "@/lib/format-time";
 import { getListingPath, extractShortIdFromSlug } from "@/lib/listing-url";
 import {
   fetchCategoryListings,
+  getTopAttributeValues,
   countCategoryListings,
   CATEGORY_PAGE_SIZE,
   MIN_INDEXABLE_LISTINGS,
   type CategorySort,
   type DatePosted,
+  type AttributeFilter,
 } from "@/lib/category-listings";
+import { getSidebarFields, getQuickFilterKey, getQuickFilterIcon } from "@/lib/category-filters";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -53,6 +56,8 @@ import { ListingOwnerActions } from "@/components/listings/listing-owner-actions
 import { ShareButtons } from "@/components/listings/share-buttons";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { CategoryFilterRow } from "@/components/category-filter-row";
+import { CategorySidebarFilters } from "@/components/category-sidebar-filters";
+import { CategoryQuickFilters } from "@/components/category-quick-filters";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentlyViewed } from "@/components/track-recently-viewed";
 
@@ -107,7 +112,9 @@ type Route =
   | { kind: "not-found" };
 
 type PageParams = { category: string; slug: string };
-type CategoryLocationSearchParams = { page?: string; sort?: string; posted?: string };
+// attr_<fieldKey>/attr_<fieldKey>_min/_max are dynamic per category (see
+// category-filters.ts) so this stays a loose string map rather than naming every key.
+type CategoryLocationSearchParams = { [key: string]: string | undefined };
 type PageProps = { params: Promise<PageParams>; searchParams: Promise<CategoryLocationSearchParams> };
 
 // A category slug that doesn't resolve to a real leaf category is never valid,
@@ -255,7 +262,8 @@ async function CategoryLocationPage({
   searchParams: Promise<CategoryLocationSearchParams>;
 }) {
   const supabase = createPublicClient();
-  const { page: pageParam, sort: sortParam, posted } = await searchParams;
+  const rawParams = await searchParams;
+  const { page: pageParam, sort: sortParam, posted } = rawParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
@@ -264,30 +272,58 @@ async function CategoryLocationPage({
     ? (posted as DatePosted)
     : undefined;
 
-  const [parentCategory, { listings, totalCount }] = await Promise.all([
-    category.parent_id
-      ? supabase
-          .from("categories")
-          .select("name, slug")
-          .eq("id", category.parent_id)
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
+  const parentCategory = category.parent_id
+    ? await supabase
+        .from("categories")
+        .select("name, slug")
+        .eq("id", category.parent_id)
+        .maybeSingle()
+        .then((r) => r.data)
+    : null;
+  const topLevelSlug = parentCategory?.slug;
+  const sidebarFields = getSidebarFields(topLevelSlug);
+  const quickFilterKey = getQuickFilterKey(topLevelSlug);
+
+  const attributeFilters: AttributeFilter[] = [];
+  for (const field of sidebarFields) {
+    if (field.type === "range") {
+      const min = rawParams[`attr_${field.key}_min`];
+      const max = rawParams[`attr_${field.key}_max`];
+      if (min || max) {
+        attributeFilters.push({
+          key: field.key,
+          kind: "range",
+          min: min ? Number(min) : undefined,
+          max: max ? Number(max) : undefined,
+        });
+      }
+    } else {
+      const value = rawParams[`attr_${field.key}`];
+      if (value) attributeFilters.push({ key: field.key, kind: field.type, value });
+    }
+  }
+  const activeQuickFilterValue = quickFilterKey ? rawParams[`attr_${quickFilterKey}`] : undefined;
+
+  const [{ listings, totalCount }, quickFilterValues] = await Promise.all([
     fetchCategoryListings(supabase, {
       categoryId: category.id,
       location: location.district_name,
       page,
       sort,
       datePosted,
+      attributeFilters,
     }),
+    quickFilterKey ? getTopAttributeValues(supabase, category.id, quickFilterKey) : Promise.resolve([]),
   ]);
 
   const belowThreshold = totalCount < MIN_INDEXABLE_LISTINGS;
   const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
 
   const carryParams = new URLSearchParams();
-  if (sort !== "recommended") carryParams.set("sort", sort);
-  if (datePosted) carryParams.set("posted", datePosted);
+  for (const [key, value] of Object.entries(rawParams)) {
+    if (key === "page" || !value) continue;
+    carryParams.set(key, value);
+  }
   function pageHref(targetPage: number) {
     const params = new URLSearchParams(carryParams);
     params.set("page", String(targetPage));
@@ -345,36 +381,55 @@ async function CategoryLocationPage({
             </Link>
           </div>
         ) : (
-          <>
-            <div className="mb-4">
-              <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
-            </div>
+          <div className="flex gap-6">
+            <CategorySidebarFilters
+              categorySlug={category.slug}
+              fields={sidebarFields}
+              activeLocationSlug={location.district_slug}
+            />
 
-            <ListingGrid listings={listings} />
-            {totalPages > 1 && (
-              <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
-                {page > 1 && (
-                  <Link
-                    href={pageHref(page - 1)}
-                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                  >
-                    Previous
-                  </Link>
-                )}
-                <span className="text-neutral-500">
-                  Page {page} of {totalPages}
-                </span>
-                {page < totalPages && (
-                  <Link
-                    href={pageHref(page + 1)}
-                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                  >
-                    Next
-                  </Link>
-                )}
-              </nav>
-            )}
-          </>
+            <div className="min-w-0 flex-1">
+              {quickFilterKey && (
+                <CategoryQuickFilters
+                  items={quickFilterValues}
+                  icon={getQuickFilterIcon(topLevelSlug)}
+                  attributeKey={quickFilterKey}
+                  activeValue={activeQuickFilterValue}
+                  baseHref={`/${category.slug}/${location.district_slug}`}
+                  currentQuery={carryParams}
+                />
+              )}
+
+              <div className="mb-4">
+                <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
+              </div>
+
+              <ListingGrid listings={listings} />
+              {totalPages > 1 && (
+                <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
+                  {page > 1 && (
+                    <Link
+                      href={pageHref(page - 1)}
+                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                    >
+                      Previous
+                    </Link>
+                  )}
+                  <span className="text-neutral-500">
+                    Page {page} of {totalPages}
+                  </span>
+                  {page < totalPages && (
+                    <Link
+                      href={pageHref(page + 1)}
+                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                    >
+                      Next
+                    </Link>
+                  )}
+                </nav>
+              )}
+            </div>
+          </div>
         )}
       </main>
       <SiteFooter />
@@ -505,8 +560,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const now = Date.now();
   const similarListings: ListingCard[] = similarRows.map((row) => {
-    const sortedImages = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position);
-    const [cover, ...rest] = sortedImages;
+    const cover = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
     return {
       id: row.id,
       href: listingPath(row),
@@ -514,7 +568,6 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
-      extraImages: rest.map((img) => resolveListingImageUrl(supabase, img.storage_path)),
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };

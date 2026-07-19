@@ -3,7 +3,15 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
-import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort, type DatePosted } from "@/lib/category-listings";
+import {
+  fetchCategoryListings,
+  getTopAttributeValues,
+  CATEGORY_PAGE_SIZE,
+  type CategorySort,
+  type DatePosted,
+  type AttributeFilter,
+} from "@/lib/category-listings";
+import { getSidebarFields, getQuickFilterKey, getQuickFilterIcon } from "@/lib/category-filters";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -11,6 +19,8 @@ import { ListingGrid } from "@/components/listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CategorySearchHeader } from "@/components/category-search-header";
 import { CategoryFilterRow } from "@/components/category-filter-row";
+import { CategorySidebarFilters } from "@/components/category-sidebar-filters";
+import { CategoryQuickFilters } from "@/components/category-quick-filters";
 import { SiblingCategoryRow } from "@/components/sibling-category-row";
 
 const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
@@ -26,14 +36,10 @@ export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{
-    page?: string;
-    q?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    sort?: string;
-    posted?: string;
-  }>;
+  // attr_<fieldKey>/attr_<fieldKey>_min/_max are dynamic per category (see
+  // category-filters.ts) so this stays a loose string map rather than
+  // naming every possible key.
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 };
 
 const getLeafCategory = unstable_cache(
@@ -85,7 +91,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   if (!category) notFound();
 
   const supabase = createPublicClient();
-  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam, posted } = await searchParams;
+  const rawParams = await searchParams;
+  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam, posted } = rawParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
@@ -94,15 +101,42 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     ? (posted as DatePosted)
     : undefined;
 
-  const [parentCategory, { data: siblings }, { listings, totalCount }] = await Promise.all([
-    category.parent_id
-      ? supabase
-          .from("categories")
-          .select("name, slug")
-          .eq("id", category.parent_id)
-          .maybeSingle()
-          .then((r) => r.data)
-      : Promise.resolve(null),
+  // The top-level slug (e.g. "vehicles") drives which sidebar fields and quick-filter
+  // icon row this leaf category gets -- needs the parent's slug, not just its id, so
+  // this one lookup runs before the rest can be parallelized.
+  const parentCategory = category.parent_id
+    ? await supabase
+        .from("categories")
+        .select("name, slug")
+        .eq("id", category.parent_id)
+        .maybeSingle()
+        .then((r) => r.data)
+    : null;
+  const topLevelSlug = parentCategory?.slug;
+  const sidebarFields = getSidebarFields(topLevelSlug);
+  const quickFilterKey = getQuickFilterKey(topLevelSlug);
+
+  const attributeFilters: AttributeFilter[] = [];
+  for (const field of sidebarFields) {
+    if (field.type === "range") {
+      const min = rawParams[`attr_${field.key}_min`];
+      const max = rawParams[`attr_${field.key}_max`];
+      if (min || max) {
+        attributeFilters.push({
+          key: field.key,
+          kind: "range",
+          min: min ? Number(min) : undefined,
+          max: max ? Number(max) : undefined,
+        });
+      }
+    } else {
+      const value = rawParams[`attr_${field.key}`];
+      if (value) attributeFilters.push({ key: field.key, kind: field.type, value });
+    }
+  }
+  const activeQuickFilterValue = quickFilterKey ? rawParams[`attr_${quickFilterKey}`] : undefined;
+
+  const [{ data: siblings }, { listings, totalCount }, quickFilterValues] = await Promise.all([
     supabase.from("categories").select("id, name, slug, icon").eq("parent_id", category.parent_id).order("name"),
     getCachedCategoryListings({
       categoryId: category.id,
@@ -112,17 +146,18 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       sort,
       datePosted,
+      attributeFilters,
     }),
+    quickFilterKey ? getTopAttributeValues(supabase, category.id, quickFilterKey) : Promise.resolve([]),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
 
   const carryParams = new URLSearchParams();
-  if (q) carryParams.set("q", q);
-  if (minPrice) carryParams.set("minPrice", minPrice);
-  if (maxPrice) carryParams.set("maxPrice", maxPrice);
-  if (sort !== "recommended") carryParams.set("sort", sort);
-  if (datePosted) carryParams.set("posted", datePosted);
+  for (const [key, value] of Object.entries(rawParams)) {
+    if (key === "page" || !value) continue;
+    carryParams.set(key, value);
+  }
   function pageHref(targetPage: number) {
     const params = new URLSearchParams(carryParams);
     params.set("page", String(targetPage));
@@ -166,37 +201,54 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           {category.name} for Sale in Ghana
         </h1>
 
-        <SiblingCategoryRow siblings={siblings ?? []} activeSlug={category.slug} />
+        <div className="flex gap-6">
+          <CategorySidebarFilters categorySlug={category.slug} fields={sidebarFields} />
 
-        <div className="mb-4">
-          <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
+          <div className="min-w-0 flex-1">
+            <SiblingCategoryRow siblings={siblings ?? []} activeSlug={category.slug} />
+
+            {quickFilterKey && (
+              <CategoryQuickFilters
+                items={quickFilterValues}
+                icon={getQuickFilterIcon(topLevelSlug)}
+                attributeKey={quickFilterKey}
+                activeValue={activeQuickFilterValue}
+                baseHref={`/${category.slug}`}
+                currentQuery={carryParams}
+              />
+            )}
+
+            <div className="mb-4">
+              <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
+            </div>
+
+            <ListingGrid listings={listings} />
+
+            {totalPages > 1 && (
+              <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
+                {page > 1 && (
+                  <Link
+                    href={pageHref(page - 1)}
+                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    Previous
+                  </Link>
+                )}
+                <span className="text-neutral-500">
+                  Page {page} of {totalPages}
+                </span>
+                {page < totalPages && (
+                  <Link
+                    href={pageHref(page + 1)}
+                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    Next
+                  </Link>
+                )}
+              </nav>
+            )}
+          </div>
         </div>
-
-        <ListingGrid listings={listings} />
-
-        {totalPages > 1 && (
-          <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
-            {page > 1 && (
-              <Link
-                href={pageHref(page - 1)}
-                className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-              >
-                Previous
-              </Link>
-            )}
-            <span className="text-neutral-500">
-              Page {page} of {totalPages}
-            </span>
-            {page < totalPages && (
-              <Link
-                href={pageHref(page + 1)}
-                className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-              >
-                Next
-              </Link>
-            )}
-          </nav>
-        )}
       </main>
       <SiteFooter />
       <BottomTabBar activeHref={`/${category.slug}`} />

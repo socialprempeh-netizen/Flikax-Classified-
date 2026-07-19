@@ -106,6 +106,7 @@ export const CATEGORY_FIELDS: Record<string, ListingFieldDef[]> = {
       options: ["Automatic", "Manual"],
       required: true,
     },
+    { key: "mileage", label: "Mileage (km)", type: "number" },
     { key: "vin", label: "VIN / Chassis number", type: "text" },
     { key: "registered", label: "Registered Car", type: "boolean" },
     { key: "key_features", label: "Key Features", type: "tags", options: KEY_FEATURE_OPTIONS.vehicles },

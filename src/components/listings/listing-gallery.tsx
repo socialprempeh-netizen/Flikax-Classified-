@@ -62,14 +62,14 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
       </div>
 
       {images.length > 1 && (
-        <div className="mt-3 hidden flex-wrap gap-3 sm:flex">
+        <div className="mt-3 hidden grid-cols-5 gap-3 sm:grid">
           {images.map((url, index) => (
             <button
               key={url + index}
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`View image ${index + 1}`}
-              className={`relative size-24 shrink-0 overflow-hidden rounded-lg border-2 sm:size-36 ${
+              className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 ${
                 index === activeIndex
                   ? "border-brand ring-2 ring-brand ring-offset-2"
                   : "border-neutral-200 hover:border-neutral-300"
