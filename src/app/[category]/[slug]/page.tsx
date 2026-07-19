@@ -538,7 +538,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
         <div className="mb-4 flex flex-wrap items-center gap-1 text-sm text-neutral-500">
           <Link href="/" className="hover:text-brand">
             All ads
