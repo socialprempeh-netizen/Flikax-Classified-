@@ -38,6 +38,8 @@ import {
   countCategoryListings,
   CATEGORY_PAGE_SIZE,
   MIN_INDEXABLE_LISTINGS,
+  type CategorySort,
+  type DatePosted,
 } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -50,6 +52,7 @@ import { ContactSellerActions } from "@/components/listings/contact-seller-actio
 import { ListingOwnerActions } from "@/components/listings/listing-owner-actions";
 import { ShareButtons } from "@/components/listings/share-buttons";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
+import { CategoryFilterRow } from "@/components/category-filter-row";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentlyViewed } from "@/components/track-recently-viewed";
 
@@ -61,6 +64,8 @@ export const revalidate = 60;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 const SIMILAR_LIMIT = 8;
+const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
+const VALID_DATE_POSTED: DatePosted[] = ["24h", "7d", "30d"];
 
 const currency = new Intl.NumberFormat("en-GH", {
   style: "currency",
@@ -102,7 +107,8 @@ type Route =
   | { kind: "not-found" };
 
 type PageParams = { category: string; slug: string };
-type PageProps = { params: Promise<PageParams>; searchParams: Promise<{ page?: string }> };
+type CategoryLocationSearchParams = { page?: string; sort?: string; posted?: string };
+type PageProps = { params: Promise<PageParams>; searchParams: Promise<CategoryLocationSearchParams> };
 
 // A category slug that doesn't resolve to a real leaf category is never valid,
 // regardless of what the second segment looks like — checked first so a typo'd
@@ -246,11 +252,17 @@ async function CategoryLocationPage({
 }: {
   category: CategoryRow;
   location: LocationRow;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<CategoryLocationSearchParams>;
 }) {
   const supabase = createPublicClient();
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, sort: sortParam, posted } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
+    ? (sortParam as CategorySort)
+    : "recommended";
+  const datePosted: DatePosted | undefined = VALID_DATE_POSTED.includes(posted as DatePosted)
+    ? (posted as DatePosted)
+    : undefined;
 
   const [parentCategory, { listings, totalCount }] = await Promise.all([
     category.parent_id
@@ -261,11 +273,26 @@ async function CategoryLocationPage({
           .maybeSingle()
           .then((r) => r.data)
       : Promise.resolve(null),
-    fetchCategoryListings(supabase, { categoryId: category.id, location: location.district_name, page }),
+    fetchCategoryListings(supabase, {
+      categoryId: category.id,
+      location: location.district_name,
+      page,
+      sort,
+      datePosted,
+    }),
   ]);
 
   const belowThreshold = totalCount < MIN_INDEXABLE_LISTINGS;
   const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
+
+  const carryParams = new URLSearchParams();
+  if (sort !== "recommended") carryParams.set("sort", sort);
+  if (datePosted) carryParams.set("posted", datePosted);
+  function pageHref(targetPage: number) {
+    const params = new URLSearchParams(carryParams);
+    params.set("page", String(targetPage));
+    return `?${params.toString()}`;
+  }
 
   const breadcrumbItems = [
     { name: "Home", item: SITE_URL },
@@ -319,12 +346,16 @@ async function CategoryLocationPage({
           </div>
         ) : (
           <>
+            <div className="mb-4">
+              <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
+            </div>
+
             <ListingGrid listings={listings} />
             {totalPages > 1 && (
               <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
                 {page > 1 && (
                   <Link
-                    href={`?page=${page - 1}`}
+                    href={pageHref(page - 1)}
                     className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                   >
                     Previous
@@ -335,7 +366,7 @@ async function CategoryLocationPage({
                 </span>
                 {page < totalPages && (
                   <Link
-                    href={`?page=${page + 1}`}
+                    href={pageHref(page + 1)}
                     className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                   >
                     Next
@@ -474,7 +505,8 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const now = Date.now();
   const similarListings: ListingCard[] = similarRows.map((row) => {
-    const cover = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
+    const sortedImages = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position);
+    const [cover, ...rest] = sortedImages;
     return {
       id: row.id,
       href: listingPath(row),
@@ -482,6 +514,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
+      extraImages: rest.map((img) => resolveListingImageUrl(supabase, img.storage_path)),
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };

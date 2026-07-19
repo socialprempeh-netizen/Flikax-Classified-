@@ -12,6 +12,13 @@ export const CATEGORY_PAGE_SIZE = 24;
 export const MIN_INDEXABLE_LISTINGS = 3;
 
 export type CategorySort = "recommended" | "newest" | "price_asc" | "price_desc";
+export type DatePosted = "24h" | "7d" | "30d";
+
+const DATE_POSTED_HOURS: Record<DatePosted, number> = {
+  "24h": 24,
+  "7d": 24 * 7,
+  "30d": 24 * 30,
+};
 
 type CategoryListingsFilter = {
   categoryId: string;
@@ -20,12 +27,13 @@ type CategoryListingsFilter = {
   maxPrice?: number;
   q?: string;
   sort?: CategorySort;
+  datePosted?: DatePosted;
   page?: number;
 };
 
 export async function fetchCategoryListings(
   supabase: SupabaseClient<Database>,
-  { categoryId, location, minPrice, maxPrice, q, sort = "recommended", page = 1 }: CategoryListingsFilter
+  { categoryId, location, minPrice, maxPrice, q, sort = "recommended", datePosted, page = 1 }: CategoryListingsFilter
 ): Promise<{ listings: ListingCard[]; totalCount: number }> {
   let query = supabase
     .from("listings")
@@ -39,6 +47,10 @@ export async function fetchCategoryListings(
   if (location) query = query.eq("location", location);
   if (minPrice !== undefined) query = query.gte("price", minPrice);
   if (maxPrice !== undefined) query = query.lte("price", maxPrice);
+  if (datePosted) {
+    const cutoff = new Date(Date.now() - DATE_POSTED_HOURS[datePosted] * 3600 * 1000).toISOString();
+    query = query.gte("created_at", cutoff);
+  }
   // A plain ilike is enough for "narrow this category by keyword" -- unlike
   // the homepage's search_listings RPC, this isn't cross-category fuzzy
   // search, just a title filter on top of a category the user already
@@ -66,7 +78,8 @@ export async function fetchCategoryListings(
 
   const now = Date.now();
   const listings: ListingCard[] = (data ?? []).map((row) => {
-    const cover = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
+    const sortedImages = [...(row.listing_images ?? [])].sort((a, b) => a.position - b.position);
+    const [cover, ...rest] = sortedImages;
     return {
       id: row.id,
       href: getListingPath({
@@ -80,6 +93,7 @@ export async function fetchCategoryListings(
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
+      extraImages: rest.map((img) => resolveListingImageUrl(supabase, img.storage_path)),
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };

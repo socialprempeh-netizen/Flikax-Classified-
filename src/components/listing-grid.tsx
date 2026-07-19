@@ -12,11 +12,15 @@ export type ListingCard = {
   price: number;
   location: string;
   imageUrl: string | null;
+  /** Other photos of this listing (beyond the cover), newest-position-first, capped by the caller. */
+  extraImages?: string[];
   isFeatured?: boolean;
   isBumped?: boolean;
   negotiable?: boolean;
   createdAt?: string;
 };
+
+const MAX_THUMBS = 4;
 
 const currency = new Intl.NumberFormat("en-GH", {
   style: "currency",
@@ -106,6 +110,24 @@ export function ListingGrid({
               )}
               <CompactSaveButton listingId={listing.id} />
             </div>
+            {!isHome && listing.extraImages && listing.extraImages.length > 0 && (
+              <div className="flex gap-1 border-b border-neutral-100 bg-neutral-50 p-1.5">
+                {listing.extraImages.slice(0, MAX_THUMBS).map((url, i) => {
+                  const isLastVisible = i === MAX_THUMBS - 1;
+                  const remaining = listing.extraImages!.length - MAX_THUMBS;
+                  return (
+                    <span key={url + i} className="relative size-14 shrink-0 overflow-hidden rounded-md border border-neutral-200">
+                      <Image src={url} alt="" fill sizes="56px" quality={75} className="object-cover" />
+                      {isLastVisible && remaining > 0 && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-black/50 text-xs font-bold text-white">
+                          +{remaining}
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
             <div className="space-y-1 p-3">
               <div className="flex items-baseline gap-2">
                 <span className="text-lg font-extrabold text-brand">{currency.format(listing.price)}</span>

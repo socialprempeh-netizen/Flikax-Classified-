@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { CategorySort } from "@/lib/category-listings";
+import type { CategorySort, DatePosted } from "@/lib/category-listings";
 
 const PRICE_BUCKETS: { label: string; minPrice?: string; maxPrice?: string }[] = [
   { label: "Under GH₵100", maxPrice: "100" },
@@ -18,6 +18,13 @@ const SORT_OPTIONS: { value: CategorySort; label: string }[] = [
   { value: "price_desc", label: "Price: high to low" },
 ];
 
+const DATE_POSTED_OPTIONS: { value: DatePosted | ""; label: string }[] = [
+  { value: "", label: "Any time" },
+  { value: "24h", label: "Last 24 hours" },
+  { value: "7d", label: "Last 7 days" },
+  { value: "30d", label: "Last 30 days" },
+];
+
 function hrefWith(current: URLSearchParams, updates: Record<string, string | undefined>) {
   const params = new URLSearchParams(current);
   params.delete("page"); // any filter change resets pagination
@@ -29,15 +36,23 @@ function hrefWith(current: URLSearchParams, updates: Record<string, string | und
   return qs ? `?${qs}` : "?";
 }
 
-export function CategoryFilterRow({ sort }: { sort: CategorySort }) {
+export function CategoryFilterRow({
+  sort,
+  datePosted,
+  totalCount,
+}: {
+  sort: CategorySort;
+  datePosted?: DatePosted;
+  totalCount: number;
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeMin = searchParams.get("minPrice") ?? undefined;
   const activeMax = searchParams.get("maxPrice") ?? undefined;
 
   return (
-    <div className="lg:hidden">
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+    <div>
+      <div className="lg:hidden -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
         {PRICE_BUCKETS.map((bucket) => {
           const isActive = activeMin === bucket.minPrice && activeMax === bucket.maxPrice;
           return (
@@ -56,19 +71,36 @@ export function CategoryFilterRow({ sort }: { sort: CategorySort }) {
         })}
       </div>
 
-      <div className="mt-2 flex items-center justify-end gap-2 text-sm">
-        <span className="text-neutral-400">Sort by:</span>
-        <select
-          value={sort}
-          onChange={(e) => router.push(hrefWith(searchParams, { sort: e.target.value }))}
-          className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-sm text-neutral-700 outline-none focus:border-brand"
-        >
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+      <div className="mt-2 flex items-center justify-between gap-3 border-b border-neutral-200 pb-3 text-sm lg:mt-0 lg:border-none lg:pb-0">
+        <span className="font-medium text-neutral-500">
+          {totalCount.toLocaleString()} {totalCount === 1 ? "result" : "results"}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <select
+            value={datePosted ?? ""}
+            onChange={(e) => router.push(hrefWith(searchParams, { posted: e.target.value || undefined }))}
+            className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+          >
+            {DATE_POSTED_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sort}
+            onChange={(e) => router.push(hrefWith(searchParams, { sort: e.target.value }))}
+            className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

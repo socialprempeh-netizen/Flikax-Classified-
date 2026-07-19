@@ -31,7 +31,8 @@ export default async function SavedListingsPage() {
     .map((row) => row.listings)
     .filter((listing): listing is NonNullable<typeof listing> => Boolean(listing) && listing.status === "active")
     .map((listing) => {
-      const cover = [...(listing.listing_images ?? [])].sort((a, b) => a.position - b.position)[0];
+      const sortedImages = [...(listing.listing_images ?? [])].sort((a, b) => a.position - b.position);
+      const [cover, ...rest] = sortedImages;
       return {
         id: listing.id,
         href: getListingPath({
@@ -45,6 +46,7 @@ export default async function SavedListingsPage() {
         price: listing.price,
         location: listing.location,
         imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
+        extraImages: rest.map((img) => resolveListingImageUrl(supabase, img.storage_path)),
         isFeatured:
           listing.is_featured && (listing.featured_until ? new Date(listing.featured_until).getTime() > now : false),
       };

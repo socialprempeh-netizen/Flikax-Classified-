@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
-import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort } from "@/lib/category-listings";
+import { fetchCategoryListings, CATEGORY_PAGE_SIZE, type CategorySort, type DatePosted } from "@/lib/category-listings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -14,6 +14,7 @@ import { CategoryFilterRow } from "@/components/category-filter-row";
 import { SiblingCategoryRow } from "@/components/sibling-category-row";
 
 const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
+const VALID_DATE_POSTED: DatePosted[] = ["24h", "7d", "30d"];
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -25,7 +26,14 @@ export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ page?: string; q?: string; minPrice?: string; maxPrice?: string; sort?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    q?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    sort?: string;
+    posted?: string;
+  }>;
 };
 
 const getLeafCategory = unstable_cache(
@@ -77,11 +85,14 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   if (!category) notFound();
 
   const supabase = createPublicClient();
-  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam } = await searchParams;
+  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam, posted } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
     : "recommended";
+  const datePosted: DatePosted | undefined = VALID_DATE_POSTED.includes(posted as DatePosted)
+    ? (posted as DatePosted)
+    : undefined;
 
   const [parentCategory, { data: siblings }, { listings, totalCount }] = await Promise.all([
     category.parent_id
@@ -100,6 +111,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       sort,
+      datePosted,
     }),
   ]);
 
@@ -110,6 +122,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   if (minPrice) carryParams.set("minPrice", minPrice);
   if (maxPrice) carryParams.set("maxPrice", maxPrice);
   if (sort !== "recommended") carryParams.set("sort", sort);
+  if (datePosted) carryParams.set("posted", datePosted);
   function pageHref(targetPage: number) {
     const params = new URLSearchParams(carryParams);
     params.set("page", String(targetPage));
@@ -156,7 +169,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         <SiblingCategoryRow siblings={siblings ?? []} activeSlug={category.slug} />
 
         <div className="mb-4">
-          <CategoryFilterRow sort={sort} />
+          <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
         </div>
 
         <ListingGrid listings={listings} />
