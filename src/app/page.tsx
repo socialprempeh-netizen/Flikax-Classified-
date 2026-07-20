@@ -2,6 +2,7 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
+import { TrendingSearches } from "@/components/trending-searches";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
 import { HomepageSlider } from "@/components/homepage-slider";
@@ -149,6 +150,7 @@ export default async function Home({ searchParams }: PageProps) {
             Explore Thousands of New Listings
           </h1>
           <SearchBar defaultQuery={filters.q} defaultLocation={filters.location} />
+          <TrendingSearches />
         </div>
       </section>
 

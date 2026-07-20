@@ -17,7 +17,7 @@ export async function SiteHeader({ categories: categoriesProp }: { categories?: 
   const categories = categoriesProp ?? (await getCategories());
 
   return (
-    <header className="sticky top-0 z-50 bg-brand">
+    <header className="sticky top-0 z-50 border-b border-white/25 bg-brand">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2 sm:gap-4 sm:py-2.5 sm:px-6">
         <div className="flex items-center gap-2 sm:gap-3">
           <MobileNavDrawer categories={categories} />
@@ -25,6 +25,18 @@ export async function SiteHeader({ categories: categoriesProp }: { categories?: 
             flikax
           </Link>
         </div>
+
+        <nav className="hidden items-center gap-6 text-sm font-semibold text-white lg:flex">
+          <Link href="/" className="hover:text-white/80">
+            Browse
+          </Link>
+          <Link href="/?category=vehicles" className="hover:text-white/80">
+            Vehicles
+          </Link>
+          <Link href="/?category=property" className="hover:text-white/80">
+            Property
+          </Link>
+        </nav>
 
         <HeaderUserActions />
       </div>
