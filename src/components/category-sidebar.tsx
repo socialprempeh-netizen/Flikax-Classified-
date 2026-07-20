@@ -55,7 +55,7 @@ export function CategorySidebar({
 
   if (!activeParent) {
     return (
-      <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
+      <div className="flex w-full shrink-0 flex-col gap-3 lg:w-72">
         <div className="hidden lg:block">
           <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
         </div>
@@ -63,7 +63,7 @@ export function CategorySidebar({
           <MobileCategoryGrid parents={parents} filters={filters} />
         </div>
 
-        <div className="hidden rounded-xl bg-brand p-4 text-white lg:block">
+        <div className="hidden rounded-xl bg-brand p-3 text-white lg:block">
           <h3 className="mb-1 text-sm font-bold">Sell Something?</h3>
           <p className="mb-3 text-xs text-white/80">
             Post your ad free and reach thousands of buyers today.
@@ -77,8 +77,8 @@ export function CategorySidebar({
   const children = categories.filter((c) => c.parent_id === activeParent.id);
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
-      <div className="hidden lg:block rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+    <div className="flex w-full shrink-0 flex-col gap-3 lg:w-72">
+      <div className="hidden lg:block rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Categories</h3>
         <Link
           href={buildListingsHref({ ...filters, category: undefined })}
@@ -87,14 +87,14 @@ export function CategorySidebar({
           All categories
         </Link>
         <p className="mb-2 truncate text-sm font-semibold text-brand">{activeParent.name}</p>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
           {children.map((child) => {
             const isActive = child.slug === selectedSlug;
             return (
               <Link
                 key={child.id}
                 href={`/${child.slug}`}
-                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm ${
+                className={`flex items-center gap-2 rounded-md px-2 py-1 text-sm ${
                   isActive ? "bg-brand-light font-semibold text-brand" : "text-neutral-600 hover:bg-neutral-50"
                 }`}
               >
@@ -121,13 +121,13 @@ export function CategorySidebar({
         <MobileCategoryList categories={children} counts={counts} />
       </div>
 
-      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white shadow-sm">
+      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-300 bg-white shadow-md">
         <LocationPicker filters={filters} />
         <ExcludeLocationPicker filters={filters} />
       </div>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
-        <h3 className="mb-3 text-sm font-bold text-neutral-800">Price, GH₵</h3>
+      <div className="rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
+        <h3 className="mb-2 text-sm font-bold text-neutral-800">Price, GH₵</h3>
         <form action="/" method="get" className="mb-3 flex items-center gap-2">
           <input type="hidden" name="q" value={filters.q ?? ""} />
           <input type="hidden" name="location" value={filters.location ?? ""} />
@@ -155,14 +155,14 @@ export function CategorySidebar({
           </button>
         </form>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
           {PRICE_BUCKETS.map((bucket) => {
             const isActive = filters.minPrice === bucket.minPrice && filters.maxPrice === bucket.maxPrice;
             return (
               <Link
                 key={bucket.label}
                 href={buildListingsHref({ ...filters, minPrice: bucket.minPrice, maxPrice: bucket.maxPrice })}
-                className={`rounded-md px-2 py-1.5 text-sm ${
+                className={`rounded-md px-2 py-1 text-sm ${
                   isActive ? "bg-brand-light font-semibold text-brand" : "text-neutral-600 hover:bg-neutral-50"
                 }`}
               >

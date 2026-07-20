@@ -12,7 +12,7 @@ export function ExcludeLocationPicker({ filters }: { filters: ListingFilters }) 
 
   return (
     <>
-      <div className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-neutral-800">
+      <div className="flex w-full items-center justify-between px-3 py-2 text-sm font-bold text-neutral-800">
         <button type="button" onClick={() => setOpen(true)} className="text-left">
           Hide a location
         </button>

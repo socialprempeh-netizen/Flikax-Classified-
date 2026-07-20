@@ -26,6 +26,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getFieldsForCategory, HEADLINE_FIELD_KEYS } from "@/lib/listing-fields";
+import { formatAttributeValue } from "@/lib/format-attribute-value";
 import {
   computeMarketPriceRange,
   MARKET_PRICE_MIN_SAMPLE,
@@ -43,7 +44,7 @@ import {
   type DatePosted,
   type AttributeFilter,
 } from "@/lib/category-listings";
-import { getSidebarFields, getQuickFilterKey, getQuickFilterIcon } from "@/lib/category-filters";
+import { getSidebarFields, getQuickFilterKey } from "@/lib/category-filters";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -381,7 +382,7 @@ async function CategoryLocationPage({
             </Link>
           </div>
         ) : (
-          <div className="flex gap-6">
+          <div className="flex gap-4">
             <CategorySidebarFilters
               categorySlug={category.slug}
               fields={sidebarFields}
@@ -392,7 +393,7 @@ async function CategoryLocationPage({
               {quickFilterKey && (
                 <CategoryQuickFilters
                   items={quickFilterValues}
-                  icon={getQuickFilterIcon(topLevelSlug)}
+                  topLevelSlug={topLevelSlug}
                   attributeKey={quickFilterKey}
                   activeValue={activeQuickFilterValue}
                   baseHref={`/${category.slug}/${location.district_slug}`}
@@ -486,7 +487,14 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
   const specs = fields
     .filter((field) => field.type !== "tags")
-    .map((field) => ({ key: field.key, label: field.label, value: attributes[field.key] as string | undefined }))
+    .map((field) => {
+      const raw = attributes[field.key] as string | undefined;
+      // Make/brand specifically: sellers sometimes type "2026 Cadillac" or "toyota" --
+      // clean those up for display without touching fields where casing is meaningful
+      // (a VIN, an engine size like "3000cc") or that aren't free text at all.
+      const value = raw && (field.key === "make" || field.key === "brand") ? formatAttributeValue(raw) : raw;
+      return { key: field.key, label: field.label, value };
+    })
     .filter((spec) => spec.value);
 
   const tagSpecs = fields
@@ -657,11 +665,11 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           imageUrl={images[0] ?? null}
         />
 
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="sm:col-span-2">
             <ListingGallery images={images} title={listing.title} />
 
-            <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="mt-6 rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               {(isFeatured || isBumped) && (
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   {isFeatured && (
@@ -778,8 +786,8 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 sm:col-span-1">
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-3 sm:col-span-1">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               <div className="flex items-center gap-3">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg font-bold text-brand">
                   {sellerName[0]?.toUpperCase() ?? "F"}
@@ -808,7 +816,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-2 rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
               <a
                 href={feedbackHref}
                 className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-base font-bold text-neutral-700 hover:bg-neutral-50"
@@ -836,7 +844,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </Link>
             </div>
 
-            <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               <h3 className="mb-3 text-sm font-bold text-neutral-800">Safety First - Read This Before Proceeding</h3>
               <ul className="list-disc space-y-2 pl-4 marker:text-brand">
                 {SAFETY_TIPS.map((tip) => (

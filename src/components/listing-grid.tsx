@@ -38,7 +38,7 @@ export function ListingGrid({
   if (listings.length === 0) {
     return (
       <section className="flex-1">
-        <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-neutral-200 bg-white py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-neutral-300 bg-white py-16 text-center">
           <p className="text-sm font-medium text-neutral-600">No listings match your filters.</p>
           <p className="text-sm text-neutral-400">Try a different search, category, or price range.</p>
         </div>
@@ -51,7 +51,7 @@ export function ListingGrid({
   return (
     <section className="flex-1">
       <div
-        className={`grid gap-4 ${
+        className={`grid gap-3 ${
           isHome ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"
         }`}
       >
@@ -61,8 +61,8 @@ export function ListingGrid({
             href={listing.href}
             className={`block overflow-hidden rounded-xl bg-white ${
               isHome
-                ? "border border-neutral-200 shadow-sm hover:shadow-md"
-                : "border border-neutral-300 shadow-md hover:shadow-lg"
+                ? "border border-neutral-300 shadow-md hover:shadow-lg"
+                : "border border-neutral-400 shadow-lg hover:shadow-xl"
             }`}
           >
             <div

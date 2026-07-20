@@ -62,7 +62,7 @@ export function CategoryFilterRow({
               className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
                 isActive
                   ? "border-brand bg-brand-light text-brand"
-                  : "border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                  : "border-neutral-300 text-neutral-600 hover:bg-neutral-50"
               }`}
             >
               {bucket.label}

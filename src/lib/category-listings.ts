@@ -3,6 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { resolveListingImageUrl } from "@/lib/images";
 import { isRecentlyBumped } from "@/lib/premium-plans";
 import { getListingPath } from "@/lib/listing-url";
+import { formatAttributeValue } from "@/lib/format-attribute-value";
 import type { ListingCard } from "@/components/listing-grid";
 
 export const CATEGORY_PAGE_SIZE = 24;
@@ -152,11 +153,15 @@ export async function getTopAttributeValues(
     .eq("status", "active")
     .limit(500);
 
+  // Grouped by the *normalized* value -- "toyota" and "Toyota", or "2026 Cadillac" and
+  // "Cadillac", are the same real value with inconsistent seller-typed formatting, and
+  // must merge into one count/icon rather than showing as separate near-duplicate entries.
   const counts = new Map<string, number>();
   for (const row of data ?? []) {
     const value = (row.attributes as Record<string, unknown> | null)?.[attributeKey];
     if (typeof value !== "string" || !value.trim()) continue;
-    counts.set(value, (counts.get(value) ?? 0) + 1);
+    const normalized = formatAttributeValue(value);
+    counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
   }
 
   return [...counts.entries()]

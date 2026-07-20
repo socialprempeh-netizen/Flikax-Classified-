@@ -11,7 +11,7 @@ import {
   type DatePosted,
   type AttributeFilter,
 } from "@/lib/category-listings";
-import { getSidebarFields, getQuickFilterKey, getQuickFilterIcon } from "@/lib/category-filters";
+import { getSidebarFields, getQuickFilterKey } from "@/lib/category-filters";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -201,7 +201,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           {category.name} for Sale in Ghana
         </h1>
 
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           <CategorySidebarFilters categorySlug={category.slug} fields={sidebarFields} />
 
           <div className="min-w-0 flex-1">
@@ -210,7 +210,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
             {quickFilterKey && (
               <CategoryQuickFilters
                 items={quickFilterValues}
-                icon={getQuickFilterIcon(topLevelSlug)}
+                topLevelSlug={topLevelSlug}
                 attributeKey={quickFilterKey}
                 activeValue={activeQuickFilterValue}
                 baseHref={`/${category.slug}`}

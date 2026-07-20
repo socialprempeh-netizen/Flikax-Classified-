@@ -81,13 +81,13 @@ export function CategorySidebarFilters({
 
   return (
     <div className="hidden w-64 shrink-0 lg:block">
-      <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
         <h3 className="mb-1 text-sm font-bold text-neutral-800">Filters</h3>
 
         <button
           type="button"
           onClick={() => setLocationOpen(true)}
-          className="flex w-full items-center justify-between border-b border-neutral-100 py-3 text-left"
+          className="flex w-full items-center justify-between border-b border-neutral-100 py-2 text-left"
         >
           <span className="text-sm font-semibold text-neutral-700">Location</span>
           <span className="flex items-center gap-1 text-sm text-neutral-500">
@@ -96,8 +96,8 @@ export function CategorySidebarFilters({
           </span>
         </button>
 
-        <div className="border-b border-neutral-100 py-3">
-          <p className="mb-2 text-sm font-semibold text-neutral-700">Price, GH₵</p>
+        <div className="border-b border-neutral-100 py-2">
+          <p className="mb-1.5 text-sm font-semibold text-neutral-700">Price, GH₵</p>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -118,8 +118,8 @@ export function CategorySidebarFilters({
         </div>
 
         {fields.map((field) => (
-          <div key={field.key} className="border-b border-neutral-100 py-3 last:border-b-0">
-            <p className="mb-2 text-sm font-semibold text-neutral-700">{field.label}</p>
+          <div key={field.key} className="border-b border-neutral-100 py-2 last:border-b-0">
+            <p className="mb-1.5 text-sm font-semibold text-neutral-700">{field.label}</p>
 
             {field.type === "select" && (
               <select

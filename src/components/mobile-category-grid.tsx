@@ -12,7 +12,7 @@ export function MobileCategoryGrid({
   filters: ListingFilters;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-x-2 gap-y-3 md:grid-cols-4">
+    <div className="grid grid-cols-3 gap-x-2 gap-y-2 md:grid-cols-4">
       <Link
         href="/sell"
         className="flex min-h-16 flex-col items-center justify-start gap-1.5 text-center"

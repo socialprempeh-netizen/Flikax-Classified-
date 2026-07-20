@@ -156,7 +156,7 @@ export default async function Home({ searchParams }: PageProps) {
         <HomepageSlider slides={sliderSlides} />
       </div>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-3 px-4 py-6 sm:px-6 lg:flex-row lg:gap-6">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-3 px-4 py-6 sm:px-6 lg:flex-row lg:gap-4">
         <CategorySidebar
           categories={categories ?? []}
           counts={counts}

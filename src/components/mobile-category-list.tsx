@@ -38,7 +38,7 @@ export function MobileCategoryList({ categories, counts }: { categories: Categor
       <div className="divide-y divide-neutral-100 px-4">
         {filtered.map((child) => {
           return (
-            <Link key={child.id} href={`/${child.slug}`} className="flex items-center gap-3 py-3">
+            <Link key={child.id} href={`/${child.slug}`} className="flex items-center gap-3 py-2">
               <CategoryThumb category={child} size="size-11" iconSize="size-5" sizes="44px" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-neutral-800">{child.name}</span>

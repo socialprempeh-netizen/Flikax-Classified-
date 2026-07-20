@@ -15,7 +15,7 @@ export function LocationPicker({ filters }: { filters: ListingFilters }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold text-neutral-800"
+        className="flex w-full items-center justify-between px-3 py-2 text-sm font-bold text-neutral-800"
       >
         <span>Location</span>
         <span className="flex items-center gap-1 text-sm font-normal text-neutral-500">
