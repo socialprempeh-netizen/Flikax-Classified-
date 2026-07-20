@@ -38,6 +38,8 @@ export async function fetchHomeListings(
     price: listing.price,
     location: listing.location,
     imageUrl: listing.cover_image_path ? resolveListingImageUrl(supabase, listing.cover_image_path) : null,
+    imageWidth: listing.cover_image_width,
+    imageHeight: listing.cover_image_height,
     isFeatured: listing.is_featured,
     isBumped: isRecentlyBumped(listing.bumped_at),
     negotiable: listing.negotiable === "yes",

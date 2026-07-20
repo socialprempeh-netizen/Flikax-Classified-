@@ -29,6 +29,8 @@ type ImageSlot = {
   path?: string;
   phash?: string;
   blurScore?: number;
+  width?: number;
+  height?: number;
   error?: string;
   isExisting?: boolean;
 };
@@ -196,6 +198,8 @@ export function ListingForm({
                   path: result.body.path,
                   phash: result.body.phash,
                   blurScore: result.body.blurScore,
+                  width: result.body.width,
+                  height: result.body.height,
                 }
               : img
           )
@@ -318,6 +322,8 @@ export function ListingForm({
             position: existingCount + index,
             phash: img.phash ?? null,
             blur_score: img.blurScore ?? null,
+            width: img.width ?? null,
+            height: img.height ?? null,
           }))
         );
         if (imagesError) {
@@ -347,6 +353,8 @@ export function ListingForm({
           position: index,
           phash: img.phash ?? null,
           blur_score: img.blurScore ?? null,
+          width: img.width ?? null,
+          height: img.height ?? null,
         }))
       );
 

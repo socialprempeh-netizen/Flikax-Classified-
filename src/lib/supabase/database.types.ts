@@ -296,29 +296,35 @@ export type Database = {
         Row: {
           blur_score: number | null
           created_at: string
+          height: number | null
           id: string
           listing_id: string
           phash: unknown
           position: number
           storage_path: string
+          width: number | null
         }
         Insert: {
           blur_score?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           listing_id: string
           phash?: unknown
           position?: number
           storage_path: string
+          width?: number | null
         }
         Update: {
           blur_score?: number | null
           created_at?: string
+          height?: number | null
           id?: string
           listing_id?: string
           phash?: unknown
           position?: number
           storage_path?: string
+          width?: number | null
         }
         Relationships: [
           {
@@ -1056,7 +1062,9 @@ export type Database = {
           category_id: string
           category_name: string
           category_slug: string
+          cover_image_height: number
           cover_image_path: string
+          cover_image_width: number
           created_at: string
           description: string
           id: string

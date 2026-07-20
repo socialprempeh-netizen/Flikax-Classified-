@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { watermarkImage } from "@/lib/watermark";
 import { computeAverageHash, computeBlurScore } from "@/lib/image-hash";
@@ -68,8 +69,14 @@ export async function POST(request: Request) {
   let watermarked: Buffer;
   let phash: string;
   let blurScore: number;
+  let width: number | undefined;
+  let height: number | undefined;
   try {
     watermarked = await watermarkImage(inputBuffer);
+    // watermarkImage() resizes (max 1600px) and stamps the logo, so these are
+    // the *stored* image's real dimensions -- not the original upload's,
+    // which is what listing cards need to render at their true aspect ratio.
+    ({ width, height } = await sharp(watermarked).metadata());
     [phash, blurScore] = await Promise.all([
       computeAverageHash(inputBuffer),
       computeBlurScore(inputBuffer),
@@ -96,5 +103,5 @@ export async function POST(request: Request) {
     data: { publicUrl },
   } = storageClient.storage.from("listing-images").getPublicUrl(path);
 
-  return NextResponse.json({ path, url: publicUrl, phash, blurScore });
+  return NextResponse.json({ path, url: publicUrl, phash, blurScore, width, height });
 }

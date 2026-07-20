@@ -12,6 +12,12 @@ export type ListingCard = {
   price: number;
   location: string;
   imageUrl: string | null;
+  // Cover image's real, stored dimensions -- present for new uploads,
+  // null/undefined for images uploaded before this was tracked. Drives
+  // rendering the card's image at its true aspect ratio instead of a
+  // forced crop; missing either one falls back to the fixed crop.
+  imageWidth?: number | null;
+  imageHeight?: number | null;
   isFeatured?: boolean;
   isBumped?: boolean;
   negotiable?: boolean;
@@ -23,6 +29,11 @@ const currency = new Intl.NumberFormat("en-GH", {
   currency: "GHS",
   maximumFractionDigits: 0,
 });
+
+// Caps how tall a single card's image can get before object-cover starts
+// cropping it -- without this, an extreme portrait photo would blow out
+// its column and dominate the whole grid.
+const MAX_IMAGE_HEIGHT = 480;
 
 // "home" is the homepage grid: a wider (more horizontal) image with a
 // colored frame around it, per the brief. "default" (everywhere else --
@@ -51,77 +62,86 @@ export function ListingGrid({
   return (
     <section className="flex-1">
       <div className={isHome ? "columns-2 gap-3 sm:columns-3 lg:columns-4" : "columns-2 gap-3 sm:columns-2 lg:columns-3"}>
-        {listings.map((listing) => (
-          <Link
-            key={listing.id}
-            href={listing.href}
-            className={`mb-3 block break-inside-avoid overflow-hidden rounded-xl border border-brand bg-white ${
-              isHome ? "shadow-md hover:shadow-lg" : "shadow-lg hover:shadow-xl"
-            }`}
-          >
-            <div
-              className={`relative overflow-hidden bg-brand-light text-brand/40 ${
-                isHome ? "aspect-[2/1]" : "aspect-video"
+        {listings.map((listing) => {
+          const hasNaturalAspect = Boolean(listing.imageWidth && listing.imageHeight);
+
+          return (
+            <Link
+              key={listing.id}
+              href={listing.href}
+              className={`mb-3 block break-inside-avoid overflow-hidden rounded-xl border border-brand bg-white ${
+                isHome ? "shadow-md hover:shadow-lg" : "shadow-lg hover:shadow-xl"
               }`}
             >
-              {listing.imageUrl ? (
-                <Image
-                  src={listing.imageUrl}
-                  alt={listing.title}
-                  fill
-                  sizes={
-                    isHome
-                      ? "(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
-                      : "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 45vw"
-                  }
-                  quality={82}
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex size-full items-center justify-center">
-                  <ImageOff className="size-8" />
-                </div>
-              )}
-              {(listing.isFeatured || listing.isBumped) && (
-                <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
-                  {listing.isFeatured && (
-                    <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 shadow-sm">
-                      <Star className="size-3 fill-amber-500 text-amber-500" />
-                      Featured
+              <div
+                className={`relative w-full overflow-hidden bg-brand-light text-brand/40 ${
+                  hasNaturalAspect ? "" : isHome ? "aspect-[2/1]" : "aspect-video"
+                }`}
+                style={
+                  hasNaturalAspect
+                    ? { aspectRatio: `${listing.imageWidth} / ${listing.imageHeight}`, maxHeight: MAX_IMAGE_HEIGHT }
+                    : undefined
+                }
+              >
+                {listing.imageUrl ? (
+                  <Image
+                    src={listing.imageUrl}
+                    alt={listing.title}
+                    fill
+                    sizes={
+                      isHome
+                        ? "(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+                        : "(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 45vw"
+                    }
+                    quality={82}
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center">
+                    <ImageOff className="size-8" />
+                  </div>
+                )}
+                {(listing.isFeatured || listing.isBumped) && (
+                  <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+                    {listing.isFeatured && (
+                      <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 shadow-sm">
+                        <Star className="size-3 fill-amber-500 text-amber-500" />
+                        Featured
+                      </span>
+                    )}
+                    {listing.isBumped && (
+                      <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 shadow-sm">
+                        <TrendingUp className="size-3 text-blue-600" />
+                        Bumped
+                      </span>
+                    )}
+                  </div>
+                )}
+                <CompactSaveButton listingId={listing.id} />
+              </div>
+              <div className="space-y-1 p-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-extrabold text-brand">{currency.format(listing.price)}</span>
+                  {listing.negotiable && (
+                    <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500">
+                      Neg.
                     </span>
                   )}
-                  {listing.isBumped && (
-                    <span className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 shadow-sm">
-                      <TrendingUp className="size-3 text-blue-600" />
-                      Bumped
-                    </span>
+                </div>
+                <p className="line-clamp-2 text-sm font-semibold text-neutral-800">{listing.title}</p>
+                {listing.description && (
+                  <p className="line-clamp-2 text-xs text-neutral-500">{listing.description}</p>
+                )}
+                <div className="flex items-center justify-between gap-2 pt-0.5 text-xs text-neutral-400">
+                  <span className="truncate">{listing.location}</span>
+                  {listing.createdAt && (
+                    <span className="shrink-0">{formatRelativeTime(new Date(listing.createdAt))}</span>
                   )}
                 </div>
-              )}
-              <CompactSaveButton listingId={listing.id} />
-            </div>
-            <div className="space-y-1 p-3">
-              <div className="flex items-baseline gap-2">
-                <span className="text-lg font-extrabold text-brand">{currency.format(listing.price)}</span>
-                {listing.negotiable && (
-                  <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500">
-                    Neg.
-                  </span>
-                )}
               </div>
-              <p className="line-clamp-2 text-sm font-semibold text-neutral-800">{listing.title}</p>
-              {listing.description && (
-                <p className="line-clamp-2 text-xs text-neutral-500">{listing.description}</p>
-              )}
-              <div className="flex items-center justify-between gap-2 pt-0.5 text-xs text-neutral-400">
-                <span className="truncate">{listing.location}</span>
-                {listing.createdAt && (
-                  <span className="shrink-0">{formatRelativeTime(new Date(listing.createdAt))}</span>
-                )}
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

@@ -58,7 +58,7 @@ export async function fetchCategoryListings(
   let query = supabase
     .from("listings")
     .select(
-      "id, title, description, price, location, is_featured, featured_until, bumped_at, short_id, listing_images(storage_path, position), categories(slug)",
+      "id, title, description, price, location, is_featured, featured_until, bumped_at, short_id, listing_images(storage_path, position, width, height), categories(slug)",
       { count: "exact" }
     )
     .eq("category_id", categoryId)
@@ -128,6 +128,8 @@ export async function fetchCategoryListings(
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
+      imageWidth: cover?.width,
+      imageHeight: cover?.height,
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };

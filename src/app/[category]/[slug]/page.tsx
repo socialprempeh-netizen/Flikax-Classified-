@@ -446,7 +446,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
     supabase
       .from("listings")
       .select(
-        "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position), categories(slug), short_id"
+        "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position, width, height), categories(slug), short_id"
       )
       .eq("category_id", listing.category_id)
       .eq("status", "active")
@@ -533,7 +533,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
     const { data: similarAnyLocation } = await supabase
       .from("listings")
       .select(
-        "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position), categories(slug), short_id"
+        "id, title, price, location, is_featured, featured_until, bumped_at, listing_images(storage_path, position, width, height), categories(slug), short_id"
       )
       .eq("category_id", listing.category_id)
       .eq("status", "active")
@@ -553,6 +553,8 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
       price: row.price,
       location: row.location,
       imageUrl: cover ? resolveListingImageUrl(supabase, cover.storage_path) : null,
+      imageWidth: cover?.width,
+      imageHeight: cover?.height,
       isFeatured: row.is_featured && (row.featured_until ? new Date(row.featured_until).getTime() > now : false),
       isBumped: isRecentlyBumped(row.bumped_at),
     };
