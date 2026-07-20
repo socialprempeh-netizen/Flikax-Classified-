@@ -367,7 +367,7 @@ export function ListingForm({
 
   if (posted) {
     return (
-      <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center shadow-sm">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center shadow-[0_10px_50px_rgba(0,0,0,0.3)]">
         <h1 className="text-xl font-bold text-neutral-800">
           {isEditing ? "Listing updated!" : "Listing posted!"}
         </h1>
@@ -399,7 +399,7 @@ export function ListingForm({
       {step === 1 && (
         <form
           onSubmit={handleNext}
-          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm"
+          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
         >
           <div>
             <h1 className="text-xl font-bold text-neutral-800">
@@ -645,7 +645,7 @@ export function ListingForm({
       {step === 2 && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm"
+          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
         >
           <div>
             <h1 className="text-xl font-bold text-neutral-800">
