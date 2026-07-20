@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
 
 const NAV_GROUPS: { label: string; href: string; badge?: string }[][] = [
+  [{ label: "Saved Ads", href: "/saved" }],
   [
     { label: "Personal details", href: "/settings" },
     { label: "Business details", href: "/settings/business" },

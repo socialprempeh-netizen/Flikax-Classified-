@@ -145,8 +145,8 @@ export default async function Home({ searchParams }: PageProps) {
 
       <section className="bg-brand pb-10 pt-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h1 className="mb-5 text-center text-2xl font-bold text-white sm:text-3xl">
-            Find products, cars, property & more
+          <h1 className="mb-5 text-center text-lg font-bold text-white sm:text-xl">
+            Explore Thousands of New Listings
           </h1>
           <SearchBar defaultQuery={filters.q} defaultLocation={filters.location} />
         </div>

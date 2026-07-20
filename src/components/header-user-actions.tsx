@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bookmark, MessageSquare, Bell, Gem, ClipboardList, UserRound, UserPlus } from "lucide-react";
+import { MessageSquare, Bell, Gem, ClipboardList, UserRound, UserPlus, Megaphone } from "lucide-react";
 import { useSessionSummary } from "@/lib/use-session-summary";
 
 // Split out of SiteHeader so the auth-dependent icons (which need cookies())
@@ -47,15 +47,6 @@ export function HeaderUserActions() {
       </div>
 
       <div className="hidden items-center gap-1.5 sm:flex sm:gap-3">
-        <Link
-          href={gatedHref ?? "/saved"}
-          title="Saved"
-          aria-label="Saved"
-          className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 sm:size-10"
-        >
-          <Bookmark className="size-4 sm:size-5" />
-        </Link>
-
         <Link
           href={gatedHref ?? "/messages"}
           title="Messages"
@@ -113,9 +104,10 @@ export function HeaderUserActions() {
 
         <Link
           href="/sell"
-          className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-brand hover:bg-brand-light sm:px-5 sm:py-2 sm:text-sm"
+          className="flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-orange-600 sm:px-5 sm:py-2 sm:text-sm"
         >
-          SELL
+          <Megaphone className="size-3.5 sm:size-4" />
+          Advertise for Free
         </Link>
       </div>
     </>
