@@ -106,7 +106,7 @@ export function LocationPickerModal({
             <span className="shrink-0 text-base font-bold text-neutral-800">Select location</span>
           )}
 
-          <div className="ml-auto flex items-center gap-2 rounded-lg border-2 border-slate-strong px-3 py-2">
+          <div className="ml-auto flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2">
             <Search className="size-4 shrink-0 text-neutral-400" />
             <input
               autoFocus

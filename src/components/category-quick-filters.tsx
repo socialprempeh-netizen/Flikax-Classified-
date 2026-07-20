@@ -95,7 +95,7 @@ function QuickFilterTile({
     <Link
       href={qs ? `${baseHref}?${qs}` : baseHref}
       className={`flex h-24 flex-col items-center justify-center gap-2 rounded-xl border-2 bg-white px-2 py-3 text-center transition-colors ${
-        isActive ? "border-brand bg-brand-light" : "border-slate-strong hover:border-neutral-500"
+        isActive ? "border-brand bg-brand-light" : "border-neutral-300 hover:border-neutral-400"
       } ${className}`}
     >
       {style === "brand" ? (

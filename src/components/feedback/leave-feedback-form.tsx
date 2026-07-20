@@ -7,7 +7,7 @@ import { submitFeedbackAction, type Sentiment } from "@/app/u/actions";
 
 const OPTIONS: { value: Sentiment; label: string; icon: LucideIcon; activeClass: string }[] = [
   { value: "positive", label: "Positive", icon: Smile, activeClass: "border-green-300 bg-green-100 text-green-700" },
-  { value: "neutral", label: "Neutral", icon: Meh, activeClass: "border-slate-strong bg-neutral-100 text-neutral-600" },
+  { value: "neutral", label: "Neutral", icon: Meh, activeClass: "border-neutral-300 bg-neutral-100 text-neutral-600" },
   { value: "negative", label: "Negative", icon: Frown, activeClass: "border-red-300 bg-red-100 text-red-700" },
 ];
 
@@ -44,8 +44,8 @@ export function LeaveFeedbackForm({ profileId }: { profileId: string }) {
             key={opt.value}
             type="button"
             onClick={() => setSentiment(opt.value)}
-            className={`flex flex-1 flex-col items-center gap-1 rounded-lg border-2 px-3 py-2 text-xs font-semibold ${
-              sentiment === opt.value ? opt.activeClass : "border-slate-strong text-neutral-500 hover:bg-neutral-50"
+            className={`flex flex-1 flex-col items-center gap-1 rounded-lg border px-3 py-2 text-xs font-semibold ${
+              sentiment === opt.value ? opt.activeClass : "border-neutral-200 text-neutral-500 hover:bg-neutral-50"
             }`}
           >
             <opt.icon className="size-5" />
@@ -59,7 +59,7 @@ export function LeaveFeedbackForm({ profileId }: { profileId: string }) {
         required
         rows={3}
         placeholder="Share your experience..."
-        className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
       {success && <p className="text-sm text-green-600">Thanks for your feedback!</p>}

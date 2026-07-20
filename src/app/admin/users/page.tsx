@@ -85,7 +85,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
 
       <form
         method="get"
-        className="mt-6 mb-4 flex flex-wrap items-end gap-3 rounded-2xl border-2 border-slate-strong bg-white p-4"
+        className="mt-6 mb-4 flex flex-wrap items-end gap-3 rounded-2xl border border-neutral-100 bg-white p-4"
       >
         <label className="block">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -96,7 +96,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
             name="q"
             defaultValue={params.q}
             placeholder="Name, phone, email, or ID"
-            className="w-64 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-64 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -107,7 +107,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           <select
             name="role"
             defaultValue={roleFilter ?? ""}
-            className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           >
             <option value="">All</option>
             <option value="user">User</option>
@@ -123,7 +123,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
           <select
             name="status"
             defaultValue={statusFilter ?? ""}
-            className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           >
             <option value="">All</option>
             <option value="active">Active</option>
@@ -150,7 +150,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         )}
       </form>
 
-      <div className="divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {rows.length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">No users match these filters.</p>
         ) : (

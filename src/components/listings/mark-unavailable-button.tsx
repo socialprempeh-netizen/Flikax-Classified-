@@ -35,7 +35,7 @@ export function MarkUnavailableButton({ listingId }: { listingId: string }) {
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-slate-strong py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
       >
         <CircleOff className="size-4" />
         {isPending ? "Updating..." : "Mark unavailable"}

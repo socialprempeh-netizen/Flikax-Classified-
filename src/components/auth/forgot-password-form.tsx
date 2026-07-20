@@ -32,7 +32,7 @@ export function ForgotPasswordForm() {
 
   if (sent) {
     return (
-      <div className="w-full max-w-sm rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
         <h1 className="text-lg font-bold text-neutral-800">Check your email</h1>
         <p className="mt-1 text-sm text-neutral-500">
           If an account exists for <span className="font-medium text-neutral-700">{email}</span>, we&apos;ve
@@ -40,7 +40,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           href="/auth/login"
-          className="mt-4 block w-full rounded-lg border-2 border-slate-strong py-2.5 text-center text-sm font-bold text-neutral-700 hover:bg-neutral-50"
+          className="mt-4 block w-full rounded-lg border border-neutral-200 py-2.5 text-center text-sm font-bold text-neutral-700 hover:bg-neutral-50"
         >
           Back to login
         </Link>
@@ -51,7 +51,7 @@ export function ForgotPasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-sm space-y-4 rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-sm"
+      className="w-full max-w-sm space-y-4 rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm"
     >
       <div>
         <h1 className="text-lg font-bold text-neutral-800">Reset your password</h1>
@@ -70,7 +70,7 @@ export function ForgotPasswordForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 

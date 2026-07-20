@@ -173,7 +173,7 @@ export default async function Home({ searchParams }: PageProps) {
               {page > 1 && (
                 <Link
                   href={buildListingsHref(filters, page - 1)}
-                  className="rounded-lg border-2 border-slate-strong px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   Previous
                 </Link>
@@ -184,7 +184,7 @@ export default async function Home({ searchParams }: PageProps) {
               {page < totalPages && (
                 <Link
                   href={buildListingsHref(filters, page + 1)}
-                  className="rounded-lg border-2 border-slate-strong px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   Next
                 </Link>

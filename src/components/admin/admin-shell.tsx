@@ -168,7 +168,7 @@ export function AdminShell({
               {role === "super_admin" ? "Super Admin" : "Admin"}
             </span>
             <span className="text-sm text-neutral-600">{adminName || "Admin"}</span>
-            <LogoutButton className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50" />
+            <LogoutButton className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50" />
           </div>
         </header>
 

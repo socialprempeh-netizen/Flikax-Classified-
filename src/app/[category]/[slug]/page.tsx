@@ -373,7 +373,7 @@ async function CategoryLocationPage({
         </h1>
 
         {belowThreshold ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-strong bg-white py-16 text-center">
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-200 bg-white py-16 text-center">
             <p className="text-sm font-medium text-neutral-600">
               No {category.name} listings in {location.district_name} yet.
             </p>
@@ -411,7 +411,7 @@ async function CategoryLocationPage({
                   {page > 1 && (
                     <Link
                       href={pageHref(page - 1)}
-                      className="rounded-lg border-2 border-slate-strong px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                     >
                       Previous
                     </Link>
@@ -422,7 +422,7 @@ async function CategoryLocationPage({
                   {page < totalPages && (
                     <Link
                       href={pageHref(page + 1)}
-                      className="rounded-lg border-2 border-slate-strong px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
+                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
                     >
                       Next
                     </Link>
@@ -669,7 +669,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           <div className="sm:col-span-2">
             <ListingGallery images={images} title={listing.title} />
 
-            <div className="mt-6 rounded-xl border-2 border-slate-strong bg-white p-4 shadow-md">
+            <div className="mt-6 rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               {(isFeatured || isBumped) && (
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   {isFeatured && (
@@ -787,7 +787,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           </div>
 
           <div className="flex flex-col gap-3 sm:col-span-1">
-            <div className="rounded-xl border-2 border-slate-strong bg-white p-4 shadow-md">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               <div className="flex items-center gap-3">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg font-bold text-brand">
                   {sellerName[0]?.toUpperCase() ?? "F"}
@@ -816,10 +816,10 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-xl border-2 border-slate-strong bg-white p-3 shadow-md">
+            <div className="flex flex-col gap-2 rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
               <a
                 href={feedbackHref}
-                className="flex items-center justify-center gap-2 rounded-lg border-2 border-slate-strong py-2 text-base font-bold text-neutral-700 hover:bg-neutral-50"
+                className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-base font-bold text-neutral-700 hover:bg-neutral-50"
               >
                 <MessageSquareWarning className="size-4" />
                 Leave Feedback
@@ -844,7 +844,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </Link>
             </div>
 
-            <div className="rounded-xl border-2 border-slate-strong bg-white p-4 shadow-md">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
               <h3 className="mb-3 text-sm font-bold text-neutral-800">Safety First - Read This Before Proceeding</h3>
               <ul className="list-disc space-y-2 pl-4 marker:text-brand">
                 {SAFETY_TIPS.map((tip) => (

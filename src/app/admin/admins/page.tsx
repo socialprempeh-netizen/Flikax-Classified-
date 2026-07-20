@@ -17,13 +17,13 @@ export default async function AdminAdminsPage() {
       <h1 className="text-xl font-bold text-neutral-800">Admins</h1>
       <p className="mt-1 text-sm text-neutral-500">Manage who has admin access and at what level.</p>
 
-      <div className="mt-6 rounded-2xl border-2 border-slate-strong bg-white p-5">
+      <div className="mt-6 rounded-2xl border border-neutral-100 bg-white p-5">
         <h2 className="text-sm font-bold text-neutral-800">Grant admin access</h2>
         <p className="mt-0.5 text-sm text-neutral-500">The user has to have signed up already.</p>
         <GrantAdminForm />
       </div>
 
-      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {(admins ?? []).length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">No admins yet.</p>
         ) : (

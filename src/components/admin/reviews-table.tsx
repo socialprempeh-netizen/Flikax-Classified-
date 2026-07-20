@@ -77,7 +77,7 @@ export function ReviewsTable({ reviews }: { reviews: AdminReviewRow[] }) {
 
   if (reviews.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-slate-strong bg-white py-16 text-center text-sm text-neutral-400">
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-16 text-center text-sm text-neutral-400">
         No reported feedback matches these filters.
       </div>
     );
@@ -109,7 +109,7 @@ export function ReviewsTable({ reviews }: { reviews: AdminReviewRow[] }) {
         </div>
       )}
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
         <div className="flex items-center gap-3 bg-neutral-50 px-4 py-2">
           <input
             type="checkbox"
@@ -178,7 +178,7 @@ export function ReviewsTable({ reviews }: { reviews: AdminReviewRow[] }) {
                     type="button"
                     disabled={isPending}
                     onClick={() => run(() => updateFeedbackReportStatusAction([review.id], "dismissed"))}
-                    className="rounded-lg border-2 border-slate-strong px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                    className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
                   >
                     Dismiss
                   </button>
@@ -243,14 +243,14 @@ export function ReviewsTable({ reviews }: { reviews: AdminReviewRow[] }) {
               value={warnMessage}
               onChange={(e) => setWarnMessage(e.target.value)}
               placeholder="Regarding the feedback you left..."
-              className="mt-3 w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setWarnTarget(null)}
                 disabled={isPending}
-                className="rounded-lg border-2 border-slate-strong px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
               >
                 Cancel
               </button>

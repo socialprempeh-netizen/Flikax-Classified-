@@ -27,7 +27,7 @@ export function HomepageSliderManager({ initialSlides }: { initialSlides: Homepa
 
   return (
     <>
-      <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-5">
         <h2 className="text-sm font-bold text-neutral-800">
           {editingSlide ? "Edit slide" : "Add a slide"}
         </h2>
@@ -41,7 +41,7 @@ export function HomepageSliderManager({ initialSlides }: { initialSlides: Homepa
         </div>
       </div>
 
-      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {slides.length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">
             No slides yet. Add one above — it appears on the homepage as soon as it&apos;s active.

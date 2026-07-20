@@ -17,7 +17,7 @@ export function ListingsFilterBar({
   return (
     <form
       method="get"
-      className="mb-4 flex flex-wrap items-end gap-3 rounded-2xl border-2 border-slate-strong bg-white p-4"
+      className="mb-4 flex flex-wrap items-end gap-3 rounded-2xl border border-neutral-100 bg-white p-4"
     >
       <label className="block">
         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -28,7 +28,7 @@ export function ListingsFilterBar({
           name="q"
           defaultValue={filters.q}
           placeholder="Title or seller name"
-          className="w-52 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-52 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -39,7 +39,7 @@ export function ListingsFilterBar({
         <select
           name="status"
           defaultValue={filters.status ?? ""}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">All</option>
           {Object.entries(ADMIN_STATUS_LABELS).map(([value, label]) => (
@@ -58,7 +58,7 @@ export function ListingsFilterBar({
         <select
           name="category"
           defaultValue={filters.category ?? ""}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">All</option>
           {categories.map((c) => (
@@ -78,7 +78,7 @@ export function ListingsFilterBar({
           name="location"
           defaultValue={filters.location}
           placeholder="e.g. Accra"
-          className="w-36 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-36 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -111,7 +111,7 @@ export function ListingsFilterBar({
         <select
           name="sort"
           defaultValue={filters.sort ?? "newest"}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="newest">Newest first</option>
           <option value="oldest">Oldest first</option>

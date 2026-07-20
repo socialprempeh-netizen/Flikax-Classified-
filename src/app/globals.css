@@ -6,10 +6,6 @@
   --brand: #1da1f2;
   --brand-dark: #0d5f8f;
   --brand-light: #e8f6ff;
-  /* Site-wide "this is a box" border color -- deliberately darker than a
-     typical hairline gray so every card/input/panel reads as clearly
-     separated from a white page, not just faintly outlined. */
-  --slate-strong: #64748b;
 }
 
 @theme inline {
@@ -18,21 +14,17 @@
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
   --color-brand-light: var(--brand-light);
-  --color-slate-strong: var(--slate-strong);
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     "Noto Sans", sans-serif;
   --font-logo: var(--font-baloo-2);
 
-  /* Every shadow-sm/md/lg/xl in the app inherits from these four -- kept
-     strong deliberately (0.20-0.40 alpha) so a card is unmistakably
-     separated from the white background site-wide, not just on the one
-     page that happened to get tuned by hand. Don't quietly soften these
-     back down; if a specific spot looks too heavy, that's a call to make
-     explicitly, not by letting the shared default drift. */
-  --shadow-sm: 0 4px 12px 0 rgb(0 0 0 / 0.2);
-  --shadow-md: 0 8px 20px -2px rgb(0 0 0 / 0.28), 0 4px 10px -3px rgb(0 0 0 / 0.22);
-  --shadow-lg: 0 12px 32px -4px rgb(0 0 0 / 0.35), 0 6px 16px -6px rgb(0 0 0 / 0.28);
-  --shadow-xl: 0 20px 45px -8px rgb(0 0 0 / 0.4), 0 10px 20px -8px rgb(0 0 0 / 0.32);
+  /* Between Tailwind's defaults and flat: the previous values (0.03-0.07
+     opacity) were tuned down from harsh dark boxes but ended up reading as
+     no shadow at all on our light neutral-50 background. */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 8px -1px rgb(0 0 0 / 0.09), 0 2px 5px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 8px 14px -3px rgb(0 0 0 / 0.1), 0 4px 7px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 14px 20px -5px rgb(0 0 0 / 0.12), 0 6px 8px -6px rgb(0 0 0 / 0.09);
 }
 
 @media (prefers-color-scheme: dark) {

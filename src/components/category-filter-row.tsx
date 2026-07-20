@@ -59,10 +59,10 @@ export function CategoryFilterRow({
             <Link
               key={bucket.label}
               href={hrefWith(searchParams, { minPrice: bucket.minPrice, maxPrice: bucket.maxPrice })}
-              className={`shrink-0 rounded-full border-2 px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
+              className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
                 isActive
                   ? "border-brand bg-brand-light text-brand"
-                  : "border-slate-strong text-neutral-600 hover:bg-neutral-50"
+                  : "border-neutral-300 text-neutral-600 hover:bg-neutral-50"
               }`}
             >
               {bucket.label}
@@ -80,7 +80,7 @@ export function CategoryFilterRow({
           <select
             value={datePosted ?? ""}
             onChange={(e) => router.push(hrefWith(searchParams, { posted: e.target.value || undefined }))}
-            className="rounded-lg border-2 border-slate-strong bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+            className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
           >
             {DATE_POSTED_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -92,7 +92,7 @@ export function CategoryFilterRow({
           <select
             value={sort}
             onChange={(e) => router.push(hrefWith(searchParams, { sort: e.target.value }))}
-            className="rounded-lg border-2 border-slate-strong bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+            className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

@@ -139,21 +139,21 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border-2 border-slate-strong bg-white p-4">
+        <div className="rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="flex items-center gap-2 text-neutral-400">
             <Banknote className="size-4" />
             <span className="text-xs font-semibold uppercase tracking-wide">Total revenue</span>
           </div>
           <p className="mt-2 text-2xl font-extrabold text-neutral-800">GHS {totalRevenue.toFixed(2)}</p>
         </div>
-        <div className="rounded-2xl border-2 border-slate-strong bg-white p-4">
+        <div className="rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="flex items-center gap-2 text-neutral-400">
             <CalendarDays className="size-4" />
             <span className="text-xs font-semibold uppercase tracking-wide">This month</span>
           </div>
           <p className="mt-2 text-2xl font-extrabold text-neutral-800">GHS {monthRevenue.toFixed(2)}</p>
         </div>
-        <div className="rounded-2xl border-2 border-slate-strong bg-white p-4">
+        <div className="rounded-2xl border border-neutral-100 bg-white p-4">
           <div className="flex items-center gap-2 text-neutral-400">
             <CalendarClock className="size-4" />
             <span className="text-xs font-semibold uppercase tracking-wide">Today</span>
@@ -163,7 +163,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
       </div>
 
       {Object.keys(byPlanType).length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border-2 border-slate-strong bg-white p-4 text-sm text-neutral-600">
+        <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-neutral-100 bg-white p-4 text-sm text-neutral-600">
           {Object.entries(byPlanType).map(([planType, amount]) => (
             <span key={planType} className="rounded-full bg-neutral-100 px-3 py-1">
               {ADMIN_PLAN_TYPE_LABELS[planType] ?? planType}: GHS {amount.toFixed(2)}
@@ -181,7 +181,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
             <Link
               href={buildAdminPaymentsHref({ ...filters, page: String(Math.max(1, page - 1)) })}
               aria-disabled={page <= 1}
-              className={`flex items-center gap-1 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium ${
+              className={`flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium ${
                 page <= 1 ? "pointer-events-none text-neutral-300" : "text-neutral-700 hover:bg-neutral-50"
               }`}
             >
@@ -194,7 +194,7 @@ export default async function AdminPaymentsPage({ searchParams }: PageProps) {
             <Link
               href={buildAdminPaymentsHref({ ...filters, page: String(Math.min(totalPages, page + 1)) })}
               aria-disabled={page >= totalPages}
-              className={`flex items-center gap-1 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium ${
+              className={`flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium ${
                 page >= totalPages ? "pointer-events-none text-neutral-300" : "text-neutral-700 hover:bg-neutral-50"
               }`}
             >

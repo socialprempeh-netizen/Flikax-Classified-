@@ -55,7 +55,7 @@ export function PaymentsTable({ purchases }: { purchases: AdminPurchaseRow[] }) 
 
   if (purchases.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-slate-strong bg-white py-16 text-center text-sm text-neutral-400">
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-16 text-center text-sm text-neutral-400">
         No purchases match these filters.
       </div>
     );
@@ -65,7 +65,7 @@ export function PaymentsTable({ purchases }: { purchases: AdminPurchaseRow[] }) 
     <div>
       {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
         {purchases.map((p) => (
           <div key={p.id} className="flex items-start gap-3 p-4 hover:bg-neutral-50">
             <div className="min-w-0 flex-1">
@@ -133,7 +133,7 @@ export function PaymentsTable({ purchases }: { purchases: AdminPurchaseRow[] }) 
               )}
               <Link
                 href={`/admin/users/${p.userId}`}
-                className="rounded-lg border-2 border-slate-strong px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
               >
                 View user
               </Link>

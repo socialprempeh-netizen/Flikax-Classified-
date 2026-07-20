@@ -122,7 +122,7 @@ export function ListingDetailActions({
   }
 
   return (
-    <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
+    <div className="rounded-2xl border border-neutral-100 bg-white p-5">
       <h2 className="text-sm font-bold text-neutral-800">Moderation actions</h2>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
@@ -175,7 +175,7 @@ export function ListingDetailActions({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="flex-1 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           >
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
@@ -187,7 +187,7 @@ export function ListingDetailActions({
             type="button"
             disabled={isPending || selectedCategory === categoryId}
             onClick={saveCategory}
-            className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="rounded-lg border border-neutral-200 px-3 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             Save
           </button>
@@ -203,7 +203,7 @@ export function ListingDetailActions({
             type="button"
             disabled={isPending}
             onClick={() => extendExpiry(30)}
-            className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             +30 days
           </button>
@@ -211,7 +211,7 @@ export function ListingDetailActions({
             type="button"
             disabled={isPending}
             onClick={() => extendExpiry(90)}
-            className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             +90 days
           </button>

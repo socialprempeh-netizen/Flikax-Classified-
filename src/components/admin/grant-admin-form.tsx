@@ -35,7 +35,7 @@ export function GrantAdminForm() {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="024 123 4567"
-          className="w-44 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-44 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -44,7 +44,7 @@ export function GrantAdminForm() {
         <select
           value={role}
           onChange={(e) => setRole(e.target.value as "admin" | "super_admin")}
-          className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="admin">Admin</option>
           <option value="super_admin">Super Admin</option>

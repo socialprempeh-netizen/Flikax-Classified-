@@ -11,7 +11,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
   return (
     <form
       method="get"
-      className="mb-4 flex flex-wrap items-end gap-3 rounded-2xl border-2 border-slate-strong bg-white p-4"
+      className="mb-4 flex flex-wrap items-end gap-3 rounded-2xl border border-neutral-100 bg-white p-4"
     >
       <label className="block">
         <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
@@ -22,7 +22,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
           name="q"
           defaultValue={filters.q}
           placeholder="Admin name"
-          className="w-52 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-52 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -33,7 +33,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
         <select
           name="action"
           defaultValue={filters.action ?? ""}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">All</option>
           {Object.entries(ADMIN_AUDIT_ACTION_LABELS).map(([value, label]) => (
@@ -51,7 +51,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
         <select
           name="targetType"
           defaultValue={filters.targetType ?? ""}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">All</option>
           {Object.entries(ADMIN_AUDIT_TARGET_TYPE_LABELS).map(([value, label]) => (
@@ -70,7 +70,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
           type="date"
           name="dateFrom"
           defaultValue={filters.dateFrom}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -82,7 +82,7 @@ export function AuditLogFilterBar({ filters }: { filters: AdminAuditLogFilters }
           type="date"
           name="dateTo"
           defaultValue={filters.dateTo}
-          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 

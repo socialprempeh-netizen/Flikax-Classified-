@@ -100,7 +100,7 @@ export function ListingsTable({ listings }: { listings: AdminListingRow[] }) {
 
   if (listings.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-slate-strong bg-white py-16 text-center text-sm text-neutral-400">
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-16 text-center text-sm text-neutral-400">
         No listings match these filters.
       </div>
     );
@@ -148,7 +148,7 @@ export function ListingsTable({ listings }: { listings: AdminListingRow[] }) {
         </div>
       )}
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
         <div className="flex items-center gap-3 bg-neutral-50 px-4 py-2">
           <input
             type="checkbox"
@@ -246,14 +246,14 @@ export function ListingsTable({ listings }: { listings: AdminListingRow[] }) {
                   type="button"
                   disabled={isPending}
                   onClick={() => setConfirm({ type: "hide", ids: [listing.id] })}
-                  className="rounded-lg border-2 border-slate-strong px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                  className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
                 >
                   Hide
                 </button>
               )}
               <Link
                 href={`/admin/listings/${listing.id}`}
-                className="rounded-lg border-2 border-slate-strong px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
               >
                 Manage
               </Link>

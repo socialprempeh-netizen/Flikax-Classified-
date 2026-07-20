@@ -81,7 +81,7 @@ export function CategorySidebarFilters({
 
   return (
     <div className="hidden w-64 shrink-0 lg:block">
-      <div className="rounded-xl border-2 border-slate-strong bg-white p-3 shadow-md">
+      <div className="rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
         <h3 className="mb-1 text-sm font-bold text-neutral-800">Filters</h3>
 
         <button
@@ -104,7 +104,7 @@ export function CategorySidebarFilters({
               placeholder="min"
               value={values.minPrice}
               onChange={(e) => setValue("minPrice", e.target.value)}
-              className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+              className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
             />
             <span className="shrink-0 text-neutral-400">–</span>
             <input
@@ -112,7 +112,7 @@ export function CategorySidebarFilters({
               placeholder="max"
               value={values.maxPrice}
               onChange={(e) => setValue("maxPrice", e.target.value)}
-              className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+              className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ export function CategorySidebarFilters({
               <select
                 value={values[field.key]}
                 onChange={(e) => setValue(field.key, e.target.value)}
-                className="w-full rounded-lg border-2 border-slate-strong bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+                className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
               >
                 <option value="">Any</option>
                 {(field.options ?? []).map((opt) => (
@@ -142,7 +142,7 @@ export function CategorySidebarFilters({
                 placeholder={`Find ${field.label.toLowerCase()}`}
                 value={values[field.key]}
                 onChange={(e) => setValue(field.key, e.target.value)}
-                className="w-full rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+                className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
               />
             )}
 
@@ -153,7 +153,7 @@ export function CategorySidebarFilters({
                   placeholder="min"
                   value={values[`${field.key}_min`]}
                   onChange={(e) => setValue(`${field.key}_min`, e.target.value)}
-                  className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+                  className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
                 />
                 <span className="shrink-0 text-neutral-400">–</span>
                 <input
@@ -161,7 +161,7 @@ export function CategorySidebarFilters({
                   placeholder="max"
                   value={values[`${field.key}_max`]}
                   onChange={(e) => setValue(`${field.key}_max`, e.target.value)}
-                  className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+                  className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
                 />
               </div>
             )}

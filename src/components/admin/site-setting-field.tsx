@@ -38,7 +38,7 @@ export function SiteSettingField({ setting }: { setting: SiteSetting }) {
             setValue(e.target.value);
             setSaved(false);
           }}
-          className="w-64 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-64 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
         <button
           type="button"

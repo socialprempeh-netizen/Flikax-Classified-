@@ -74,7 +74,7 @@ export function PersonalDetailsForm({ profile }: { profile: Profile }) {
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -83,7 +83,7 @@ export function PersonalDetailsForm({ profile }: { profile: Profile }) {
         <select
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         >
           <option value="">Select location</option>
           {regions.map((region) => (
@@ -105,7 +105,7 @@ export function PersonalDetailsForm({ profile }: { profile: Profile }) {
             type="date"
             value={dateOfBirth}
             onChange={(e) => setDateOfBirth(e.target.value)}
-            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -114,7 +114,7 @@ export function PersonalDetailsForm({ profile }: { profile: Profile }) {
           <select
             value={sex}
             onChange={(e) => setSex(e.target.value)}
-            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           >
             <option value="" disabled>
               Select

@@ -14,7 +14,7 @@ export default async function AdminSettingsPage() {
       <p className="mt-1 text-sm text-neutral-500">Feature flags and site configuration, editable without a redeploy.</p>
 
       <h2 className="mt-6 text-sm font-bold text-neutral-800">Feature flags</h2>
-      <div className="mt-2 divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="mt-2 divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {flags.length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">No flags yet.</p>
         ) : (
@@ -23,7 +23,7 @@ export default async function AdminSettingsPage() {
       </div>
 
       <h2 className="mt-6 text-sm font-bold text-neutral-800">Site settings</h2>
-      <div className="mt-2 divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="mt-2 divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {settings.length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">No settings yet.</p>
         ) : (

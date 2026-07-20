@@ -367,7 +367,7 @@ export function ListingForm({
 
   if (posted) {
     return (
-      <div className="rounded-2xl border-2 border-slate-strong bg-white p-8 text-center shadow-[0_10px_50px_rgba(0,0,0,0.3)]">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-8 text-center shadow-[0_10px_50px_rgba(0,0,0,0.3)]">
         <h1 className="text-xl font-bold text-neutral-800">
           {isEditing ? "Listing updated!" : "Listing posted!"}
         </h1>
@@ -383,7 +383,7 @@ export function ListingForm({
           </Link>
           <Link
             href="/"
-            className="rounded-full border-2 border-slate-strong px-6 py-2.5 text-sm font-bold text-neutral-700 hover:border-brand hover:text-brand"
+            className="rounded-full border border-neutral-200 px-6 py-2.5 text-sm font-bold text-neutral-700 hover:border-brand hover:text-brand"
           >
             Back to home
           </Link>
@@ -399,7 +399,7 @@ export function ListingForm({
       {step === 1 && (
         <form
           onSubmit={handleNext}
-          className="space-y-6 rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
+          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
         >
           <div>
             <h1 className="text-xl font-bold text-neutral-800">
@@ -419,7 +419,7 @@ export function ListingForm({
                   setCategoryId("");
                   setAttributes({});
                 }}
-                className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
               >
                 <option value="" disabled>
                   Select category
@@ -439,7 +439,7 @@ export function ListingForm({
                 disabled={!parentId}
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand disabled:bg-neutral-50"
+                className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand disabled:bg-neutral-50"
               >
                 <option value="" disabled>
                   {parentId ? "Select subcategory" : "Choose category first"}
@@ -486,7 +486,7 @@ export function ListingForm({
                         required={field.required}
                         value={scalarValue}
                         onChange={(e) => setAttribute(field.key, e.target.value)}
-                        className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
                       />
                     )}
                     {field.type === "number" && (
@@ -495,7 +495,7 @@ export function ListingForm({
                         required={field.required}
                         value={scalarValue}
                         onChange={(e) => setAttribute(field.key, e.target.value)}
-                        className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
                       />
                     )}
                     {field.type === "select" && (
@@ -503,7 +503,7 @@ export function ListingForm({
                         required={field.required}
                         value={scalarValue}
                         onChange={(e) => setAttribute(field.key, e.target.value)}
-                        className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
                       >
                         <option value="" disabled>
                           Select {field.label.toLowerCase()}
@@ -536,10 +536,10 @@ export function ListingForm({
                               type="button"
                               onClick={() => toggleTagAttribute(field.key, opt)}
                               aria-pressed={isSelected}
-                              className={`rounded-full border-2 px-3 py-1.5 text-xs font-medium ${
+                              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
                                 isSelected
                                   ? "border-brand bg-brand-light text-brand"
-                                  : "border-slate-strong text-neutral-600 hover:bg-neutral-50"
+                                  : "border-neutral-200 text-neutral-600 hover:bg-neutral-50"
                               }`}
                             >
                               {opt}
@@ -561,7 +561,7 @@ export function ListingForm({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Condition, features, reason for selling..."
-              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 
@@ -575,7 +575,7 @@ export function ListingForm({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="0.00"
-              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 
@@ -583,7 +583,7 @@ export function ListingForm({
             <span className="mb-1 block text-sm font-medium text-neutral-700">
               Contact phone number*
             </span>
-            <div className="flex items-center rounded-lg border-2 border-slate-strong focus-within:border-brand">
+            <div className="flex items-center rounded-lg border border-neutral-200 focus-within:border-brand">
               <span className="border-r border-neutral-200 px-3 py-2 text-sm text-neutral-500">
                 +233
               </span>
@@ -645,7 +645,7 @@ export function ListingForm({
       {step === 2 && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
+          className="space-y-6 rounded-2xl border border-neutral-100 bg-white p-6 shadow-[0_10px_50px_rgba(0,0,0,0.3)]"
         >
           <div>
             <h1 className="text-xl font-bold text-neutral-800">
@@ -664,13 +664,13 @@ export function ListingForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. iPhone 13 Pro, 256GB"
-              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 
           <div>
             <span className="mb-1 block text-sm font-medium text-neutral-700">Category</span>
-            <div className="flex items-center justify-between rounded-lg border-2 border-slate-strong bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+            <div className="flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
               <span>
                 {parentCategory?.name}
                 {selectedCategory ? ` / ${selectedCategory.name}` : ""}
@@ -690,7 +690,7 @@ export function ListingForm({
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             >
               {GHANA_REGIONS.map((region) => (
                 <optgroup key={region.slug} label={region.name}>
@@ -712,7 +712,7 @@ export function ListingForm({
               {images.map((img) => (
                 <div
                   key={img.id}
-                  className="relative aspect-square overflow-hidden rounded-lg border-2 border-slate-strong"
+                  className="relative aspect-square overflow-hidden rounded-lg border border-neutral-200"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.previewUrl} alt="" className="size-full object-cover" />
@@ -738,7 +738,7 @@ export function ListingForm({
               ))}
 
               {images.length < MAX_IMAGES && (
-                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-slate-strong text-neutral-400 hover:border-brand hover:text-brand">
+                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-neutral-300 text-neutral-400 hover:border-brand hover:text-brand">
                   <ImagePlus className="size-5" />
                   <span className="text-xs">Add photo</span>
                   <input
@@ -762,7 +762,7 @@ export function ListingForm({
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
               placeholder="https://youtube.com/..."
-              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 

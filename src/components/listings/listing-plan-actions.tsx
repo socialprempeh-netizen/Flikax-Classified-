@@ -55,7 +55,7 @@ export function ListingPlanActions({
   }
 
   return (
-    <div className="relative z-10 mt-2 space-y-2 rounded-lg border-2 border-dashed border-slate-strong p-3">
+    <div className="relative z-10 mt-2 space-y-2 rounded-lg border border-dashed border-neutral-200 p-3">
       {availablePlans.map((plan) => (
         <div key={plan.id} className="flex items-center justify-between gap-2">
           <p className="text-xs text-neutral-600">
@@ -75,7 +75,7 @@ export function ListingPlanActions({
               type="button"
               onClick={() => pay(plan.id, "flutterwave")}
               disabled={loadingKey !== null}
-              className="rounded border-2 border-slate-strong px-2 py-1 text-[10px] font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+              className="rounded border border-neutral-200 px-2 py-1 text-[10px] font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
             >
               {loadingKey === `${plan.id}-flutterwave` ? "..." : "Flutterwave"}
             </button>

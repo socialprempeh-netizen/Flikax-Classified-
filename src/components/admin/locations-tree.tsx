@@ -69,7 +69,7 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
     <div>
       {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
         {regions.map((region, index) => {
           const districts = districtsOf(region.region_slug);
           const isOpen = expanded.has(region.region_slug);
@@ -113,7 +113,7 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
                       setRenameTarget({ type: "region", slug: region.region_slug, name: region.region_name });
                       setRenameValue(region.region_name);
                     }}
-                    className="rounded-lg border-2 border-slate-strong px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                    className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
                   >
                     <Pencil className="size-3.5" />
                   </button>
@@ -162,7 +162,7 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
                             setRenameTarget({ type: "district", id: district.id, name: district.district_name });
                             setRenameValue(district.district_name);
                           }}
-                          className="rounded-lg border-2 border-slate-strong px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
+                          className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
                         >
                           <Pencil className="size-3.5" />
                         </button>
@@ -194,14 +194,14 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               autoFocus
-              className="mt-3 w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
             <div className="mt-5 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setRenameTarget(null)}
                 disabled={isPending}
-                className="rounded-lg border-2 border-slate-strong px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
               >
                 Cancel
               </button>

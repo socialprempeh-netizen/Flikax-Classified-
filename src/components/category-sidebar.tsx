@@ -83,7 +83,7 @@ export function CategorySidebar({
 
   return (
     <div className="flex w-full shrink-0 flex-col gap-3 lg:w-72">
-      <div className="hidden lg:block rounded-xl border-2 border-slate-strong bg-white p-3 shadow-md">
+      <div className="hidden lg:block rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Categories</h3>
         <Link
           href={buildListingsHref({ ...filters, category: undefined })}
@@ -126,12 +126,12 @@ export function CategorySidebar({
         <MobileCategoryList categories={children} counts={counts} />
       </div>
 
-      <div className="divide-y divide-neutral-100 rounded-xl border-2 border-slate-strong bg-white shadow-md">
+      <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-300 bg-white shadow-md">
         <LocationPicker filters={filters} />
         <ExcludeLocationPicker filters={filters} />
       </div>
 
-      <div className="rounded-xl border-2 border-slate-strong bg-white p-3 shadow-md">
+      <div className="rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
         <h3 className="mb-2 text-sm font-bold text-neutral-800">Price, GH₵</h3>
         <form action="/" method="get" className="mb-3 flex items-center gap-2">
           <input type="hidden" name="q" value={filters.q ?? ""} />
@@ -142,7 +142,7 @@ export function CategorySidebar({
             name="minPrice"
             placeholder="min"
             defaultValue={filters.minPrice}
-            className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+            className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
           />
           <span className="shrink-0 text-neutral-400">–</span>
           <input
@@ -150,7 +150,7 @@ export function CategorySidebar({
             name="maxPrice"
             placeholder="max"
             defaultValue={filters.maxPrice}
-            className="w-full min-w-0 rounded-lg border-2 border-slate-strong px-2 py-1.5 text-sm outline-none focus:border-brand"
+            className="w-full min-w-0 rounded-lg border border-neutral-200 px-2 py-1.5 text-sm outline-none focus:border-brand"
           />
           <button
             type="submit"

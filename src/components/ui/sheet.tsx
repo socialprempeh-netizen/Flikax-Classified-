@@ -23,8 +23,8 @@ function SheetOverlay({ className, ...props }: React.ComponentProps<typeof Sheet
 }
 
 const SIDE_CLASSES = {
-  left: "inset-y-0 left-0 h-full w-80 max-w-[85vw] border-r-2 data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0",
-  right: "inset-y-0 right-0 h-full w-80 max-w-[85vw] border-l-2 data-[state=closed]:translate-x-full data-[state=open]:translate-x-0",
+  left: "inset-y-0 left-0 h-full w-80 max-w-[85vw] border-r data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0",
+  right: "inset-y-0 right-0 h-full w-80 max-w-[85vw] border-l data-[state=closed]:translate-x-full data-[state=open]:translate-x-0",
 };
 
 function SheetContent({
@@ -38,7 +38,7 @@ function SheetContent({
       <SheetOverlay />
       <SheetPrimitive.Content
         className={cn(
-          "fixed z-50 flex flex-col gap-4 border-slate-strong bg-white p-0 shadow-xl transition-transform ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
+          "fixed z-50 flex flex-col gap-4 border-neutral-100 bg-white p-0 shadow-xl transition-transform ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300",
           SIDE_CLASSES[side],
           className
         )}

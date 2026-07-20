@@ -29,7 +29,7 @@ export function PremiumPlansManager({ initialPlans }: { initialPlans: PremiumPla
 
   return (
     <>
-      <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
+      <div className="rounded-2xl border border-neutral-100 bg-white p-5">
         <h2 className="text-sm font-bold text-neutral-800">
           {editingPlan ? `Edit "${editingPlan.name}"` : "Create a plan"}
         </h2>
@@ -43,7 +43,7 @@ export function PremiumPlansManager({ initialPlans }: { initialPlans: PremiumPla
         </div>
       </div>
 
-      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="mt-6 divide-y divide-neutral-100 rounded-2xl border border-neutral-100 bg-white">
         {plans.length === 0 ? (
           <p className="p-6 text-sm text-neutral-400">No plans yet.</p>
         ) : (

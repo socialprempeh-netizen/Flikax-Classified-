@@ -62,7 +62,7 @@ export function ModerationTable({ flags }: { flags: AdminModerationRow[] }) {
 
   if (flags.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-dashed border-slate-strong bg-white py-16 text-center text-sm text-neutral-400">
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-16 text-center text-sm text-neutral-400">
         No flagged listings match these filters.
       </div>
     );
@@ -102,7 +102,7 @@ export function ModerationTable({ flags }: { flags: AdminModerationRow[] }) {
         </div>
       )}
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
         <div className="flex items-center gap-3 bg-neutral-50 px-4 py-2">
           <input
             type="checkbox"
@@ -197,7 +197,7 @@ export function ModerationTable({ flags }: { flags: AdminModerationRow[] }) {
               )}
               <Link
                 href={`/admin/listings/${flag.listingId}`}
-                className="rounded-lg border-2 border-slate-strong px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                className="rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
               >
                 Edit listing
               </Link>
