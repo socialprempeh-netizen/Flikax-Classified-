@@ -92,7 +92,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   const supabase = createPublicClient();
   const rawParams = await searchParams;
-  const { page: pageParam, q, minPrice, maxPrice, sort: sortParam, posted } = rawParams;
+  const { page: pageParam, q, location, minPrice, maxPrice, sort: sortParam, posted } = rawParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
@@ -140,6 +140,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     supabase.from("categories").select("id, name, slug, icon").eq("parent_id", category.parent_id).order("name"),
     getCachedCategoryListings({
       categoryId: category.id,
+      location,
       page,
       q,
       minPrice: minPrice ? Number(minPrice) : undefined,

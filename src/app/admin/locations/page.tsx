@@ -6,19 +6,24 @@ export default async function AdminLocationsPage() {
 
   const { data } = await supabase
     .from("locations")
-    .select("id, region_name, region_slug, region_order, district_name, district_slug, district_order, enabled")
+    .select(
+      "id, region_name, region_slug, region_order, district_name, district_slug, district_order, suburb_name, suburb_slug, suburb_order, enabled"
+    )
     .order("region_order")
-    .order("district_order");
+    .order("district_order")
+    .order("suburb_order");
 
   const rows: AdminLocation[] = data ?? [];
+  const districtRows = rows.filter((r) => !r.suburb_name);
+  const suburbRows = rows.filter((r) => r.suburb_name);
   const enabledCount = rows.filter((r) => r.enabled).length;
 
   return (
     <div>
       <h1 className="text-xl font-bold text-neutral-800">Locations</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        {rows.length} districts across{" "}
-        {new Set(rows.map((r) => r.region_slug)).size} regions · {enabledCount} enabled.
+        {districtRows.length} districts across{" "}
+        {new Set(rows.map((r) => r.region_slug)).size} regions · {suburbRows.length} suburbs · {enabledCount} enabled.
       </p>
 
       <div className="mt-6">

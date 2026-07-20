@@ -23,6 +23,7 @@ export function CategorySidebarFilters({
 
   const allDistricts = regions.flatMap((r) => r.districts);
   const activeDistrict = allDistricts.find((d) => d.slug === activeLocationSlug);
+  const locationDisplayName = activeDistrict?.name ?? searchParams.get("location") ?? "All Ghana";
 
   const [values, setValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {
@@ -74,9 +75,22 @@ export function CategorySidebarFilters({
 
   function handleLocationSelect(name?: string) {
     const target = name ? allDistricts.find((d) => d.name === name) : undefined;
-    const qs = searchParams.toString();
-    const href = target ? `/${categorySlug}/${target.slug}` : `/${categorySlug}`;
-    router.push(qs ? `${href}?${qs}` : href);
+    const params = new URLSearchParams(searchParams);
+    params.delete("location");
+
+    if (target) {
+      const qs = params.toString();
+      router.push(qs ? `/${categorySlug}/${target.slug}?${qs}` : `/${categorySlug}/${target.slug}`);
+      return;
+    }
+
+    // Not a district -- either a suburb (no dedicated SEO subpage of its own)
+    // or a cleared/"All Ghana" selection. A suburb still filters correctly
+    // via the plain `location` query param since listings match on it with
+    // exact string equality, same as a district does.
+    if (name) params.set("location", name);
+    const qs = params.toString();
+    router.push(qs ? `/${categorySlug}?${qs}` : `/${categorySlug}`);
   }
 
   return (
@@ -91,7 +105,7 @@ export function CategorySidebarFilters({
         >
           <span className="text-sm font-semibold text-neutral-700">Location</span>
           <span className="flex items-center gap-1 text-sm text-neutral-500">
-            {activeDistrict?.name ?? "All Ghana"}
+            {locationDisplayName}
             <ChevronRight className="size-4" />
           </span>
         </button>

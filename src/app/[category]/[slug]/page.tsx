@@ -138,6 +138,7 @@ const resolveRoute = cache(async (categorySlug: string, slug: string): Promise<R
     .select("district_name, district_slug")
     .eq("district_slug", slug)
     .eq("enabled", true)
+    .is("suburb_slug", null)
     .maybeSingle();
 
   if (location) return { kind: "location", category, location };

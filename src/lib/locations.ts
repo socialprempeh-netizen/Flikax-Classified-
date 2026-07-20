@@ -1,6 +1,12 @@
+export type Suburb = {
+  name: string;
+  slug: string;
+};
+
 export type District = {
   name: string;
   slug: string;
+  suburbs?: Suburb[];
 };
 
 export type Region = {
@@ -370,6 +376,13 @@ export function matchLocationToDistrict(location: string, regions: Region[]): Di
     for (const district of region.districts) {
       const tokens = district.name.toLowerCase().split(/[\s/]+/);
       if (tokens.includes(loc)) return district;
+    }
+  }
+  // A listing's location may be a suburb rather than a district -- roll it
+  // up to its parent district so per-district aggregates still count it.
+  for (const region of regions) {
+    for (const district of region.districts) {
+      if (district.suburbs?.some((s) => s.name.toLowerCase() === loc)) return district;
     }
   }
   return null;

@@ -476,6 +476,9 @@ export type Database = {
           region_name: string
           region_order: number
           region_slug: string
+          suburb_name: string | null
+          suburb_order: number
+          suburb_slug: string | null
           updated_at: string
         }
         Insert: {
@@ -488,6 +491,9 @@ export type Database = {
           region_name: string
           region_order?: number
           region_slug: string
+          suburb_name?: string | null
+          suburb_order?: number
+          suburb_slug?: string | null
           updated_at?: string
         }
         Update: {
@@ -500,6 +506,9 @@ export type Database = {
           region_name?: string
           region_order?: number
           region_slug?: string
+          suburb_name?: string | null
+          suburb_order?: number
+          suburb_slug?: string | null
           updated_at?: string
         }
         Relationships: []

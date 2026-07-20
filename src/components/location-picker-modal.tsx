@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import type { District, Region } from "@/lib/locations";
+import type { District, Region, Suburb } from "@/lib/locations";
 import { useRegions } from "@/lib/use-regions";
 
 // Split an already-sorted list into `columnCount` contiguous chunks so columns
@@ -17,26 +17,35 @@ function splitIntoColumns<T>(items: T[], columnCount: number): T[][] {
 
 type SearchResult =
   | { kind: "region"; region: Region }
-  | { kind: "district"; district: District; region: Region };
+  | { kind: "district"; district: District; region: Region }
+  | { kind: "suburb"; suburb: Suburb; district: District; region: Region };
 
 export function LocationPickerModal({
   open,
   onClose,
   onSelect,
+  allowBroadSelection = true,
 }: {
   open: boolean;
   onClose: () => void;
   onSelect: (name?: string) => void;
+  /** Set false to hide "All Ghana" / "All {region}" shortcuts -- for contexts
+   * (like the Sell form) where a listing needs a concrete district or suburb,
+   * never a blank/region-wide value. */
+  allowBroadSelection?: boolean;
 }) {
   const regions = useRegions();
   const [activeRegionSlug, setActiveRegionSlug] = useState<string | null>(null);
+  const [activeDistrictSlug, setActiveDistrictSlug] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
   const activeRegion = regions.find((r) => r.slug === activeRegionSlug) ?? null;
+  const activeDistrict = activeRegion?.districts.find((d) => d.slug === activeDistrictSlug) ?? null;
 
   function close() {
     onClose();
     setActiveRegionSlug(null);
+    setActiveDistrictSlug(null);
     setQuery("");
   }
 
@@ -47,6 +56,18 @@ export function LocationPickerModal({
 
   function openRegion(slug: string) {
     setActiveRegionSlug(slug);
+    setActiveDistrictSlug(null);
+    setQuery("");
+  }
+
+  function openDistrict(slug: string) {
+    setActiveDistrictSlug(slug);
+    setQuery("");
+  }
+
+  function goBack() {
+    if (activeDistrict) setActiveDistrictSlug(null);
+    else setActiveRegionSlug(null);
     setQuery("");
   }
 
@@ -61,6 +82,11 @@ export function LocationPickerModal({
       for (const district of region.districts) {
         if (district.name.toLowerCase().includes(q)) {
           results.push({ kind: "district", district, region });
+        }
+        for (const suburb of district.suburbs ?? []) {
+          if (suburb.name.toLowerCase().includes(q)) {
+            results.push({ kind: "suburb", suburb, district, region });
+          }
         }
       }
     }
@@ -78,6 +104,12 @@ export function LocationPickerModal({
     return splitIntoColumns(sorted, 3);
   }, [activeRegion]);
 
+  const suburbColumns = useMemo(() => {
+    if (!activeDistrict?.suburbs) return [];
+    const sorted = [...activeDistrict.suburbs].sort((a, b) => a.name.localeCompare(b.name));
+    return splitIntoColumns(sorted, 3);
+  }, [activeDistrict]);
+
   if (!open) return null;
 
   return (
@@ -93,10 +125,7 @@ export function LocationPickerModal({
           {activeRegion ? (
             <button
               type="button"
-              onClick={() => {
-                setActiveRegionSlug(null);
-                setQuery("");
-              }}
+              onClick={goBack}
               className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-base font-medium text-neutral-700 hover:bg-neutral-50 hover:text-brand"
             >
               <ChevronLeft className="size-4" />
@@ -112,7 +141,7 @@ export function LocationPickerModal({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Find state, city or district..."
+              placeholder="Find state, city, district or suburb..."
               className="w-40 min-w-0 text-base text-neutral-700 outline-none placeholder:text-neutral-400 sm:w-56"
             />
           </div>
@@ -144,7 +173,7 @@ export function LocationPickerModal({
                     <span className="text-base font-medium text-neutral-800">{result.region.name}</span>
                     <ChevronRight className="size-4 text-neutral-600" />
                   </button>
-                ) : (
+                ) : result.kind === "district" ? (
                   <button
                     key={`district-${result.district.slug}`}
                     type="button"
@@ -154,46 +183,105 @@ export function LocationPickerModal({
                     <div className="text-base text-neutral-800">{result.district.name}</div>
                     <div className="text-sm text-neutral-400">{result.region.name}</div>
                   </button>
+                ) : (
+                  <button
+                    key={`suburb-${result.district.slug}-${result.suburb.slug}`}
+                    type="button"
+                    onClick={() => selectLocation(result.suburb.name)}
+                    className="block cursor-pointer px-2 py-2 text-left transition-colors hover:bg-neutral-50"
+                  >
+                    <div className="text-base text-neutral-800">{result.suburb.name}</div>
+                    <div className="text-sm text-neutral-400">
+                      {result.district.name}, {result.region.name}
+                    </div>
+                  </button>
                 )
               )}
             </div>
-          ) : activeRegion ? (
+          ) : activeDistrict ? (
             <>
               <button
                 type="button"
-                onClick={() => selectLocation(activeRegion.name)}
+                onClick={() => selectLocation(activeDistrict.name)}
                 className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
               >
-                All {activeRegion.name}
+                All {activeDistrict.name}
               </button>
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                {districtColumns.map((column, columnIndex) => (
+                {suburbColumns.map((column, columnIndex) => (
                   <div key={columnIndex} className="flex flex-1 flex-col divide-y divide-neutral-100">
-                    {column.map((district) => (
+                    {column.map((suburb) => (
                       <button
-                        key={district.slug}
+                        key={suburb.slug}
                         type="button"
-                        onClick={() => selectLocation(district.name)}
+                        onClick={() => selectLocation(suburb.name)}
                         className="block cursor-pointer px-2 py-1 text-left leading-tight transition-colors hover:bg-neutral-50"
                       >
-                        <div className="text-sm leading-tight text-neutral-700">{district.name}</div>
-                        <div className="text-xs text-neutral-400">{activeRegion.name}</div>
+                        <div className="text-sm leading-tight text-neutral-700">{suburb.name}</div>
+                        <div className="text-xs text-neutral-400">{activeDistrict.name}</div>
                       </button>
                     ))}
                   </div>
                 ))}
               </div>
             </>
+          ) : activeRegion ? (
+            <>
+              {allowBroadSelection && (
+                <button
+                  type="button"
+                  onClick={() => selectLocation(activeRegion.name)}
+                  className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
+                >
+                  All {activeRegion.name}
+                </button>
+              )}
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                {districtColumns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex flex-1 flex-col divide-y divide-neutral-100">
+                    {column.map((district) =>
+                      district.suburbs?.length ? (
+                        <button
+                          key={district.slug}
+                          type="button"
+                          onClick={() => openDistrict(district.slug)}
+                          className="flex w-full cursor-pointer items-center justify-between gap-1 px-2 py-1 text-left leading-tight transition-colors hover:bg-neutral-50"
+                        >
+                          <span>
+                            <div className="text-sm leading-tight text-neutral-700">{district.name}</div>
+                            <div className="text-xs text-neutral-400">{activeRegion.name}</div>
+                          </span>
+                          <ChevronRight className="size-3.5 shrink-0 text-neutral-400" />
+                        </button>
+                      ) : (
+                        <button
+                          key={district.slug}
+                          type="button"
+                          onClick={() => selectLocation(district.name)}
+                          className="block cursor-pointer px-2 py-1 text-left leading-tight transition-colors hover:bg-neutral-50"
+                        >
+                          <div className="text-sm leading-tight text-neutral-700">{district.name}</div>
+                          <div className="text-xs text-neutral-400">{activeRegion.name}</div>
+                        </button>
+                      )
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <>
-              <button
-                type="button"
-                onClick={() => selectLocation(undefined)}
-                className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
-              >
-                All Ghana
-              </button>
+              {allowBroadSelection && (
+                <button
+                  type="button"
+                  onClick={() => selectLocation(undefined)}
+                  className="mb-2 block w-full cursor-pointer rounded-lg px-3 py-1.5 text-left text-base font-semibold text-brand transition-colors hover:bg-brand-light"
+                >
+                  All Ghana
+                </button>
+              )}
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 {regionColumns.map((column, columnIndex) => (

@@ -3,12 +3,13 @@
 import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, ImagePlus, Loader2 } from "lucide-react";
+import { ChevronRight, X, ImagePlus, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { GHANA_REGIONS, GHANA_ALL_DISTRICTS } from "@/lib/locations";
+import { GHANA_ALL_DISTRICTS } from "@/lib/locations";
 import { getFieldsForCategory } from "@/lib/listing-fields";
 import { toGhanaE164, toGhanaLocal } from "@/lib/phone";
 import { VehicleSpecFields } from "@/components/listings/vehicle-spec-fields";
+import { LocationPickerModal } from "@/components/location-picker-modal";
 
 // Rendered via the dedicated cascading VehicleSpecFields component instead of
 // the generic field loop below when the category is Vehicles.
@@ -88,6 +89,7 @@ export function ListingForm({
 
   const [title, setTitle] = useState(existingListing?.title ?? "");
   const [location, setLocation] = useState(existingListing?.location ?? GHANA_ALL_DISTRICTS[0].name);
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState(existingListing?.video_url ?? "");
   const [images, setImages] = useState<ImageSlot[]>(
     existingListing?.images.map((img) => ({
@@ -685,24 +687,24 @@ export function ListingForm({
             </div>
           </div>
 
-          <label className="block">
+          <div>
             <span className="mb-1 block text-sm font-medium text-neutral-700">Location</span>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            <button
+              type="button"
+              onClick={() => setLocationPickerOpen(true)}
+              className="flex w-full items-center justify-between rounded-lg border border-slate-300 px-3 py-2 text-left text-sm text-neutral-800 outline-none focus:border-brand"
             >
-              {GHANA_REGIONS.map((region) => (
-                <optgroup key={region.slug} label={region.name}>
-                  {region.districts.map((district) => (
-                    <option key={district.slug} value={district.name}>
-                      {district.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </label>
+              {location}
+              <ChevronRight className="size-4 shrink-0 text-neutral-400" />
+            </button>
+          </div>
+
+          <LocationPickerModal
+            open={locationPickerOpen}
+            onClose={() => setLocationPickerOpen(false)}
+            onSelect={(name) => name && setLocation(name)}
+            allowBroadSelection={false}
+          />
 
           <div>
             <span className="mb-2 block text-sm font-medium text-neutral-700">

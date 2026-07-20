@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, ChevronUp, Pencil, Trash2 } from "lucide-react";
 import {
   updateDistrictNameAction,
+  updateSuburbNameAction,
   updateRegionNameAction,
   toggleLocationEnabledAction,
   reorderDistrictAction,
+  reorderSuburbAction,
   reorderRegionAction,
   deleteLocationAction,
 } from "@/app/admin/locations/actions";
@@ -22,10 +24,16 @@ export type AdminLocation = {
   district_name: string;
   district_slug: string;
   district_order: number;
+  suburb_name: string | null;
+  suburb_slug: string | null;
+  suburb_order: number | null;
   enabled: boolean;
 };
 
-type RenameTarget = { type: "region"; slug: string; name: string } | { type: "district"; id: string; name: string };
+type RenameTarget =
+  | { type: "region"; slug: string; name: string }
+  | { type: "district"; id: string; name: string }
+  | { type: "suburb"; id: string; name: string };
 
 export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
   const router = useRouter();
@@ -33,6 +41,7 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
     (a, b) => a.region_order - b.region_order
   );
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [expandedDistricts, setExpandedDistricts] = useState<Set<string>>(new Set());
   const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<AdminLocation | null>(null);
@@ -44,6 +53,15 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
       const next = new Set(prev);
       if (next.has(slug)) next.delete(slug);
       else next.add(slug);
+      return next;
+    });
+  }
+
+  function toggleDistrict(id: string) {
+    setExpandedDistricts((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -62,7 +80,15 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
   }
 
   function districtsOf(regionSlug: string) {
-    return locations.filter((l) => l.region_slug === regionSlug).sort((a, b) => a.district_order - b.district_order);
+    return locations
+      .filter((l) => l.region_slug === regionSlug && !l.suburb_name)
+      .sort((a, b) => a.district_order - b.district_order);
+  }
+
+  function suburbsOf(regionSlug: string, districtSlug: string) {
+    return locations
+      .filter((l) => l.region_slug === regionSlug && l.district_slug === districtSlug && l.suburb_name)
+      .sort((a, b) => (a.suburb_order ?? 0) - (b.suburb_order ?? 0));
   }
 
   return (
@@ -122,60 +148,146 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
 
               {isOpen && (
                 <div className="divide-y divide-neutral-50 bg-neutral-50/50 pl-9">
-                  {districts.map((district, districtIndex) => (
-                    <div key={district.id} className="flex items-center gap-2 py-2 pr-3">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={district.enabled}
-                          disabled={isPending}
-                          onChange={(e) => run(() => toggleLocationEnabledAction(district.id, e.target.checked))}
-                          className="size-4 accent-brand"
-                        />
-                      </label>
-                      <span
-                        className={`flex-1 text-sm ${district.enabled ? "text-neutral-700" : "text-neutral-400 line-through"}`}
-                      >
-                        {district.district_name}
-                      </span>
+                  {districts.map((district, districtIndex) => {
+                    const suburbs = suburbsOf(district.region_slug, district.district_slug);
+                    const isDistrictOpen = expandedDistricts.has(district.id);
 
-                      <div className="flex shrink-0 items-center gap-1">
-                        <button
-                          type="button"
-                          disabled={isPending || districtIndex === 0}
-                          onClick={() => run(() => reorderDistrictAction(district.id, "up"))}
-                          className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-white disabled:opacity-30"
-                        >
-                          <ChevronUp className="size-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isPending || districtIndex === districts.length - 1}
-                          onClick={() => run(() => reorderDistrictAction(district.id, "down"))}
-                          className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-white disabled:opacity-30"
-                        >
-                          <ChevronDown className="size-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRenameTarget({ type: "district", id: district.id, name: district.district_name });
-                            setRenameValue(district.district_name);
-                          }}
-                          className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
-                        >
-                          <Pencil className="size-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteTarget(district)}
-                          className="rounded-lg border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-white"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </button>
+                    return (
+                      <div key={district.id}>
+                        <div className="flex items-center gap-2 py-2 pr-3">
+                          {suburbs.length > 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleDistrict(district.id)}
+                              className="flex size-6 shrink-0 items-center justify-center rounded-md text-neutral-500 hover:bg-white"
+                            >
+                              {isDistrictOpen ? (
+                                <ChevronDown className="size-3.5" />
+                              ) : (
+                                <ChevronRight className="size-3.5" />
+                              )}
+                            </button>
+                          ) : (
+                            <span className="size-6 shrink-0" />
+                          )}
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={district.enabled}
+                              disabled={isPending}
+                              onChange={(e) => run(() => toggleLocationEnabledAction(district.id, e.target.checked))}
+                              className="size-4 accent-brand"
+                            />
+                          </label>
+                          <span
+                            className={`flex-1 text-sm ${district.enabled ? "text-neutral-700" : "text-neutral-400 line-through"}`}
+                          >
+                            {district.district_name}
+                            {suburbs.length > 0 && (
+                              <span className="ml-1.5 text-xs font-normal text-neutral-400">
+                                ({suburbs.filter((s) => s.enabled).length}/{suburbs.length} suburbs)
+                              </span>
+                            )}
+                          </span>
+
+                          <div className="flex shrink-0 items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={isPending || districtIndex === 0}
+                              onClick={() => run(() => reorderDistrictAction(district.id, "up"))}
+                              className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-white disabled:opacity-30"
+                            >
+                              <ChevronUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isPending || districtIndex === districts.length - 1}
+                              onClick={() => run(() => reorderDistrictAction(district.id, "down"))}
+                              className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-white disabled:opacity-30"
+                            >
+                              <ChevronDown className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRenameTarget({ type: "district", id: district.id, name: district.district_name });
+                                setRenameValue(district.district_name);
+                              }}
+                              className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
+                            >
+                              <Pencil className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTarget(district)}
+                              className="rounded-lg border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-white"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {isDistrictOpen && suburbs.length > 0 && (
+                          <div className="divide-y divide-neutral-100 bg-white pl-8">
+                            {suburbs.map((suburb, suburbIndex) => (
+                              <div key={suburb.id} className="flex items-center gap-2 py-1.5 pr-3">
+                                <label className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={suburb.enabled}
+                                    disabled={isPending}
+                                    onChange={(e) => run(() => toggleLocationEnabledAction(suburb.id, e.target.checked))}
+                                    className="size-4 accent-brand"
+                                  />
+                                </label>
+                                <span
+                                  className={`flex-1 text-sm ${suburb.enabled ? "text-neutral-600" : "text-neutral-400 line-through"}`}
+                                >
+                                  {suburb.suburb_name}
+                                </span>
+
+                                <div className="flex shrink-0 items-center gap-1">
+                                  <button
+                                    type="button"
+                                    disabled={isPending || suburbIndex === 0}
+                                    onClick={() => run(() => reorderSuburbAction(suburb.id, "up"))}
+                                    className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
+                                  >
+                                    <ChevronUp className="size-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={isPending || suburbIndex === suburbs.length - 1}
+                                    onClick={() => run(() => reorderSuburbAction(suburb.id, "down"))}
+                                    className="flex size-6 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
+                                  >
+                                    <ChevronDown className="size-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRenameTarget({ type: "suburb", id: suburb.id, name: suburb.suburb_name! });
+                                      setRenameValue(suburb.suburb_name!);
+                                    }}
+                                    className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                                  >
+                                    <Pencil className="size-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setDeleteTarget(suburb)}
+                                    className="rounded-lg border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-neutral-50"
+                                  >
+                                    <Trash2 className="size-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -187,7 +299,7 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-900/70 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
             <h2 className="text-base font-bold text-neutral-800">
-              Rename {renameTarget.type === "region" ? "region" : "district"}
+              Rename {renameTarget.type === "region" ? "region" : renameTarget.type === "district" ? "district" : "suburb"}
             </h2>
             <input
               type="text"
@@ -213,7 +325,9 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
                     () =>
                       renameTarget.type === "region"
                         ? updateRegionNameAction(renameTarget.slug, renameValue)
-                        : updateDistrictNameAction(renameTarget.id, renameValue),
+                        : renameTarget.type === "district"
+                          ? updateDistrictNameAction(renameTarget.id, renameValue)
+                          : updateSuburbNameAction(renameTarget.id, renameValue),
                     () => setRenameTarget(null)
                   )
                 }
@@ -228,8 +342,8 @@ export function LocationsTree({ locations }: { locations: AdminLocation[] }) {
 
       <ConfirmDialog
         open={deleteTarget !== null}
-        title={`Delete "${deleteTarget?.district_name}"?`}
-        message="This can't be undone. Blocked automatically if any listing's location matches this district."
+        title={`Delete "${deleteTarget?.suburb_name ?? deleteTarget?.district_name}"?`}
+        message="This can't be undone. Blocked automatically if any listing's location matches this entry."
         confirmLabel="Delete"
         pending={isPending}
         onConfirm={() => deleteTarget && run(() => deleteLocationAction(deleteTarget.id), () => setDeleteTarget(null))}

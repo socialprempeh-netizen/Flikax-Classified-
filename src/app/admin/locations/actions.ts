@@ -26,13 +26,37 @@ export async function updateDistrictNameAction(id: string, name: string) {
   const { supabase, actorId } = await requireSuperAdminActor();
   if (!name.trim()) throw new Error("Enter a name.");
 
+  const { data: current } = await supabase
+    .from("locations")
+    .select("region_slug, district_slug")
+    .eq("id", id)
+    .maybeSingle();
+  if (!current) throw new Error("Location not found");
+
+  // Every suburb row duplicates its parent district's name (same convention
+  // as region_name on district rows) -- cascade so it doesn't go stale.
   const { error } = await supabase
     .from("locations")
     .update({ district_name: name.trim(), updated_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("region_slug", current.region_slug)
+    .eq("district_slug", current.district_slug);
   if (error) throw new Error(error.message);
 
   await logAdminAction({ actorId, action: "location.district_rename", targetType: "location", targetId: id, detail: { name: name.trim() } });
+  revalidateLocations();
+}
+
+export async function updateSuburbNameAction(id: string, name: string) {
+  const { supabase, actorId } = await requireSuperAdminActor();
+  if (!name.trim()) throw new Error("Enter a name.");
+
+  const { error } = await supabase
+    .from("locations")
+    .update({ suburb_name: name.trim(), updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+
+  await logAdminAction({ actorId, action: "location.suburb_rename", targetType: "location", targetId: id, detail: { name: name.trim() } });
   revalidateLocations();
 }
 
@@ -76,7 +100,8 @@ export async function reorderDistrictAction(id: string, direction: "up" | "down"
   let siblingQuery = supabase
     .from("locations")
     .select("id, district_order")
-    .eq("region_slug", current.region_slug);
+    .eq("region_slug", current.region_slug)
+    .is("suburb_slug", null);
   siblingQuery =
     direction === "up"
       ? siblingQuery.lt("district_order", current.district_order).order("district_order", { ascending: false })
@@ -96,6 +121,44 @@ export async function reorderDistrictAction(id: string, direction: "up" | "down"
   if (err1 || err2) throw new Error(err1?.message ?? err2?.message ?? "Could not reorder");
 
   await logAdminAction({ actorId, action: "location.district_reorder", targetType: "location", targetId: id, detail: { direction } });
+  revalidateLocations();
+}
+
+export async function reorderSuburbAction(id: string, direction: "up" | "down") {
+  const { supabase, actorId } = await requireSuperAdminActor();
+
+  const { data: current } = await supabase
+    .from("locations")
+    .select("id, region_slug, district_slug, suburb_order")
+    .eq("id", id)
+    .maybeSingle();
+  if (!current) throw new Error("Location not found");
+
+  let siblingQuery = supabase
+    .from("locations")
+    .select("id, suburb_order")
+    .eq("region_slug", current.region_slug)
+    .eq("district_slug", current.district_slug)
+    .not("suburb_slug", "is", null);
+  siblingQuery =
+    direction === "up"
+      ? siblingQuery.lt("suburb_order", current.suburb_order).order("suburb_order", { ascending: false })
+      : siblingQuery.gt("suburb_order", current.suburb_order).order("suburb_order", { ascending: true });
+
+  const { data: sibling } = await siblingQuery.limit(1).maybeSingle();
+  if (!sibling) return;
+
+  const { error: err1 } = await supabase
+    .from("locations")
+    .update({ suburb_order: sibling.suburb_order })
+    .eq("id", current.id);
+  const { error: err2 } = await supabase
+    .from("locations")
+    .update({ suburb_order: current.suburb_order })
+    .eq("id", sibling.id);
+  if (err1 || err2) throw new Error(err1?.message ?? err2?.message ?? "Could not reorder");
+
+  await logAdminAction({ actorId, action: "location.suburb_reorder", targetType: "location", targetId: id, detail: { direction } });
   revalidateLocations();
 }
 
@@ -132,13 +195,34 @@ export async function reorderRegionAction(regionSlug: string, direction: "up" | 
 export async function deleteLocationAction(id: string) {
   const { supabase, actorId } = await requireSuperAdminActor();
 
-  const { data: location } = await supabase.from("locations").select("district_name").eq("id", id).maybeSingle();
+  const { data: location } = await supabase
+    .from("locations")
+    .select("region_slug, district_slug, district_name, suburb_name")
+    .eq("id", id)
+    .maybeSingle();
   if (!location) throw new Error("Location not found");
 
+  // Deleting a bare district row would orphan any suburb rows still nested
+  // under it -- those aren't linked by a real FK, so this has to be checked
+  // explicitly rather than relying on the database to catch it.
+  if (!location.suburb_name) {
+    const { count: suburbCount } = await supabase
+      .from("locations")
+      .select("id", { count: "exact", head: true })
+      .eq("region_slug", location.region_slug)
+      .eq("district_slug", location.district_slug)
+      .not("suburb_slug", "is", null);
+    if (suburbCount && suburbCount > 0) {
+      throw new Error(`Can't delete — ${suburbCount} suburb${suburbCount === 1 ? "" : "s"} still nested under this district.`);
+    }
+  }
+
+  // A suburb row's listings key off its own name, not the parent district's.
+  const locationName = location.suburb_name ?? location.district_name;
   const { count } = await supabase
     .from("listings")
     .select("id", { count: "exact", head: true })
-    .eq("location", location.district_name);
+    .eq("location", locationName);
   if (count && count > 0) {
     throw new Error(`Can't delete — ${count} listing${count === 1 ? "" : "s"} still use this location.`);
   }
