@@ -22,37 +22,26 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 p-4 sm:p-8">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
-        <div className="order-2 flex flex-col justify-center gap-6 p-8 sm:p-12 lg:order-1">
-          <div>
-            <Link href="/" className="font-logo text-3xl font-extrabold lowercase text-brand">
-              flikax
-            </Link>
-            <h1 className="mt-4 text-2xl font-bold text-neutral-800">Welcome back</h1>
-            <p className="mt-1 text-sm text-neutral-500">
-              Buy and sell anything, anywhere in Ghana. Log in or create an account to get started.
-            </p>
-          </div>
-
-          {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
-              {error}
-            </p>
-          )}
-
-          <div className="flex flex-col items-center gap-3">
-            <GoogleSignInButton redirectTo={redirectTo} />
-            <AuthMethodTabs redirectTo={redirectTo} />
-          </div>
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-3xl bg-white p-8 shadow-[0_10px_50px_rgba(0,0,0,0.3)] sm:p-12">
+        <div>
+          <Link href="/" className="font-logo text-3xl font-extrabold lowercase text-brand">
+            flikax
+          </Link>
+          <h1 className="mt-4 text-2xl font-bold text-neutral-800">Welcome back</h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            Buy and sell anything, anywhere in Ghana. Log in or create an account to get started.
+          </p>
         </div>
 
-        <div className="order-1 h-48 sm:h-64 lg:order-2 lg:h-auto">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/login-hero.jpg"
-            alt="A vendor and customer connecting at a local market"
-            className="size-full object-cover"
-          />
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="flex flex-col items-center gap-3">
+          <GoogleSignInButton redirectTo={redirectTo} />
+          <AuthMethodTabs redirectTo={redirectTo} />
         </div>
       </div>
     </div>

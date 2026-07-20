@@ -17,7 +17,7 @@ export function AuthMethodTabs({ redirectTo }: { redirectTo?: string }) {
         <span className="h-px flex-1 bg-neutral-200" />
       </div>
 
-      <div className="flex justify-center gap-6 text-sm font-bold">
+      <div className="flex justify-center gap-6 text-base font-bold">
         <button
           type="button"
           onClick={() => setMethod("email")}
