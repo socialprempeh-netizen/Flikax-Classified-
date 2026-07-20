@@ -38,7 +38,6 @@ import {
   fetchCategoryListings,
   getTopAttributeValues,
   countCategoryListings,
-  CATEGORY_PAGE_SIZE,
   MIN_INDEXABLE_LISTINGS,
   type CategorySort,
   type DatePosted,
@@ -56,15 +55,17 @@ import { ContactSellerActions } from "@/components/listings/contact-seller-actio
 import { ListingOwnerActions } from "@/components/listings/listing-owner-actions";
 import { ShareButtons } from "@/components/listings/share-buttons";
 import { ListingGrid, type ListingCard } from "@/components/listing-grid";
+import { InfiniteListingGrid } from "@/components/infinite-listing-grid";
 import { CategoryFilterRow } from "@/components/category-filter-row";
 import { CategorySidebarFilters } from "@/components/category-sidebar-filters";
 import { CategoryQuickFilters } from "@/components/category-quick-filters";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrackRecentlyViewed } from "@/components/track-recently-viewed";
+import { loadMoreCategoryListingsAction } from "@/app/[category]/actions";
 
 // Only actually applies to the listing-detail branch of this route (the
-// location-scoped listing branch reads searchParams for pagination, which
-// forces it dynamic regardless of this export -- see CategoryLocationPage).
+// location-scoped listing branch reads searchParams for sort/date filters,
+// which forces it dynamic regardless of this export -- see CategoryLocationPage).
 export const revalidate = 60;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -265,8 +266,7 @@ async function CategoryLocationPage({
 }) {
   const supabase = createPublicClient();
   const rawParams = await searchParams;
-  const { page: pageParam, sort: sortParam, posted } = rawParams;
-  const page = Math.max(1, Number(pageParam) || 1);
+  const { sort: sortParam, posted } = rawParams;
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
     : "recommended";
@@ -306,30 +306,25 @@ async function CategoryLocationPage({
   }
   const activeQuickFilterValue = quickFilterKey ? rawParams[`attr_${quickFilterKey}`] : undefined;
 
+  const listingsFilter = {
+    categoryId: category.id,
+    location: location.district_name,
+    sort,
+    datePosted,
+    attributeFilters,
+  };
+
   const [{ listings, totalCount }, quickFilterValues] = await Promise.all([
-    fetchCategoryListings(supabase, {
-      categoryId: category.id,
-      location: location.district_name,
-      page,
-      sort,
-      datePosted,
-      attributeFilters,
-    }),
+    fetchCategoryListings(supabase, { ...listingsFilter, page: 1 }),
     quickFilterKey ? getTopAttributeValues(supabase, category.id, quickFilterKey) : Promise.resolve([]),
   ]);
 
   const belowThreshold = totalCount < MIN_INDEXABLE_LISTINGS;
-  const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
 
   const carryParams = new URLSearchParams();
   for (const [key, value] of Object.entries(rawParams)) {
     if (key === "page" || !value) continue;
     carryParams.set(key, value);
-  }
-  function pageHref(targetPage: number) {
-    const params = new URLSearchParams(carryParams);
-    params.set("page", String(targetPage));
-    return `?${params.toString()}`;
   }
 
   const breadcrumbItems = [
@@ -406,30 +401,11 @@ async function CategoryLocationPage({
                 <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
               </div>
 
-              <ListingGrid listings={listings} />
-              {totalPages > 1 && (
-                <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
-                  {page > 1 && (
-                    <Link
-                      href={pageHref(page - 1)}
-                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                    >
-                      Previous
-                    </Link>
-                  )}
-                  <span className="text-neutral-500">
-                    Page {page} of {totalPages}
-                  </span>
-                  {page < totalPages && (
-                    <Link
-                      href={pageHref(page + 1)}
-                      className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                    >
-                      Next
-                    </Link>
-                  )}
-                </nav>
-              )}
+              <InfiniteListingGrid
+                initialListings={listings}
+                initialTotalCount={totalCount}
+                loadMore={loadMoreCategoryListingsAction.bind(null, listingsFilter)}
+              />
             </div>
           </div>
         )}

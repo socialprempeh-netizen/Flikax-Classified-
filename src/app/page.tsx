@@ -1,22 +1,19 @@
-import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { TrendingSearches } from "@/components/trending-searches";
 import { CategorySidebar } from "@/components/category-sidebar";
-import { ListingGrid, type ListingCard } from "@/components/listing-grid";
+import { InfiniteListingGrid } from "@/components/infinite-listing-grid";
 import { HomepageSlider } from "@/components/homepage-slider";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { createPublicClient } from "@/lib/supabase/public";
 import { getCategories } from "@/lib/categories";
-import { resolveListingImageUrl } from "@/lib/images";
-import { isRecentlyBumped } from "@/lib/premium-plans";
-import { getListingPath } from "@/lib/listing-url";
-import { buildListingsHref, type ListingFilters } from "@/lib/filters";
+import { fetchHomeListings } from "@/lib/home-listings";
+import type { ListingFilters } from "@/lib/filters";
 import { getActiveHomepageSlides, resolveSlideImageUrl } from "@/lib/homepage-slides";
+import { loadMoreHomeListingsAction } from "@/app/actions";
 
-const PAGE_SIZE = 24;
 const VALID_SORTS = ["recommended", "newest", "price_asc", "price_desc"];
 
 // The route itself still opts into dynamic rendering (it reads searchParams
@@ -44,24 +41,10 @@ const getHomeCategoryCounts = unstable_cache(
   { revalidate: 60, tags: ["listings"] }
 );
 
-const getHomeSearchResults = unstable_cache(
-  async (filters: ListingFilters, page: number) => {
-    const supabase = createPublicClient();
-    const { data } = await supabase.rpc("search_listings", {
-      search_query: filters.q,
-      category_slug: filters.category,
-      location_filter: filters.location,
-      exclude_location: filters.excludeLocation,
-      min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
-      max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-      p_page: page,
-      sort: filters.sort,
-    });
-    return data ?? [];
-  },
-  ["home-search-listings"],
-  { revalidate: 60, tags: ["listings"] }
-);
+const getHomeSearchResults = unstable_cache(fetchHomeListings, ["home-search-listings"], {
+  revalidate: 60,
+  tags: ["listings"],
+});
 
 const getHomeSlides = unstable_cache(
   async () => {
@@ -81,7 +64,6 @@ type PageProps = {
     minPrice?: string;
     maxPrice?: string;
     sort?: string;
-    page?: string;
   }>;
 };
 
@@ -96,39 +78,17 @@ export default async function Home({ searchParams }: PageProps) {
     maxPrice: params.maxPrice || undefined,
     sort: VALID_SORTS.includes(params.sort ?? "") ? params.sort : undefined,
   };
-  const page = Math.max(1, Number(params.page) || 1);
 
   const supabase = createPublicClient();
 
-  const [categories, countRows, results, slides] = await Promise.all([
+  const [categories, countRows, { listings, totalCount }, slides] = await Promise.all([
     getCategories(),
     getHomeCategoryCounts(),
-    getHomeSearchResults(filters, page),
+    getHomeSearchResults(filters, 1),
     getHomeSlides(),
   ]);
 
   const counts = new Map((countRows ?? []).map((row) => [row.category_id, row.listing_count]));
-
-  const listings: ListingCard[] = (results ?? []).map((listing) => ({
-    id: listing.id,
-    href: getListingPath({
-      title: listing.title,
-      location: listing.location,
-      short_id: listing.short_id,
-      categorySlug: listing.category_slug,
-    }),
-    title: listing.title,
-    description: listing.description,
-    price: listing.price,
-    location: listing.location,
-    imageUrl: listing.cover_image_path
-      ? resolveListingImageUrl(supabase, listing.cover_image_path)
-      : null,
-    isFeatured: listing.is_featured,
-    isBumped: isRecentlyBumped(listing.bumped_at),
-    negotiable: listing.negotiable === "yes",
-    createdAt: listing.created_at,
-  }));
 
   const sliderSlides = slides.map((slide) => ({
     id: slide.id,
@@ -136,9 +96,6 @@ export default async function Home({ searchParams }: PageProps) {
     headline: slide.headline,
     linkUrl: slide.link_url,
   }));
-
-  const totalCount = results?.[0]?.total_count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
@@ -166,31 +123,12 @@ export default async function Home({ searchParams }: PageProps) {
           filters={filters}
         />
         <div className="flex-1">
-          <ListingGrid listings={listings} variant="home" />
-
-          {totalPages > 1 && (
-            <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
-              {page > 1 && (
-                <Link
-                  href={buildListingsHref(filters, page - 1)}
-                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  Previous
-                </Link>
-              )}
-              <span className="text-neutral-500">
-                Page {page} of {totalPages}
-              </span>
-              {page < totalPages && (
-                <Link
-                  href={buildListingsHref(filters, page + 1)}
-                  className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  Next
-                </Link>
-              )}
-            </nav>
-          )}
+          <InfiniteListingGrid
+            initialListings={listings}
+            initialTotalCount={totalCount}
+            variant="home"
+            loadMore={loadMoreHomeListingsAction.bind(null, filters)}
+          />
         </div>
       </main>
 

@@ -50,24 +50,18 @@ export function ListingGrid({
 
   return (
     <section className="flex-1">
-      <div
-        className={`grid gap-3 ${
-          isHome ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3"
-        }`}
-      >
+      <div className={isHome ? "columns-2 gap-3 sm:columns-3 lg:columns-4" : "columns-2 gap-3 sm:columns-2 lg:columns-3"}>
         {listings.map((listing) => (
           <Link
             key={listing.id}
             href={listing.href}
-            className={`block overflow-hidden rounded-xl bg-white ${
-              isHome
-                ? "border border-neutral-300 shadow-md hover:shadow-lg"
-                : "border border-neutral-400 shadow-lg hover:shadow-xl"
+            className={`mb-3 block break-inside-avoid overflow-hidden rounded-xl border border-brand bg-white ${
+              isHome ? "shadow-md hover:shadow-lg" : "shadow-lg hover:shadow-xl"
             }`}
           >
             <div
               className={`relative overflow-hidden bg-brand-light text-brand/40 ${
-                isHome ? "aspect-[2/1] border-2 border-brand" : "aspect-video"
+                isHome ? "aspect-[2/1]" : "aspect-video"
               }`}
             >
               {listing.imageUrl ? (

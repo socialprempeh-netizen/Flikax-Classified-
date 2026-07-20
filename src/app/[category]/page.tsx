@@ -6,7 +6,6 @@ import { createPublicClient } from "@/lib/supabase/public";
 import {
   fetchCategoryListings,
   getTopAttributeValues,
-  CATEGORY_PAGE_SIZE,
   type CategorySort,
   type DatePosted,
   type AttributeFilter,
@@ -15,13 +14,14 @@ import { getSidebarFields, getQuickFilterKey } from "@/lib/category-filters";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
-import { ListingGrid } from "@/components/listing-grid";
+import { InfiniteListingGrid } from "@/components/infinite-listing-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CategorySearchHeader } from "@/components/category-search-header";
 import { CategoryFilterRow } from "@/components/category-filter-row";
 import { CategorySidebarFilters } from "@/components/category-sidebar-filters";
 import { CategoryQuickFilters } from "@/components/category-quick-filters";
 import { SiblingCategoryRow } from "@/components/sibling-category-row";
+import { loadMoreCategoryListingsAction } from "@/app/[category]/actions";
 
 const VALID_SORTS: CategorySort[] = ["recommended", "newest", "price_asc", "price_desc"];
 const VALID_DATE_POSTED: DatePosted[] = ["24h", "7d", "30d"];
@@ -92,8 +92,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   const supabase = createPublicClient();
   const rawParams = await searchParams;
-  const { page: pageParam, q, location, minPrice, maxPrice, sort: sortParam, posted } = rawParams;
-  const page = Math.max(1, Number(pageParam) || 1);
+  const { q, location, minPrice, maxPrice, sort: sortParam, posted } = rawParams;
   const sort: CategorySort = VALID_SORTS.includes(sortParam as CategorySort)
     ? (sortParam as CategorySort)
     : "recommended";
@@ -136,33 +135,27 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   }
   const activeQuickFilterValue = quickFilterKey ? rawParams[`attr_${quickFilterKey}`] : undefined;
 
+  const listingsFilter = {
+    categoryId: category.id,
+    location,
+    q,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    sort,
+    datePosted,
+    attributeFilters,
+  };
+
   const [{ data: siblings }, { listings, totalCount }, quickFilterValues] = await Promise.all([
     supabase.from("categories").select("id, name, slug, icon").eq("parent_id", category.parent_id).order("name"),
-    getCachedCategoryListings({
-      categoryId: category.id,
-      location,
-      page,
-      q,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      sort,
-      datePosted,
-      attributeFilters,
-    }),
+    getCachedCategoryListings({ ...listingsFilter, page: 1 }),
     quickFilterKey ? getTopAttributeValues(supabase, category.id, quickFilterKey) : Promise.resolve([]),
   ]);
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / CATEGORY_PAGE_SIZE));
 
   const carryParams = new URLSearchParams();
   for (const [key, value] of Object.entries(rawParams)) {
     if (key === "page" || !value) continue;
     carryParams.set(key, value);
-  }
-  function pageHref(targetPage: number) {
-    const params = new URLSearchParams(carryParams);
-    params.set("page", String(targetPage));
-    return `?${params.toString()}`;
   }
 
   const breadcrumbItems = [
@@ -223,31 +216,11 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
               <CategoryFilterRow sort={sort} datePosted={datePosted} totalCount={totalCount} />
             </div>
 
-            <ListingGrid listings={listings} />
-
-            {totalPages > 1 && (
-              <nav className="mt-6 flex items-center justify-center gap-3 text-sm">
-                {page > 1 && (
-                  <Link
-                    href={pageHref(page - 1)}
-                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                  >
-                    Previous
-                  </Link>
-                )}
-                <span className="text-neutral-500">
-                  Page {page} of {totalPages}
-                </span>
-                {page < totalPages && (
-                  <Link
-                    href={pageHref(page + 1)}
-                    className="rounded-lg border border-neutral-200 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-50"
-                  >
-                    Next
-                  </Link>
-                )}
-              </nav>
-            )}
+            <InfiniteListingGrid
+              initialListings={listings}
+              initialTotalCount={totalCount}
+              loadMore={loadMoreCategoryListingsAction.bind(null, listingsFilter)}
+            />
           </div>
         </div>
       </main>
