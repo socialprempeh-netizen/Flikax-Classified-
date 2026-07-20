@@ -22,7 +22,7 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 p-4 sm:p-8">
-      <div className="flex w-full max-w-md flex-col gap-6 rounded-3xl bg-white p-8 shadow-[0_10px_50px_rgba(0,0,0,0.3)] sm:p-12">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-3xl border border-neutral-200 bg-white p-8 shadow-[0_10px_30px_rgba(0,0,0,0.15)] sm:p-12">
         <div>
           <Link href="/" className="font-logo text-3xl font-extrabold lowercase text-brand">
             flikax
