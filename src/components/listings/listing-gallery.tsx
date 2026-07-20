@@ -72,7 +72,7 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
               className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 ${
                 index === activeIndex
                   ? "border-brand ring-2 ring-brand ring-offset-2"
-                  : "border-neutral-200 hover:border-neutral-300"
+                  : "border-slate-strong hover:border-neutral-500"
               }`}
             >
               <Image src={url} alt="" fill sizes="144px" quality={82} className="object-cover" />

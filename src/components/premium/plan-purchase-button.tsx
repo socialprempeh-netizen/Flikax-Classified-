@@ -41,7 +41,7 @@ export function PlanPurchaseButton({ planId }: { planId: string }) {
           type="button"
           onClick={() => pay("flutterwave")}
           disabled={loading !== null}
-          className="flex-1 rounded-lg border border-neutral-200 px-3 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+          className="flex-1 rounded-lg border-2 border-slate-strong px-3 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
         >
           {loading === "flutterwave" ? "Redirecting..." : "Pay with Flutterwave"}
         </button>

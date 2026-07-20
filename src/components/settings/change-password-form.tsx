@@ -65,7 +65,7 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string } = {})
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 
@@ -76,7 +76,7 @@ export function ChangePasswordForm({ redirectTo }: { redirectTo?: string } = {})
           required
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </label>
 

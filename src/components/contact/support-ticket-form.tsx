@@ -62,7 +62,7 @@ export function SupportTicketForm({ defaultEmail }: { defaultEmail?: string }) {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
           <label className="block">
@@ -72,7 +72,7 @@ export function SupportTicketForm({ defaultEmail }: { defaultEmail?: string }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
         </div>
@@ -82,7 +82,7 @@ export function SupportTicketForm({ defaultEmail }: { defaultEmail?: string }) {
           <select
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           >
             {TOPICS.map((t) => (
               <option key={t} value={t}>
@@ -99,7 +99,7 @@ export function SupportTicketForm({ defaultEmail }: { defaultEmail?: string }) {
             rows={4}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 

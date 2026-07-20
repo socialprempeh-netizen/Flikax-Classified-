@@ -77,7 +77,7 @@ export function HomepageSlideRow({
           onClick={() => handleReorder("up")}
           disabled={isPending || isFirst}
           aria-label="Move up"
-          className="flex size-6 items-center justify-center rounded border border-neutral-200 text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
+          className="flex size-6 items-center justify-center rounded border-2 border-slate-strong text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
         >
           <ArrowUp className="size-3.5" />
         </button>
@@ -86,14 +86,14 @@ export function HomepageSlideRow({
           onClick={() => handleReorder("down")}
           disabled={isPending || isLast}
           aria-label="Move down"
-          className="flex size-6 items-center justify-center rounded border border-neutral-200 text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
+          className="flex size-6 items-center justify-center rounded border-2 border-slate-strong text-neutral-500 hover:bg-neutral-50 disabled:opacity-30"
         >
           <ArrowDown className="size-3.5" />
         </button>
       </div>
 
       {/* eslint-disable-next-line @next/next/no-img-element -- already-optimized storage image in an admin list, not worth next/image here */}
-      <img src={imageUrl} alt="" className="h-16 w-28 shrink-0 rounded-lg border border-neutral-200 object-cover" />
+      <img src={imageUrl} alt="" className="h-16 w-28 shrink-0 rounded-lg border-2 border-slate-strong object-cover" />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-neutral-800">{slide.headline || "(no headline)"}</p>

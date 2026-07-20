@@ -14,14 +14,14 @@ export type AdminAuditLogRow = {
 export function AuditLogTable({ entries }: { entries: AdminAuditLogRow[] }) {
   if (entries.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-16 text-center text-sm text-neutral-400">
+      <div className="rounded-2xl border-2 border-dashed border-slate-strong bg-white py-16 text-center text-sm text-neutral-400">
         No audit log entries match these filters.
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+    <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
       {entries.map((entry) => (
         <div key={entry.id} className="flex items-start gap-3 p-4">
           <div className="min-w-0 flex-1">

@@ -132,7 +132,7 @@ export function PhoneAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+    <div className="w-full max-w-sm rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-sm">
       {step === "phone" && (
         <form onSubmit={sendOtp} className="space-y-4">
           <div>
@@ -146,7 +146,7 @@ export function PhoneAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
             <span className="mb-1 block text-sm font-medium text-neutral-700">
               Phone number
             </span>
-            <div className="flex items-center rounded-lg border border-neutral-200 focus-within:border-brand">
+            <div className="flex items-center rounded-lg border-2 border-slate-strong focus-within:border-brand">
               <span className="border-r border-neutral-200 px-3 py-2 text-sm text-neutral-500">
                 +233
               </span>
@@ -204,7 +204,7 @@ export function PhoneAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
               placeholder="123456"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-center text-lg tracking-[0.5em] text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-center text-lg tracking-[0.5em] text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 
@@ -247,7 +247,7 @@ export function PhoneAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="e.g. Ama Owusu"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
 

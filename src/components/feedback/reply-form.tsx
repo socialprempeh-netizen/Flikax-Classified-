@@ -32,7 +32,7 @@ export function ReplyForm({ feedbackId, profileId }: { feedbackId: string; profi
           onChange={(e) => setMessage(e.target.value)}
           required
           placeholder="Write a reply..."
-          className="min-w-0 flex-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="min-w-0 flex-1 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand"
         />
         <button
           type="submit"

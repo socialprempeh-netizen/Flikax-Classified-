@@ -107,7 +107,7 @@ export default async function AdminDashboardPage() {
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-neutral-100 bg-white p-4">
+          <div key={stat.label} className="rounded-2xl border-2 border-slate-strong bg-white p-4">
             <div className="flex items-center gap-2 text-neutral-400">
               <stat.icon className="size-4" />
               <span className="text-xs font-semibold uppercase tracking-wide">{stat.label}</span>
@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Link
           href="/admin/listings?status=pending"
-          className="flex items-center justify-between rounded-2xl border border-neutral-100 bg-white p-5 hover:border-brand/40 hover:bg-brand-light/20"
+          className="flex items-center justify-between rounded-2xl border-2 border-slate-strong bg-white p-5 hover:border-brand/40 hover:bg-brand-light/20"
         >
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-full bg-amber-100 text-amber-700">
@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/reports"
-          className="flex items-center justify-between rounded-2xl border border-neutral-100 bg-white p-5 hover:border-brand/40 hover:bg-brand-light/20"
+          className="flex items-center justify-between rounded-2xl border-2 border-slate-strong bg-white p-5 hover:border-brand/40 hover:bg-brand-light/20"
         >
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-full bg-red-100 text-red-600">

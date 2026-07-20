@@ -78,7 +78,7 @@ export default async function PremiumPage() {
                 {sectionPlans.map((plan) => (
                   <div
                     key={plan.id}
-                    className="flex flex-col rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm"
+                    className="flex flex-col rounded-2xl border-2 border-slate-strong bg-white p-5 shadow-sm"
                   >
                     <p className="font-bold text-neutral-800">{plan.name}</p>
                     {plan.description && <p className="mt-1 text-sm text-neutral-500">{plan.description}</p>}

@@ -9,7 +9,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1980 + 2 }, (_, i) => String(CURRENT_YEAR + 1 - i));
 
 const FIELD_CLASS =
-  "w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand disabled:bg-neutral-50";
+  "w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand disabled:bg-neutral-50";
 
 // Vehicles-only: cascading Make -> Model dropdowns sourced from the bundled
 // NHTSA car-data set, with a free-text "Other / Not listed" escape hatch for

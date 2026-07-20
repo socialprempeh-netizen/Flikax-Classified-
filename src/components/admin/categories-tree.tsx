@@ -90,7 +90,7 @@ export function CategoriesTree({
         Add top-level category
       </button>
 
-      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+      <div className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
         {parents.map((parent, index) => {
           const children = childrenOf(parent.id);
           const isOpen = expanded.has(parent.id);
@@ -131,14 +131,14 @@ export function CategoriesTree({
                   <button
                     type="button"
                     onClick={() => setFormTarget({ mode: "create", parentId: parent.id })}
-                    className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                    className="rounded-lg border-2 border-slate-strong px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
                   >
                     <Plus className="size-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormTarget({ mode: "edit", category: parent })}
-                    className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                    className="rounded-lg border-2 border-slate-strong px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
                   >
                     <Pencil className="size-3.5" />
                   </button>
@@ -181,7 +181,7 @@ export function CategoriesTree({
                         <button
                           type="button"
                           onClick={() => setFormTarget({ mode: "edit", category: child })}
-                          className="rounded-lg border border-neutral-200 px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
+                          className="rounded-lg border-2 border-slate-strong px-2 py-1 text-xs font-bold text-neutral-700 hover:bg-white"
                         >
                           <Pencil className="size-3.5" />
                         </button>
@@ -271,7 +271,7 @@ function CategoryFormModal({
               setName(e.target.value);
               if (!slugTouched) setSlug(slugify(e.target.value));
             }}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -284,7 +284,7 @@ function CategoryFormModal({
               setSlug(e.target.value);
               setSlugTouched(true);
             }}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -294,7 +294,7 @@ function CategoryFormModal({
             <select
               value={parentId ?? ""}
               onChange={(e) => setParentId(e.target.value || null)}
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             >
               {parents
                 .filter((p) => p.id !== editing?.id)
@@ -315,8 +315,8 @@ function CategoryFormModal({
                 key={iconName}
                 type="button"
                 onClick={() => setIcon(iconName)}
-                className={`flex size-8 items-center justify-center rounded-lg border ${
-                  icon === iconName ? "border-brand bg-brand-light text-brand" : "border-neutral-200 text-neutral-500 hover:bg-neutral-50"
+                className={`flex size-8 items-center justify-center rounded-lg border-2 ${
+                  icon === iconName ? "border-brand bg-brand-light text-brand" : "border-slate-strong text-neutral-500 hover:bg-neutral-50"
                 }`}
               >
                 <Icon className="size-4" />
@@ -330,7 +330,7 @@ function CategoryFormModal({
             type="button"
             onClick={onCancel}
             disabled={pending}
-            className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="rounded-lg border-2 border-slate-strong px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             Cancel
           </button>

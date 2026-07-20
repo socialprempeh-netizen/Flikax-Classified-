@@ -83,7 +83,7 @@ export function ReportFeedbackButton({ feedbackId }: { feedbackId: string }) {
                   {FEEDBACK_REPORT_REASONS.map((value) => (
                     <label
                       key={value}
-                      className="flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-700 has-[:checked]:border-brand has-[:checked]:bg-brand-light"
+                      className="flex items-center gap-2 rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-700 has-[:checked]:border-brand has-[:checked]:bg-brand-light"
                     >
                       <input
                         type="radio"
@@ -105,7 +105,7 @@ export function ReportFeedbackButton({ feedbackId }: { feedbackId: string }) {
                     type="button"
                     onClick={close}
                     disabled={isPending}
-                    className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                    className="rounded-lg border-2 border-slate-strong px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
                   >
                     Cancel
                   </button>

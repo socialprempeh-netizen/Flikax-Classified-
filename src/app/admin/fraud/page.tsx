@@ -38,7 +38,7 @@ export default async function AdminFraudPage() {
         <h2 className="text-sm font-bold text-neutral-800">
           Duplicate contact phone across accounts ({duplicatePhones.length})
         </h2>
-        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
           {duplicatePhones.length === 0 ? (
             <p className="p-6 text-sm text-neutral-400">No matches.</p>
           ) : (
@@ -75,7 +75,7 @@ export default async function AdminFraudPage() {
           High-frequency posting — {FREQUENCY_THRESHOLD}+ listings in the last {FREQUENCY_WINDOW_HOURS}h (
           {highFrequencyPosters.length})
         </h2>
-        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
           {highFrequencyPosters.length === 0 ? (
             <p className="p-6 text-sm text-neutral-400">No matches.</p>
           ) : (
@@ -103,7 +103,7 @@ export default async function AdminFraudPage() {
           Gmail dot/plus-variant addresses (e.g. j.doe@gmail.com and jdoe+2@gmail.com) that normalize to
           the same inbox. Best-effort — won&apos;t catch every alias trick.
         </p>
-        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+        <div className="mt-2 divide-y divide-neutral-100 overflow-hidden rounded-2xl border-2 border-slate-strong bg-white">
           {!adminClient ? (
             <p className="p-6 text-sm text-red-600">
               Not available — admin operations aren&apos;t configured on this environment (missing service

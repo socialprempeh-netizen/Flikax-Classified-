@@ -37,11 +37,11 @@ export default async function PerformanceInsightsPage() {
       </p>
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-neutral-200 bg-white py-16 text-center">
+        <div className="rounded-xl border-2 border-dashed border-slate-strong bg-white py-16 text-center">
           <p className="text-sm font-medium text-neutral-600">No listings yet.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-neutral-100 bg-white shadow-md">
+        <div className="overflow-x-auto rounded-xl border-2 border-slate-strong bg-white shadow-md">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-neutral-100 text-xs uppercase tracking-wide text-neutral-400">

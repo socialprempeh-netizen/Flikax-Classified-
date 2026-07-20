@@ -13,7 +13,7 @@ const PLAN_TYPE_OPTIONS: { value: PlanType; label: string }[] = [
 ];
 
 const FIELD_CLASS =
-  "w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand";
+  "w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand";
 
 function planToForm(plan: PremiumPlan | null): PlanFormInput {
   if (!plan) {
@@ -209,7 +209,7 @@ export function PremiumPlanForm({
           <button
             type="button"
             onClick={addFeature}
-            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
           >
             Add
           </button>
@@ -230,7 +230,7 @@ export function PremiumPlanForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-lg border border-neutral-200 px-4 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            className="rounded-lg border-2 border-slate-strong px-4 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
           >
             Cancel
           </button>

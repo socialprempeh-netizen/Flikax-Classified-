@@ -18,7 +18,7 @@ export function RevealPhoneButton({
   const variantClasses =
     variant === "solid"
       ? "bg-brand text-white hover:bg-brand-dark"
-      : "border border-neutral-200 text-neutral-700 hover:bg-neutral-50";
+      : "border-2 border-slate-strong text-neutral-700 hover:bg-neutral-50";
 
   if (revealed) {
     return (

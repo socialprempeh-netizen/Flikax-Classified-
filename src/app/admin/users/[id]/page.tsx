@@ -66,7 +66,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
       <div className="grid gap-6 sm:grid-cols-3">
         <div className="flex flex-col gap-4 sm:col-span-2">
-          <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-bold text-neutral-800">{profile.full_name || "Unnamed user"}</h1>
               <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${STATUS_STYLES[status]}`}>
@@ -103,7 +103,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             </div>
           </div>
 
-          <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
             <h2 className="text-sm font-bold text-neutral-800">Listings ({listings?.length ?? 0})</h2>
             {(listings ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-neutral-400">No listings yet.</p>
@@ -133,7 +133,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             )}
           </div>
 
-          <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
             <h2 className="text-sm font-bold text-neutral-800">Purchases ({purchases?.length ?? 0})</h2>
             {(purchases ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-neutral-400">No purchases yet.</p>
@@ -158,7 +158,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             )}
           </div>
 
-          <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
             <h2 className="text-sm font-bold text-neutral-800">Warning log ({warnings?.length ?? 0})</h2>
             {(warnings ?? []).length === 0 ? (
               <p className="mt-2 text-sm text-neutral-400">No warnings logged.</p>

@@ -84,7 +84,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
 
   if (checkEmail) {
     return (
-      <div className="w-full max-w-sm rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+      <div className="w-full max-w-sm rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-sm">
         <h1 className="text-lg font-bold text-neutral-800">Check your email</h1>
         <p className="mt-1 text-sm text-neutral-500">
           We sent a confirmation link to <span className="font-medium text-neutral-700">{email}</span>. Click
@@ -93,7 +93,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
         <button
           type="button"
           onClick={() => switchMode("sign-in")}
-          className="mt-4 w-full rounded-lg border border-neutral-200 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
+          className="mt-4 w-full rounded-lg border-2 border-slate-strong py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50"
         >
           Back to sign in
         </button>
@@ -102,7 +102,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm">
+    <div className="w-full max-w-sm rounded-2xl border-2 border-slate-strong bg-white p-6 shadow-sm">
       <div className="mb-4 flex rounded-lg bg-neutral-100 p-1 text-sm font-bold">
         <button
           type="button"
@@ -134,7 +134,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="e.g. Ama Owusu"
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
         )}
@@ -148,7 +148,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -161,7 +161,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
             minLength={mode === "sign-up" ? 8 : undefined}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
         </label>
 
@@ -174,7 +174,7 @@ export function EmailAuthForm({ redirectTo = "/" }: { redirectTo?: string }) {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+              className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
             />
           </label>
         )}

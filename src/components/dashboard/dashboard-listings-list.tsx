@@ -48,14 +48,14 @@ export function DashboardListingsList({
 }) {
   if (listings.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-neutral-200 bg-white py-16 text-center">
+      <div className="rounded-xl border-2 border-dashed border-slate-strong bg-white py-16 text-center">
         <p className="text-sm font-medium text-neutral-600">No listings here yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-md">
+    <div className="divide-y divide-neutral-100 overflow-hidden rounded-xl border-2 border-slate-strong bg-white shadow-md">
       {listings.map((listing) => (
         <div key={listing.id} className="relative flex gap-4 p-4 hover:bg-brand-light/30">
           <Link href={listing.href} aria-label={listing.title} className="absolute inset-0 z-0" />

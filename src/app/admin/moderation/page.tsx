@@ -121,7 +121,7 @@ export default async function AdminModerationPage({ searchParams }: PageProps) {
             <Link
               href={buildAdminModerationHref({ ...filters, page: String(Math.max(1, page - 1)) })}
               aria-disabled={page <= 1}
-              className={`flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium ${
+              className={`flex items-center gap-1 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium ${
                 page <= 1 ? "pointer-events-none text-neutral-300" : "text-neutral-700 hover:bg-neutral-50"
               }`}
             >
@@ -134,7 +134,7 @@ export default async function AdminModerationPage({ searchParams }: PageProps) {
             <Link
               href={buildAdminModerationHref({ ...filters, page: String(Math.min(totalPages, page + 1)) })}
               aria-disabled={page >= totalPages}
-              className={`flex items-center gap-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium ${
+              className={`flex items-center gap-1 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm font-medium ${
                 page >= totalPages ? "pointer-events-none text-neutral-300" : "text-neutral-700 hover:bg-neutral-50"
               }`}
             >

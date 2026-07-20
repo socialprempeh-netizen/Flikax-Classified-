@@ -49,7 +49,7 @@ export function UserDetailActions({
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+    <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
       <h2 className="text-sm font-bold text-neutral-800">Account actions</h2>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
@@ -62,7 +62,7 @@ export function UserDetailActions({
             type="button"
             disabled={isPending}
             onClick={() => run(() => toggleVerifiedAction(userId, false))}
-            className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             Remove verification
           </button>
@@ -97,7 +97,7 @@ export function UserDetailActions({
             <select
               value={suspendDays}
               onChange={(e) => setSuspendDays(Number(e.target.value))}
-              className="rounded-lg border border-neutral-200 px-2 py-1.5 text-xs text-neutral-800 outline-none focus:border-brand"
+              className="rounded-lg border-2 border-slate-strong px-2 py-1.5 text-xs text-neutral-800 outline-none focus:border-brand"
             >
               {SUSPEND_DURATIONS.map((d) => (
                 <option key={d} value={d}>
@@ -153,13 +153,13 @@ export function UserDetailActions({
           value={warningMessage}
           onChange={(e) => setWarningMessage(e.target.value)}
           placeholder="Recorded on this profile — not delivered to the user (no notification system exists yet)."
-          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-xs text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-lg border-2 border-slate-strong px-3 py-2 text-xs text-neutral-800 outline-none focus:border-brand"
         />
         <button
           type="button"
           disabled={isPending || !warningMessage.trim()}
           onClick={() => run(() => logWarningAction(userId, warningMessage), () => setWarningMessage(""))}
-          className="mt-2 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+          className="mt-2 rounded-lg border-2 border-slate-strong px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
         >
           Log warning
         </button>

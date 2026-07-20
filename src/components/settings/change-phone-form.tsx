@@ -69,7 +69,7 @@ export function ChangePhoneForm({ currentPhone }: { currentPhone: string | null 
             value={rawPhone}
             onChange={(e) => setRawPhone(e.target.value)}
             placeholder="024 123 4567"
-            className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
           <button
             type="submit"
@@ -91,7 +91,7 @@ export function ChangePhoneForm({ currentPhone }: { currentPhone: string | null 
             value={otp}
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
             placeholder="123456"
-            className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+            className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
           />
           <button
             type="submit"

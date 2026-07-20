@@ -88,7 +88,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
               short_id: conversation.listing.short_id,
               categorySlug: conversation.listing.categories?.slug ?? "listing",
             })}
-            className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-white p-3 shadow-sm hover:shadow-md"
+            className="flex items-center gap-3 rounded-xl border-2 border-slate-strong bg-white p-3 shadow-sm hover:shadow-md"
           >
             <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brand-light text-brand/40">
               {coverUrl ? (

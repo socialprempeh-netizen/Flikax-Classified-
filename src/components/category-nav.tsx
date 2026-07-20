@@ -98,7 +98,7 @@ export function CategoryNav({
   }, [hoveredId]);
 
   return (
-    <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border border-neutral-300 bg-white shadow-md sm:w-72">
+    <nav className="relative w-full shrink-0 divide-y divide-neutral-100 rounded-xl border-2 border-slate-strong bg-white shadow-md sm:w-72">
       {parents.map((cat) => {
         const children = categories.filter((c) => c.parent_id === cat.id);
         const isHovered = hoveredId === cat.id;
@@ -140,7 +140,7 @@ export function CategoryNav({
                 }}
                 onMouseEnter={() => handleEnter(cat.id)}
                 onMouseLeave={handleLeave}
-                className="z-40 overflow-y-auto rounded-xl border border-neutral-300 bg-white p-2 shadow-lg"
+                className="z-40 overflow-y-auto rounded-xl border-2 border-slate-strong bg-white p-2 shadow-lg"
               >
                 {children.map((child) => {
                   return (

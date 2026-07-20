@@ -70,10 +70,10 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
           <Link
             key={w}
             href={buildAdminAnalyticsHref({ ...filters, window: w })}
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium ${
               String(windowDays) === w
                 ? "border-brand bg-brand-light text-brand"
-                : "border-neutral-200 text-neutral-600 hover:bg-neutral-50"
+                : "border-slate-strong text-neutral-600 hover:bg-neutral-50"
             }`}
           >
             {WINDOW_LABELS[w]}
@@ -81,7 +81,7 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      <div className="mt-4 rounded-2xl border border-neutral-100 bg-white p-4">
+      <div className="mt-4 rounded-2xl border-2 border-slate-strong bg-white p-4">
         <div className="flex items-center gap-2 text-neutral-400">
           <span className="text-xs font-semibold uppercase tracking-wide">
             Revenue ({WINDOW_LABELS[String(windowDays)]})
@@ -104,14 +104,14 @@ export default async function AdminAnalyticsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-neutral-100 bg-white p-4">
+        <div className="rounded-2xl border-2 border-slate-strong bg-white p-4">
           <div className="flex items-center gap-2 text-neutral-400">
             <Eye className="size-4" />
             <span className="text-xs font-semibold uppercase tracking-wide">Total views (all time)</span>
           </div>
           <p className="mt-2 text-2xl font-extrabold text-neutral-800">{totalViews}</p>
         </div>
-        <div className="rounded-2xl border border-neutral-100 bg-white p-4">
+        <div className="rounded-2xl border-2 border-slate-strong bg-white p-4">
           <div className="flex items-center gap-2 text-neutral-400">
             <Bookmark className="size-4" />
             <span className="text-xs font-semibold uppercase tracking-wide">Total saves</span>

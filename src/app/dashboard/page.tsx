@@ -123,7 +123,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         <select
           name="category"
           defaultValue={category ?? ""}
-          className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
+          className="rounded-lg border-2 border-slate-strong px-3 py-1.5 text-sm text-neutral-700 outline-none focus:border-brand"
         >
           <option value="">All categories</option>
           {parentCategories.map((cat) => (

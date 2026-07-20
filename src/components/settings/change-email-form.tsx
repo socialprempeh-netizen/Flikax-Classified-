@@ -41,7 +41,7 @@ export function ChangeEmailForm({ currentEmail }: { currentEmail: string | null 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="rounded-lg border-2 border-slate-strong px-3 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
         <button
           type="submit"

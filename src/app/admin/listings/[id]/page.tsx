@@ -87,7 +87,7 @@ export default async function AdminListingDetailPage({ params }: { params: Promi
         <div className="sm:col-span-2">
           <ListingGallery images={images} title={listing.title} />
 
-          <div className="mt-6 rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="mt-6 rounded-2xl border-2 border-slate-strong bg-white p-5">
             <div className="flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full px-2.5 py-1 text-xs font-bold ${
@@ -184,7 +184,7 @@ export default async function AdminListingDetailPage({ params }: { params: Promi
         </div>
 
         <div className="flex flex-col gap-4 sm:col-span-1">
-          <div className="rounded-2xl border border-neutral-100 bg-white p-5">
+          <div className="rounded-2xl border-2 border-slate-strong bg-white p-5">
             <h2 className="text-sm font-bold text-neutral-800">Seller</h2>
             <p className="mt-2 text-sm text-neutral-700">{listing.profiles?.full_name || "Unnamed user"}</p>
             {(listing.contact_phone || listing.profiles?.phone) && (

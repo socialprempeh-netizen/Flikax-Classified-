@@ -154,7 +154,7 @@ export function ChatThread({
   const bothRevealed = phoneRevealedByBuyer && phoneRevealedBySeller;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-neutral-100 bg-white shadow-sm">
+    <div className="flex flex-1 flex-col overflow-hidden rounded-xl border-2 border-slate-strong bg-white shadow-sm">
       <div className="border-b border-neutral-100 p-4">
         {bothRevealed && otherPartyPhone ? (
           <a
@@ -173,7 +173,7 @@ export function ChatThread({
             type="button"
             onClick={handleReveal}
             disabled={isRevealing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-slate-strong px-4 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
           >
             <Phone className="size-4" />
             {isRevealing ? "Sharing..." : "Share my phone number"}
@@ -263,7 +263,7 @@ export function ChatThread({
                 type="button"
                 onClick={() => handleQuickReply(text)}
                 disabled={isSending}
-                className="shrink-0 rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:border-brand/40 hover:bg-brand-light hover:text-brand disabled:opacity-50"
+                className="shrink-0 rounded-full border-2 border-slate-strong px-3 py-1.5 text-xs font-medium text-neutral-600 hover:border-brand/40 hover:bg-brand-light hover:text-brand disabled:opacity-50"
               >
                 {text}
               </button>
@@ -278,7 +278,7 @@ export function ChatThread({
             onChange={(event) => setDraft(event.target.value)}
             placeholder="Type a message..."
             maxLength={2000}
-            className="flex-1 rounded-full border border-neutral-200 px-4 py-2 text-sm outline-none focus:border-brand"
+            className="flex-1 rounded-full border-2 border-slate-strong px-4 py-2 text-sm outline-none focus:border-brand"
           />
           <button
             type="submit"

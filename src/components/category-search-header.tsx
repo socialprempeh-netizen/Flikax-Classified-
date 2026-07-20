@@ -22,7 +22,7 @@ export function CategorySearchHeader({
           name="q"
           defaultValue={query}
           placeholder={`Search in ${categoryName}`}
-          className="w-full rounded-full border border-neutral-200 px-4 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
+          className="w-full rounded-full border-2 border-slate-strong px-4 py-2 text-sm text-neutral-800 outline-none focus:border-brand"
         />
       </form>
       <Link href="/saved" aria-label="Saved listings" className="shrink-0 text-neutral-500">
