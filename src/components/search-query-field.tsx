@@ -31,7 +31,7 @@ export function SearchQueryField({ defaultQuery }: { defaultQuery?: string }) {
           setRecent(getRecentlyViewed());
           setOpen(true);
         }}
-        placeholder="I am looking for..."
+        placeholder="What are you looking for?"
         autoComplete="off"
         className="w-full min-w-0 bg-transparent px-1 py-1.5 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
       />
