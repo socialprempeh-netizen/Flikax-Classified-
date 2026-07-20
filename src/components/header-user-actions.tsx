@@ -104,7 +104,7 @@ export function HeaderUserActions() {
 
         <Link
           href="/sell"
-          className="flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-orange-600 sm:px-5 sm:py-2 sm:text-sm"
+          className="flex items-center gap-1.5 rounded-full bg-[#FB923C] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#F97E1F] sm:px-5 sm:py-2 sm:text-sm"
         >
           <Megaphone className="size-3.5 sm:size-4" />
           Advertise for Free

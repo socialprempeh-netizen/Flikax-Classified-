@@ -68,7 +68,12 @@ export function CategorySidebar({
           <p className="mb-3 text-xs text-white/80">
             Post your ad free and reach thousands of buyers today.
           </p>
-          <SellCta label="+ Post Free Ad" variant="footer" size="sm" className="w-full" />
+          <SellCta
+            label="+ Post Free Ad"
+            variant="footer"
+            size="sm"
+            className="w-full !bg-[#FB923C] !text-white hover:!bg-[#F97E1F]"
+          />
         </div>
       </div>
     );
