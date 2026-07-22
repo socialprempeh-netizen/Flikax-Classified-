@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import { FacebookIcon, XIcon, WhatsAppIcon, TikTokIcon } from "@/components/icons/social-icons";
 
 const ICON_BUTTON_CLASS =
-  "flex size-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-600 hover:bg-brand-light hover:text-brand";
+  "flex size-10 items-center justify-center rounded-full border border-neutral-300 bg-neutral-200 text-neutral-700 shadow-sm hover:bg-brand-light hover:text-brand";
 
 export function ShareButtons({ title, priceLabel }: { title: string; priceLabel: string }) {
   const [url, setUrl] = useState("");
@@ -67,7 +67,7 @@ export function ShareButtons({ title, priceLabel }: { title: string; priceLabel:
         title="TikTok doesn't support pre-filled link sharing — this copies the listing details instead"
         className={
           copied
-            ? "flex size-9 items-center justify-center rounded-full bg-green-100 text-green-600"
+            ? "flex size-10 items-center justify-center rounded-full border border-green-300 bg-green-100 text-green-600"
             : ICON_BUTTON_CLASS
         }
       >

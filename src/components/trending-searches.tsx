@@ -1,16 +1,15 @@
 import Link from "next/link";
 
-// No search-analytics tracking exists yet to derive this from real query
-// volume, so this is a curated list -- deliberately scoped to terms that
-// match categories/attributes actually present on Flikax (vehicles, phones,
-// property, electronics, home & furniture) rather than generic filler.
-const TRENDING_SEARCHES = ["Toyota Corolla", "iPhone", "Apartment in Accra", "Laptop", "Land Cruiser"];
+/** `terms` is derived from real listing view activity (see fetchTrendingTerms
+ * in lib/trending.ts) -- not a curated/hardcoded list. Renders nothing if
+ * there isn't enough activity yet to populate it. */
+export function TrendingSearches({ terms }: { terms: string[] }) {
+  if (terms.length === 0) return null;
 
-export function TrendingSearches() {
   return (
     <div className="mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center gap-1.5 text-xs">
       <span className="font-semibold text-white/80">Trending:</span>
-      {TRENDING_SEARCHES.map((term) => (
+      {terms.map((term) => (
         <Link
           key={term}
           href={`/?q=${encodeURIComponent(term)}`}

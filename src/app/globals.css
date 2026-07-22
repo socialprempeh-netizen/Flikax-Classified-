@@ -11,8 +11,9 @@
   --brand-dark: #0d5f8f;
   --brand-light: #e8f6ff;
   /* Light cream tint used behind product photos in listing cards and behind
-     the mobile category icon strip (Temu-style). */
-  --cream: #fdf8ef;
+     the mobile category icon strip (Temu-style) -- kept warm enough to read
+     as a deliberate tint, not just an off-white. */
+  --cream: #f7ecd6;
 }
 
 @theme inline {
@@ -40,6 +41,14 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+html {
+  /* Matches body -- without this, mobile Safari/Chrome's overscroll-bounce
+     at the top/bottom of the page reveals the browser's default (black in
+     dark mode contexts, or just an unstyled) background instead of our grey,
+     since the bounce briefly scrolls past body into html's own canvas. */
+  background: var(--background);
 }
 
 body {

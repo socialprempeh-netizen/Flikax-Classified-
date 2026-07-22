@@ -33,7 +33,7 @@ export function CategoryThumb({
 
   if (imagePath) {
     return (
-      <span className={`relative ${size} shrink-0 overflow-hidden ${rounded} ${className}`}>
+      <span className={`relative ${size} shrink-0 overflow-hidden bg-neutral-200 ${rounded} ${className}`}>
         <Image
           src={imagePath}
           alt={category.name}

@@ -462,7 +462,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
   const fields = getFieldsForCategory(topLevelSlug ?? undefined);
   const attributes = (listing.attributes ?? {}) as Record<string, string | string[]>;
 
-  const specs = fields
+  const allSpecs = fields
     .filter((field) => field.type !== "tags")
     .map((field) => {
       const raw = attributes[field.key] as string | undefined;
@@ -484,7 +484,10 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
     .filter((spec) => spec.values.length > 0);
 
   const headlineKeys = topLevelSlug ? (HEADLINE_FIELD_KEYS[topLevelSlug] ?? []) : [];
-  const headlineSpecs = specs.filter((spec) => headlineKeys.includes(spec.key));
+  const headlineSpecs = allSpecs.filter((spec) => headlineKeys.includes(spec.key));
+  // The full spec grid below shouldn't repeat whatever's already shown as a
+  // headline badge right under the price.
+  const specs = allSpecs.filter((spec) => !headlineKeys.includes(spec.key));
 
   const marketPriceSinceIso = new Date(
     Date.now() - MARKET_PRICE_WINDOW_DAYS * 24 * 3600 * 1000
@@ -648,7 +651,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
           <div className="sm:col-span-2">
             <ListingGallery images={images} title={listing.title} />
 
-            <div className="mt-6 rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
+            <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
               {(isFeatured || isBumped) && (
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   {isFeatured && (
@@ -682,7 +685,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                 </span>
               </div>
 
-              <p className="mt-3 text-4xl font-extrabold text-brand">
+              <p className="mt-3 text-3xl font-extrabold text-brand">
                 {currency.format(listing.price)}
                 {listing.negotiable === "yes" && (
                   <span className="ml-2 text-base font-medium text-neutral-500">Negotiable</span>
@@ -703,6 +706,12 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                 </div>
               )}
 
+              {sellerPhone && (
+                <div className="mt-4 hidden sm:block sm:w-64">
+                  <RevealPhoneButton phone={sellerPhone} label="Show contact" />
+                </div>
+              )}
+
               {headlineSpecs.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-4 border-t border-neutral-100 pt-4">
                   {headlineSpecs.map((spec) => {
@@ -718,55 +727,56 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                   })}
                 </div>
               )}
+            </div>
 
-              {specs.length > 0 && (
-                <div className="mt-5 grid grid-cols-2 divide-y divide-neutral-100 border-t border-neutral-100 sm:grid-cols-3">
+            {specs.length > 0 && (
+              <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
+                <h2 className="mb-3 text-base font-bold text-neutral-800">Specifications</h2>
+                <div className="grid grid-cols-2 divide-y divide-neutral-100 sm:grid-cols-3">
                   {specs.map((spec) => (
                     <div key={spec.key} className="py-3 pr-3">
                       <p className="text-base font-semibold text-neutral-800">{spec.value}</p>
-                      <p className="text-xs uppercase tracking-wide text-neutral-400">{spec.label}</p>
+                      <p className="text-xs font-medium text-neutral-400">{spec.label}</p>
                     </div>
                   ))}
                 </div>
-              )}
-
-              {tagSpecs.map((spec) => (
-                <div key={spec.key} className="mt-5 border-t border-neutral-100 pt-5">
-                  <h2 className="mb-2 text-base font-bold text-neutral-800">{spec.label}</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {spec.values.map((value) => (
-                      <span
-                        key={value}
-                        className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700"
-                      >
-                        {value}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
-              {listing.description && (
-                <div className="mt-5 border-t border-neutral-100 pt-5">
-                  <h2 className="mb-2 text-base font-bold text-neutral-800">Description</h2>
-                  <p className="whitespace-pre-wrap text-base text-neutral-600">{listing.description}</p>
-                </div>
-              )}
-
-              {sellerPhone && (
-                <div className="mt-5 hidden sm:block sm:w-64">
-                  <RevealPhoneButton phone={sellerPhone} label="Show contact" />
-                </div>
-              )}
-
-              <div className="mt-5 border-t border-neutral-100 pt-5">
-                <ShareButtons title={listing.title} priceLabel={currency.format(listing.price)} />
               </div>
+            )}
+
+            {tagSpecs.length > 0 && (
+              <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
+                {tagSpecs.map((spec, index) => (
+                  <div key={spec.key} className={index > 0 ? "mt-4 border-t border-neutral-100 pt-4" : ""}>
+                    <h2 className="mb-2 text-base font-bold text-neutral-800">{spec.label}</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {spec.values.map((value) => (
+                        <span
+                          key={value}
+                          className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-700"
+                        >
+                          {value}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {listing.description && (
+              <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
+                <h2 className="mb-2 text-base font-bold text-neutral-800">Description</h2>
+                <p className="whitespace-pre-wrap text-base text-neutral-600">{listing.description}</p>
+              </div>
+            )}
+
+            <div className="mt-4 rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
+              <ShareButtons title={listing.title} priceLabel={currency.format(listing.price)} />
             </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:col-span-1">
-            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
               <div className="flex items-center gap-3">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-lg font-bold text-brand">
                   {sellerName[0]?.toUpperCase() ?? "F"}
@@ -795,7 +805,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-xl border border-neutral-300 bg-white p-3 shadow-md">
+            <div className="flex flex-col gap-2 rounded-xl border border-neutral-300 bg-white p-3 shadow-lg">
               <a
                 href={feedbackHref}
                 className="flex items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-base font-bold text-neutral-700 hover:bg-neutral-50"
@@ -823,7 +833,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
               </Link>
             </div>
 
-            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-md">
+            <div className="rounded-xl border border-neutral-300 bg-white p-4 shadow-lg">
               <h3 className="mb-3 text-sm font-bold text-neutral-800">Safety First - Read This Before Proceeding</h3>
               <ul className="list-disc space-y-2 pl-4 marker:text-brand">
                 {SAFETY_TIPS.map((tip) => (

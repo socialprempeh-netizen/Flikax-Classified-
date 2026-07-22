@@ -12,6 +12,7 @@ import { getCategories } from "@/lib/categories";
 import { fetchHomeListings } from "@/lib/home-listings";
 import type { ListingFilters } from "@/lib/filters";
 import { getActiveHomepageSlides, resolveSlideImageUrl } from "@/lib/homepage-slides";
+import { fetchTrendingTerms } from "@/lib/trending";
 import { loadMoreHomeListingsAction } from "@/app/actions";
 
 const VALID_SORTS = ["recommended", "newest", "price_asc", "price_desc"];
@@ -55,6 +56,15 @@ const getHomeSlides = unstable_cache(
   { revalidate: 60, tags: ["homepage-slides"] }
 );
 
+const getTrendingTerms = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    return fetchTrendingTerms(supabase);
+  },
+  ["home-trending-terms"],
+  { revalidate: 300, tags: ["listings"] }
+);
+
 type PageProps = {
   searchParams: Promise<{
     q?: string;
@@ -81,11 +91,12 @@ export default async function Home({ searchParams }: PageProps) {
 
   const supabase = createPublicClient();
 
-  const [categories, countRows, { listings, totalCount }, slides] = await Promise.all([
+  const [categories, countRows, { listings, totalCount }, slides, trendingTerms] = await Promise.all([
     getCategories(),
     getHomeCategoryCounts(),
     getHomeSearchResults(filters, 1),
     getHomeSlides(),
+    getTrendingTerms(),
   ]);
 
   const counts = new Map((countRows ?? []).map((row) => [row.category_id, row.listing_count]));
@@ -101,21 +112,21 @@ export default async function Home({ searchParams }: PageProps) {
     <div className="flex flex-1 flex-col bg-background pb-16 lg:pb-0">
       <SiteHeader categories={categories} />
 
-      <section className="bg-brand pb-10 pt-6">
+      <section className="bg-brand pb-6 pt-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h1 className="mb-5 text-center text-lg font-bold text-white sm:text-xl">
             Explore Thousands of New Listings
           </h1>
           <SearchBar defaultQuery={filters.q} defaultLocation={filters.location} />
-          <TrendingSearches />
+          <TrendingSearches terms={trendingTerms} />
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6">
+      <div className="mx-auto w-full max-w-7xl px-4 pt-3 sm:px-6">
         <HomepageSlider slides={sliderSlides} />
       </div>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:gap-4">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 pb-6 pt-3 sm:px-6 lg:flex-row lg:gap-4">
         <CategorySidebar
           categories={categories ?? []}
           counts={counts}
