@@ -6,7 +6,7 @@ export function StartChatButton({ listingId }: { listingId: string }) {
     <form action={startOrGetConversationAction.bind(null, listingId)}>
       <button
         type="submit"
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2.5 text-base font-bold text-neutral-800 hover:bg-neutral-200"
+        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-2 border-brand bg-white px-3 py-2 text-sm font-bold text-brand hover:bg-brand-light"
       >
         <MessageCircle className="size-4" />
         Send Message

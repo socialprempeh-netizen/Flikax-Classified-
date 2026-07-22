@@ -685,7 +685,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
                 </span>
               </div>
 
-              <p className="mt-3 text-3xl font-extrabold text-brand">
+              <p className="mt-3 text-xl font-bold text-brand">
                 {currency.format(listing.price)}
                 {listing.negotiable === "yes" && (
                   <span className="ml-2 text-base font-medium text-neutral-500">Negotiable</span>
@@ -701,7 +701,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
 
               {sellerPhone && (
                 <div className="mt-4 flex gap-2 sm:hidden">
-                  <RevealPhoneButton phone={sellerPhone} label="Show contact" variant="outline" />
+                  <RevealPhoneButton phone={sellerPhone} label="Show contact" compact />
                   <StartChatButton listingId={listing.id} />
                 </div>
               )}

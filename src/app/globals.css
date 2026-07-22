@@ -36,18 +36,16 @@
   --shadow-xl: 0 14px 20px -5px rgb(0 0 0 / 0.12), 0 6px 8px -6px rgb(0 0 0 / 0.09);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 html {
   /* Matches body -- without this, mobile Safari/Chrome's overscroll-bounce
-     at the top/bottom of the page reveals the browser's default (black in
-     dark mode contexts, or just an unstyled) background instead of our grey,
-     since the bounce briefly scrolls past body into html's own canvas. */
+     at the top/bottom of the page reveals html's own unstyled canvas instead
+     of our grey, since the bounce briefly scrolls past body into it. There's
+     deliberately no @media (prefers-color-scheme: dark) override anywhere in
+     this file: the site has no dark-mode-aware component styling (every card
+     is a hardcoded bg-white), so a device with system dark mode on would
+     otherwise flip *only* this background near-black while every card/button
+     stayed styled for light mode -- exactly the "black background bleeding
+     through" bug this was built to prevent. */
   background: var(--background);
 }
 
