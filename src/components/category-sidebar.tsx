@@ -59,7 +59,10 @@ export function CategorySidebar({
         <div className="hidden lg:block">
           <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
         </div>
-        <div className="rounded-xl bg-cream p-3 lg:hidden">
+        {/* Deliberately its own paler, less-saturated shade rather than the
+            shared --cream token used behind listing-card photos and the
+            gallery -- this panel needed toning down without affecting those. */}
+        <div className="rounded-xl bg-[#f6f3ec] p-3 lg:hidden">
           <MobileCategoryGrid parents={parents} filters={filters} />
         </div>
 
