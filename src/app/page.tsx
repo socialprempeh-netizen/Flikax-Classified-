@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SearchBar } from "@/components/search-bar";
 import { TrendingSearches } from "@/components/trending-searches";
 import { CategorySidebar } from "@/components/category-sidebar";
-import { ListingGrid } from "@/components/listing-grid";
+import { InfiniteListingGrid } from "@/components/infinite-listing-grid";
 import { HomepageSlider } from "@/components/homepage-slider";
 import { SiteFooter } from "@/components/site-footer";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -13,6 +13,11 @@ import { fetchHomeListings } from "@/lib/home-listings";
 import type { ListingFilters } from "@/lib/filters";
 import { getActiveHomepageSlides, resolveSlideImageUrl } from "@/lib/homepage-slides";
 import { fetchTrendingTerms } from "@/lib/trending";
+import { loadMoreHomeListingsAction } from "@/app/actions";
+
+// Homepage infinite scroll stops here (4 batches of PAGE_SIZE) rather than
+// scrolling through the whole catalog -- category pages have no such cap.
+const HOME_MAX_LISTINGS = 96;
 
 const VALID_SORTS = ["recommended", "newest", "price_asc", "price_desc"];
 
@@ -90,7 +95,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   const supabase = createPublicClient();
 
-  const [categories, countRows, { listings }, slides, trendingTerms] = await Promise.all([
+  const [categories, countRows, { listings, totalCount }, slides, trendingTerms] = await Promise.all([
     getCategories(),
     getHomeCategoryCounts(),
     getHomeSearchResults(filters, 1),
@@ -133,7 +138,13 @@ export default async function Home({ searchParams }: PageProps) {
           filters={filters}
         />
         <div className="flex-1">
-          <ListingGrid listings={listings} variant="home" />
+          <InfiniteListingGrid
+            initialListings={listings}
+            initialTotalCount={totalCount}
+            variant="home"
+            loadMore={loadMoreHomeListingsAction.bind(null, filters)}
+            maxItems={HOME_MAX_LISTINGS}
+          />
         </div>
       </main>
 

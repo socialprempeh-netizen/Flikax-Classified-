@@ -11,11 +11,17 @@ export function InfiniteListingGrid({
   initialTotalCount,
   variant,
   loadMore,
+  maxItems,
 }: {
   initialListings: ListingCard[];
   initialTotalCount: number;
   variant?: "default" | "home";
   loadMore: (page: number) => Promise<LoadMoreResult>;
+  /** Stops auto-loading once this many listings have accumulated, even if
+   * more real results exist -- the homepage caps at a fixed batch count
+   * rather than scrolling through the entire catalog. Omit for the
+   * uncapped category-page behavior. */
+  maxItems?: number;
 }) {
   const [listings, setListings] = useState(initialListings);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
@@ -35,7 +41,8 @@ export function InfiniteListingGrid({
     setErrored(false);
   }, [initialListings, initialTotalCount]);
 
-  const hasMore = listings.length < totalCount;
+  const effectiveTotal = maxItems ? Math.min(totalCount, maxItems) : totalCount;
+  const hasMore = listings.length < effectiveTotal;
 
   async function loadNext() {
     if (loadingRef.current) return;
@@ -45,7 +52,10 @@ export function InfiniteListingGrid({
     try {
       const nextPage = pageRef.current + 1;
       const result = await loadMore(nextPage);
-      setListings((prev) => [...prev, ...result.listings]);
+      setListings((prev) => {
+        const merged = [...prev, ...result.listings];
+        return maxItems ? merged.slice(0, maxItems) : merged;
+      });
       setTotalCount(result.totalCount);
       pageRef.current = nextPage;
     } catch {
