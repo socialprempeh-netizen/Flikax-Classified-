@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { ImageOff, ChevronLeft, ChevronRight, Camera } from "lucide-react";
 
+// Below this drag distance, a pointer down/up is treated as a tap/click
+// (e.g. on the image itself) rather than an intentional swipe.
+const SWIPE_THRESHOLD_PX = 50;
+
 export function ListingGallery({ images, title }: { images: string[]; title: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const dragStartX = useRef<number | null>(null);
 
   if (images.length === 0) {
     return (
@@ -23,9 +28,29 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
     setActiveIndex((i) => (i + 1) % images.length);
   }
 
+  function handlePointerDown(e: React.PointerEvent) {
+    dragStartX.current = e.clientX;
+  }
+
+  function handlePointerUp(e: React.PointerEvent) {
+    if (dragStartX.current === null) return;
+    const deltaX = e.clientX - dragStartX.current;
+    dragStartX.current = null;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return;
+    if (deltaX > 0) prev();
+    else next();
+  }
+
   return (
     <div>
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+      <div
+        className="relative aspect-[4/3] w-full touch-pan-y select-none overflow-hidden rounded-xl"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => {
+          dragStartX.current = null;
+        }}
+      >
         <Image
           src={images[activeIndex]}
           alt={title}

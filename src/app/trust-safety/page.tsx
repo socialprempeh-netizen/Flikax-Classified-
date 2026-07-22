@@ -83,7 +83,7 @@ const CATEGORY_TIPS = [
 
 export default async function TrustSafetyPage() {
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
 
       <TocLayout toc={TOC}>

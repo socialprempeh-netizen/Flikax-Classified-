@@ -47,7 +47,7 @@ export default async function MessagesPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="mb-6 border-l-4 border-brand pl-3 text-xl font-bold text-neutral-800">Messages</h1>

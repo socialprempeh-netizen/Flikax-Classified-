@@ -340,7 +340,7 @@ async function CategoryLocationPage({
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
@@ -606,7 +606,7 @@ async function ListingDetail({ listing }: { listing: ListingRow }) {
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
+    <div className="flex flex-1 flex-col bg-background pb-16 lg:pb-0">
       <JsonLd data={productJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader />

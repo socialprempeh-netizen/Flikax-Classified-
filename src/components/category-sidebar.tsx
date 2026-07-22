@@ -59,7 +59,7 @@ export function CategorySidebar({
         <div className="hidden lg:block">
           <CategoryNav parents={parents} categories={categories} counts={counts} filters={filters} />
         </div>
-        <div className="lg:hidden">
+        <div className="rounded-xl bg-cream p-3 lg:hidden">
           <MobileCategoryGrid parents={parents} filters={filters} />
         </div>
 

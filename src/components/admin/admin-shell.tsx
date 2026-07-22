@@ -88,7 +88,7 @@ export function AdminShell({
   const navItems = NAV_ITEMS.filter((item) => !item.superAdminOnly || role === "super_admin");
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
+    <div className="flex min-h-screen bg-background">
       <aside
         className={`flex shrink-0 flex-col border-r border-neutral-200 bg-neutral-900 text-white transition-all ${
           collapsed ? "w-16" : "w-60"

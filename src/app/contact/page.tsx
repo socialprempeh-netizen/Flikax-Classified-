@@ -32,7 +32,7 @@ export default async function ContactPage() {
   const supportEmail = supportEmailSetting ?? SUPPORT_EMAIL;
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
 
       <main className="mx-auto w-full max-w-2xl flex-1 space-y-10 px-4 py-12 sm:px-6">

@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* Site-wide page background -- a visible light grey (Jiji-style) rather
+     than flat white, so cards/panels read as sitting on a surface instead
+     of blending into the page. Single source of truth: every page-root
+     wrapper uses bg-background instead of hardcoding a neutral-* shade. */
+  --background: #eef0f2;
   --foreground: #171717;
   --brand: #1da1f2;
   --brand-dark: #0d5f8f;
   --brand-light: #e8f6ff;
+  /* Light cream tint used behind product photos in listing cards and behind
+     the mobile category icon strip (Temu-style). */
+  --cream: #fdf8ef;
 }
 
 @theme inline {
@@ -14,6 +21,7 @@
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
   --color-brand-light: var(--brand-light);
+  --color-cream: var(--cream);
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     "Noto Sans", sans-serif;
   --font-logo: var(--font-baloo-2);

@@ -24,7 +24,7 @@ const TOC = [
 
 export default async function TermsPage() {
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
 
       <TocLayout toc={TOC}>

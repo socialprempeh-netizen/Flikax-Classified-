@@ -21,7 +21,7 @@ export default async function SellPage() {
   const isSuspended = Boolean(profile?.suspended_until && new Date(profile.suspended_until) > new Date());
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6">
         {isSuspended ? (

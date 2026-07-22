@@ -98,7 +98,7 @@ export default async function Home({ searchParams }: PageProps) {
   }));
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
+    <div className="flex flex-1 flex-col bg-background pb-16 lg:pb-0">
       <SiteHeader categories={categories} />
 
       <section className="bg-brand pb-10 pt-6">
@@ -115,7 +115,7 @@ export default async function Home({ searchParams }: PageProps) {
         <HomepageSlider slides={sliderSlides} />
       </div>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-3 px-4 py-6 sm:px-6 lg:flex-row lg:gap-4">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:gap-4">
         <CategorySidebar
           categories={categories ?? []}
           counts={counts}

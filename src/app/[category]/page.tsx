@@ -170,7 +170,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50 pb-16 lg:pb-0">
+    <div className="flex flex-1 flex-col bg-background pb-16 lg:pb-0">
       <JsonLd data={breadcrumbJsonLd} />
       <SiteHeader />
       <CategorySearchHeader categoryName={category.name} categorySlug={category.slug} query={q} />

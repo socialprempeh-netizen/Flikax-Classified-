@@ -37,7 +37,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   };
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
       <main className="mx-auto w-full max-w-2xl flex-1 space-y-4 px-4 py-8 sm:px-6">
         <div className="flex items-center gap-3 rounded-2xl bg-white p-5 shadow-md">

@@ -100,7 +100,7 @@ function StepList({ steps }: { steps: { title: string; body: string }[] }) {
 
 export default async function AboutPage() {
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
 
       {/* Hero */}

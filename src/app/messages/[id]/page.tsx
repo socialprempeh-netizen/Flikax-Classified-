@@ -70,7 +70,7 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
   const coverUrl = cover ? resolveListingImageUrl(supabase, cover.storage_path) : null;
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50">
+    <div className="flex flex-1 flex-col bg-background">
       <SiteHeader />
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-6 sm:px-6">
         <Link

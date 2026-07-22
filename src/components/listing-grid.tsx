@@ -74,7 +74,7 @@ export function ListingGrid({
               }`}
             >
               <div
-                className={`relative w-full overflow-hidden bg-brand-light text-brand/40 ${
+                className={`relative w-full overflow-hidden bg-cream text-brand/40 ${
                   hasNaturalAspect ? "" : isHome ? "aspect-[2/1]" : "aspect-video"
                 }`}
                 style={
